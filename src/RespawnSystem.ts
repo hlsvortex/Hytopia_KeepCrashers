@@ -46,4 +46,6 @@ export class RespawnSystem {
         }
         this.respawnTimers.clear();
     }
+
+    
 } 

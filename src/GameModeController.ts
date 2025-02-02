@@ -4,7 +4,6 @@ import { GameManager } from './GameManager';
 import { CapturePoint } from './CapturePoint';
 
 export abstract class GameModeController {
-    protected matchTimer: number = 0;
     protected _isInOvertime: boolean = false;
 
     constructor(
@@ -24,9 +23,7 @@ export abstract class GameModeController {
         return this._isInOvertime;
     }
 
-    public getCapturePoint(): CapturePoint {
-        return this.capturePoint;
-    }
+    abstract getCapturePoint(): CapturePoint;
 }
 
 export class KingOfTheHill extends GameModeController {
@@ -34,7 +31,7 @@ export class KingOfTheHill extends GameModeController {
     private teamTimes: Map<Team, number> = new Map();
     private currentControllingTeam: Team | null = null;
     private initialLockDuration: number = 10; // Seconds before point unlocks
-    private matchDuration: number = 45;//180; // 3 minutes in seconds
+    private matchDuration: number = 15;//180; // 3 minutes in seconds
     private overtimeThreshold: number = 30; // Seconds remaining for overtime
 
     constructor(gameManager: GameManager, eventRouter: EventRouter, controlPoint: CapturePoint) {
@@ -149,7 +146,7 @@ export class KingOfTheHill extends GameModeController {
         return this.teamTimes.get(team)!;
     }
 
-    public getCapturePoint(): CapturePoint {
+    getCapturePoint(): CapturePoint {
         return this.controlPoint;
     }
 } 

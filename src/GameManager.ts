@@ -433,14 +433,15 @@ export class GameManager {
     
 
     private resetMatch() {
-        this.gameStateController.resetMatch();
-        
         // Reset player positions and stats
         this.players.forEach(player => {
             player.respawn();
             const spawnPos = this.getTeamSpawnPosition(this.getPlayerTeam(player.player)?.name || 'Red');
             player.setPosition(spawnPos);
         });
+        
+        // Clear any game mode specific state
+        this.gameModeController.reset();
     }
 
     // Add new method
@@ -448,13 +449,12 @@ export class GameManager {
         console.log(`${team.name} team captured the point!`);
         this.gameStateController.setState(GameState.MatchEnd);
         
-        // Reset after 5 seconds
+        // Add proper reset sequence
         setTimeout(() => {
-            this.capturePoints.forEach(point => {
-                point.progress = 0;
-                point.controllingTeam = null;
-            });
-        }, 5000);
+            this.gameModeController.reset();
+            this.resetMatch();
+            this.gameStateController.setState(GameState.WaitingForEnoughPlayers);
+        }, 10000);
     }
 
     public getTeam(teamName: string): Team | undefined {
@@ -465,9 +465,11 @@ export class GameManager {
         console.log(`${winningTeam.name} team wins!`);
         this.gameStateController.setState(GameState.MatchEnd);
         
+        // Handle reset after delay
         setTimeout(() => {
             this.gameModeController.reset();
             this.resetMatch();
+            this.gameStateController.setState(GameState.WaitingForEnoughPlayers);
         }, 10000);
     }
 

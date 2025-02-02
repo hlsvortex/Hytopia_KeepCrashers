@@ -8,7 +8,6 @@ export class GameStateController {
     private currentState: GameState = GameState.WaitingForEnoughPlayers;
 
     private matchStartTimer: number = 5; // Seconds
-    private matchTimer: number = 300; // 5 minutes
     private readyPlayers: Set<string> = new Set();
     private minPlayers: number = 2;
     private currentPlayers: number = 0;
@@ -57,13 +56,7 @@ export class GameStateController {
                 break;
 
             case GameState.MatchPlay:
-                this.matchTimer--;
-                
-                this.eventRouter.emit('MATCH_TIME_UPDATE', this.matchTimer);
-
-                if (this.matchTimer <= 0) {
-                    this.setState(GameState.MatchEnd);
-                }
+                // Game mode handles match ending
                 break;
 
             case GameState.MatchEnd:
@@ -116,7 +109,8 @@ export class GameStateController {
             case GameState.MatchStartCountdown:
                 return `Match starts in ${this.matchStartTimer}`;
             case GameState.MatchPlay:
-                return `${Math.floor(this.matchTimer/60)}:${(this.matchTimer%60).toString().padStart(2, '0')}`;
+                //return `${Math.floor(this.matchTimer/60)}:${(this.matchTimer%60).toString().padStart(2, '0')}`;
+                return "";
             case GameState.MatchEnd:
                 return "Match ended!";
             case GameState.MatchStats:
@@ -128,9 +122,9 @@ export class GameStateController {
 
     public resetMatch() {
         this.matchStartTimer = 5;
-        this.matchTimer = 300;
         this.readyPlayers.clear();
         this.setState(GameState.WaitingForEnoughPlayers);
+        console.log("Resetting match");
     }
 
     public isPlayerReady(playerId: string): boolean {
