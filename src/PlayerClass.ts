@@ -1,4 +1,4 @@
-import { Entity, EventRouter, type PlayerInput, Vector3, type Vector3Like, Quaternion, PlayerEntity } from 'hytopia';
+import { Entity, EventRouter, type PlayerInput, Vector3, type Vector3Like, Quaternion, PlayerEntity, Light } from 'hytopia';
 import { AbilityController } from './AbilityController';
 import { Resource } from './Resource';
 import { PhysicsProjectileAbility } from './abilities/PhysicsProjectileAbility';
@@ -111,16 +111,33 @@ export class FighterAbilityController extends AbilityController {
 
     protected setupAbilities() {
         // Add fighter abilities
-        const slashOptions = {
-            name: 'Slash',
-            cooldown: 0.5,
-            resourceCost: 10,
-            resourceType: Resource.Stamina,
-            range: 3,
-            damage: 20
+        const bombOptions = {
+            name: 'Bomb',
+            cooldown: 1,
+            resourceCost: 15,
+            resourceType: Resource.Mana,
+            maxRange: -1,
+            speed: 25,
+            damage: 15,
+            modelUri: 'models/projectiles/fireball.gltf',
+            modelScale: 0.6,
+            projectileRadius: 0.1,
+            knockback: 0.8,
+            gravityScale: 0.6,
+            hitFX: ParticleFX.EXPLOSION,
+            notHitOnCollision: true,
+            lifeTime: 2,
+            aoe: {
+                radius: 2.5,
+                damage: 25,
+                knockback: 15.5,
+                falloff: true,
+            },
+
         };
-     
-      //  this.addAbility('primary', new TargetedAbility(slashOptions, this.eventRouter));
+
+        this.addAbility('primary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
+        this.addAbility('secondary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
     }
 
     public spawnClassItems() {
@@ -144,7 +161,29 @@ export class FighterAbilityController extends AbilityController {
     }
 
     tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number) {
-        // Fighter-specific tick logic
+
+        const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
+        const abilitySecondary = this._abilities.get('secondary') as SelfAbility;
+
+        this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
+        this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
+
+        //console.log(input.space);
+        if (input.sp) {
+
+            const manaCost = 0.04; // mana per second
+            const manaConsumed = manaCost * deltaTimeMs;
+
+            const damageableEntity = entity as DamageableEntity;
+
+            if (entity.linearVelocity.y > 5.1) { return; }
+            if (damageableEntity.mana < manaConsumed) { return; }
+            // Apply flying velocity
+
+            entity.applyImpulse(new Vector3(0, 1, 0));
+            damageableEntity.useMana(manaConsumed);
+        }
+        // Wizard-specific tick logic
     }
 }
 
@@ -167,14 +206,14 @@ export class ArcherAbilityController extends AbilityController {
             speed: 30,
             damage: 25,
             modelUri: 'models/projectiles/arrow.gltf',
-            modelScale: 0.4,
-            projectileRadius: 0.1,
+            modelScale: 0.5,
+            projectileRadius: 0.2,
             knockback: 0.5,
             gravityScale: 0.5,
             hitFX: ParticleFX.CLOUD_PUFF,
             charging: {
                 minChargeTime: 0.0,
-                maxChargeTime: 1.0,
+                maxChargeTime: 0.8,
                 chargeEffects: {
                     speed: {
                         min: 16,
@@ -195,8 +234,64 @@ export class ArcherAbilityController extends AbilityController {
         const arrowAbility = new PhysicsProjectileAbility(shootArrowOptions, this.eventRouter, this);
         this.addAbility('primary', arrowAbility);
 
+        const bombOptions = {
+            name: 'Bomb',
+            cooldown: 4,
+            resourceCost: 15,
+            resourceType: Resource.Mana,
+            maxRange: -1,
+            speed: 15,
+            damage: 15,
+            modelUri: 'models/projectiles/fireball.gltf',
+            modelScale: 0.8,
+            projectileRadius: 0.3,
+            knockback: 0.8,
+            gravityScale: 0.6,
+            hitFX: ParticleFX.EXPLOSION,
+            noHitOnBlockCollision: true,
+            lifeTime: 1.5,
+
+            aoe: {
+                radius: 3,
+                damage: 25,
+                knockback: 15.5,
+                falloff: true,
+            },
+
+        };
+
+        this.addAbility('secondary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
+
+        
+        /*
+        const throwSpiritAxeOptions = {
+            name: 'Spirit Axe',
+            cooldown: 1,
+            resourceCost: 20,
+            resourceType: Resource.Mana,
+            maxRange: 100,
+            speed: 30,
+            damage: 25,
+            modelUri: 'models/items/sword.gltf',
+            modelScale: 0.4,
+            projectileRadius: 0.1,
+            knockback: 0.5,
+            gravityScale: 0.5,
+            hitFX: ParticleFX.CLOUD_PUFF,
+            
+            
+        };
+
+        const SpiritAxe = new PhysicsProjectileAbility(throwSpiritAxeOptions, this.eventRouter, this);
+
+        this.addAbility('secondary', SpiritAxe);
+*/
+        
+        // TODO: Add roll ability
+        /*
         const rollOptions = {
             name: 'Roll',
+
             cooldown: 1,
             resourceCost: 20,
             resourceType: Resource.Mana,
@@ -205,6 +300,7 @@ export class ArcherAbilityController extends AbilityController {
             onUse: this.handleRoll.bind(this)
         };
         this.addAbility('secondary', new SelfAbility(rollOptions, this.eventRouter, this));
+    */
     }
 
     public spawnClassItems() {
@@ -263,3 +359,9 @@ export class ArcherAbilityController extends AbilityController {
         source.setLinearVelocity(directionVector);
     }
 }
+
+const grenadeOptions = {
+    lifeTime: 3, // Explode after 3 seconds regardless of distance
+    maxRange: -1, // No maximum travel distance
+    // ... other options ...
+};

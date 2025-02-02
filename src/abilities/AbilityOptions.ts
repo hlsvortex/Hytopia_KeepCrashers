@@ -42,13 +42,15 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     modelScale: number;
     projectileRadius: number;
     knockback: number;
+    lifeTime?: number;
     gravityScale?: number;
+    noHitOnEntityCollision?: boolean;
+    noHitOnBlockCollision?: boolean;
     hitFX?: EmitterOptions;
     collisionGroups?: {
         belongsTo: number[];
         collidesWith: number[];
     };
-    onCollision?: (source: Entity, target: Entity | BlockType) => void;
     aoe?: {
         radius: number;
         damage: number;
@@ -56,6 +58,8 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
         knockback?: number;
     };
     charging?: ChargeOptions;
+    onCollision?: (source: Entity, target: Entity | BlockType) => void;
+    onProjectileTick?: (projectile: Entity, deltaTimeMs: number) => void;
 }
 
 export interface RaycastOptions extends AbilityOptions {

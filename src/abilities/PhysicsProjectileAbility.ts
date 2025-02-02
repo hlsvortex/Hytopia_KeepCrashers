@@ -1,4 +1,4 @@
-import { Entity, EventRouter, Vector3, type Vector3Like, RigidBodyType, ColliderShape, CollisionGroup, BlockType, type QuaternionLike } from 'hytopia';
+import { Entity, EventRouter, Vector3, type Vector3Like, RigidBodyType, ColliderShape, CollisionGroup, BlockType, type QuaternionLike, PlayerEntity } from 'hytopia';
 import { Ability } from '../Ability';
 import { type PhysicsProjectileOptions } from './AbilityOptions';
 import { DamageableEntity } from '../DamageableEntity';
@@ -27,9 +27,7 @@ export class PhysicsProjectileAbility extends Ability {
         const chargeLevel = this.endCharge(); // Get final charge level and reset charging state
 
         // Apply charge effects
-        let speed = this.options.speed;
-        let damage = this.options.damage;
-        let gravityScale = this.options.gravityScale ?? 1;
+        let { speed, damage, gravityScale } = this.getChargedValues(chargeLevel);
         let size = 0;
 
         if (this.options.charging?.chargeEffects) {
@@ -61,14 +59,27 @@ export class PhysicsProjectileAbility extends Ability {
                 type: RigidBodyType.DYNAMIC,
                 linearVelocity: velocityVector,
                 gravityScale: gravityScale,
+                
             },
 
         });
 
         let age = 0;
-        const maxLifetime = this.options.maxRange / this.options.speed;
+        let maxLifetime = this.options.lifeTime; // Use lifetime if specified
+        if (typeof maxLifetime === 'undefined') {
+            if (this.options.maxRange === -1) {
+                maxLifetime = Infinity; // No range limit and no lifetime = never expire
+            } else {
+                maxLifetime = this.options.maxRange / speed; // Default range-based lifetime
+            }
+        }
 
         projectile.onTick = (entity: Entity, tickDeltaMs: number) => {
+            // Custom tick handler if provided
+            if (this.options.onProjectileTick) {
+                this.options.onProjectileTick(entity, tickDeltaMs);
+            }
+
             // Update age in seconds
             age += tickDeltaMs / 1000;
 
@@ -77,51 +88,54 @@ export class PhysicsProjectileAbility extends Ability {
             // Check if the projectile is moving (non-zero velocity)
             if (currentVelocity.x !== 0 || currentVelocity.y !== 0 || currentVelocity.z !== 0) {
                 // Set the projectile's rotation
-                projectile.setRotation(faceDirection(entity.linearVelocity as Vector3Like));
+                projectile.setRotation(faceDirection(currentVelocity));
             }
             
             // Despawn if exceeded lifetime
             if (age >= maxLifetime) {
-                if (this.options.hitFX) {
-                    this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
-                }
-                projectile.despawn();
+                this.projectileEnd(projectile, source);
             }
         };
 
 
         projectile.createAndAddChildCollider({
             shape: ColliderShape.BALL,
-            radius: 0.1,
+            radius: this.options.projectileRadius,
+            friction: 0.6,
+            bounciness: 1,
             collisionGroups: {
                 belongsTo: [CollisionGroup.ENTITY],
                 collidesWith: [CollisionGroup.ENTITY, CollisionGroup.BLOCK],
             },
 
+            
+
             onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
                 if (!started) return;
                 if (otherEntity == source) return;
                 
-                // Handle direct hit
+                if (this.options.noHitOnBlockCollision && otherEntity instanceof BlockType) {
+                    return;
+                }
+
+                if (this.options.noHitOnEntityCollision && otherEntity instanceof PlayerEntity) {
+                    return;
+                }
+
                 if (this.options.onCollision) {
                     this.options.onCollision(source, otherEntity);
                 }
                 else if (otherEntity instanceof DamageableEntity && !otherEntity.isDead()) {
+
                     otherEntity.takeDamage(damage, source as DamageableEntity);
                     otherEntity.applyImpulse(velocityVector.scale(this.options.knockback));
-                }
+                    if (otherEntity instanceof DamageableEntity) {
+                        this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), otherEntity.position as Vector3);
+                    }   
 
-                // Handle AOE damage with collider
-                this.handleAOEDamage(projectile.position as Vector3Like, source as DamageableEntity);
-
-                // Visual effects
-                if (this.options.hitFX) {
-                    this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
                 }
                 
-                if (otherEntity instanceof DamageableEntity) {
-                    this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), otherEntity.position as Vector3);
-                }   
+                this.projectileEnd(projectile, source);
 
                 world.eventRouter.emit('ProjectileHit', {
                     type: source.name,
@@ -130,11 +144,7 @@ export class PhysicsProjectileAbility extends Ability {
                     damage: this.options.damage
                 });
 
-                projectile.despawn();
-                //this.emitAbilityUsed({ type: 'PhysicsProjectile', source, damage: this.damage });
-
-                this.onCollision(source.position as Vector3);
-
+                //projectile.despawn();
             }
         });
        
@@ -144,12 +154,25 @@ export class PhysicsProjectileAbility extends Ability {
         if (this.options.useFX) {
             this.spawnEffect(new ParticleEmitter(this.options.useFX), origin);
         }
+    }
 
+    private projectileEnd(projectile: Entity, source: Entity) {
 
+        // Handle AOE damage with collider
+        this.handleAOEDamage(projectile.position as Vector3Like, source as DamageableEntity);
+
+        // Visual effects
+        if (this.options.hitFX) {
+            this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
+        }
+
+        
+        projectile.despawn();
     }
 
     private handleAOEDamage(position: Vector3Like, source: DamageableEntity) {
         if (!this.options.aoe) return;
+
 
         // Create a spherical collider for AOE detection
         const aoeCollider = new Collider({
@@ -203,8 +226,20 @@ export class PhysicsProjectileAbility extends Ability {
         //(() => effect.destroy(), effect.particleOptions.lifetime * 1000);
     }
 
-    onCollision(collisionPoint: Vector3) {
-    
+
+    private getChargedValues(chargeLevel: number) {
+        let speed = this.options.speed;
+        let damage = this.options.damage;
+        let gravityScale = this.options.gravityScale ?? 1;
+
+        if (this.options.charging?.chargeEffects) {
+            const { speed: s, damage: d, gravity: g } = this.options.charging.chargeEffects;
+            if (s) speed = this.getChargedValue(chargeLevel, s.min, s.max);
+            if (d) damage = this.getChargedValue(chargeLevel, d.min, d.max);
+            if (g) gravityScale = this.getChargedValue(chargeLevel, g.min, g.max);
+        }
+
+        return { speed, damage, gravityScale };
     }
 
     
