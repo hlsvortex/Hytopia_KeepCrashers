@@ -55,60 +55,41 @@ export class KingOfTheHill extends GameModeController {
     update(deltaTime: number): void {
         this.controlPoint.update(deltaTime);
 
-        // Only count down time if a team controls the point
         const controllingTeam = this.controlPoint.controllingTeam;
         if (controllingTeam) {
             const remainingTime = this.teamTimes.get(controllingTeam)!;
-            // Decrement time for controlling team
+            
+            // Always decrement time regardless of capture progress
             this.teamTimes.set(controllingTeam, Math.max(0, remainingTime - deltaTime));
 
-            // Check for overtime or win conditions
+            // Check for win conditions when time hits zero
             if (remainingTime <= 0) {
-                if (!this.checkOvertimeConditions()) {
+                if (this.controlPoint.progress === 100) {
+                    // Full capture with zero time = instant win
                     this.gameManager.handleGameWin(controllingTeam);
+                } else if (!this._isInOvertime) {
+                    // Enter overtime if not already in it
+                    this._isInOvertime = true;
+                    this.eventRouter.emit('OVERTIME_STARTED', controllingTeam);
                 }
-            }
-
-            // Check for overtime activation
-            if (!this._isInOvertime && remainingTime < this.overtimeThreshold) {
-                this._isInOvertime = true;
-                this.eventRouter.emit('OVERTIME_STARTED', controllingTeam);
             }
         }
     }
 
     private checkOvertimeConditions(): boolean {
-        if (!this.controlPoint.controllingTeam) return false;
-        
-        // Get the opposing team's progress
-        const otherTeam = this.otherTeam(this.controlPoint.controllingTeam);
-        const otherProgress = this.controlPoint.getTeamProgress(otherTeam);
-
-        // Overtime if opposing team has any progress
-        if (otherProgress > 0) {
-            this._isInOvertime = true;
-            return true;
-        }
-        return false;
+        return this._isInOvertime && this.controlPoint.progress < 100;
     }
 
     onPointCaptured(team: Team): void {
         const previousController = this.currentControllingTeam;
         this.currentControllingTeam = team;
 
-        if (previousController) {
-            // Store the previous controller's remaining time
-            this.teamTimes.set(previousController, this.teamTimes.get(previousController)!);
-        }
-
-        // Handle overtime win conditions
         if (this._isInOvertime) {
-            if (this.teamTimes.get(team)! <= 0) {
-                // Only win if they fully captured during overtime
-                if (this.controlPoint.progress === 100) {
-                    this.gameManager.handleGameWin(team);
-                }
-            } else {
+            if (this.teamTimes.get(team)! <= 0 && this.controlPoint.progress === 100) {
+                // Win condition met during overtime
+                this.gameManager.handleGameWin(team);
+            } else if (team !== previousController) {
+                // Point changed hands during overtime
                 this._isInOvertime = false;
             }
         }
