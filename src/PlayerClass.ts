@@ -54,7 +54,7 @@ export class WizardAbilityController extends AbilityController {
         this.addAbility('secondary', new SelfAbility(teleportOptions, this.eventRouter, this));
     }
 
-    protected spawnClassItems() {
+    public spawnClassItems() {
         this.bookEntity = new Entity({
             name: 'book',
             modelUri: 'models/items/book.gltf',
@@ -70,11 +70,9 @@ export class WizardAbilityController extends AbilityController {
         );
     }
 
-    protected destroyClassItems() {
-        if (this.bookEntity) {
-            this.bookEntity.despawn();
-            this.bookEntity = undefined;
-        }
+    public destroyClassItems() {
+        this.bookEntity?.despawn();
+        this.bookEntity = undefined;
     }
 
     tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number) {
@@ -125,7 +123,7 @@ export class FighterAbilityController extends AbilityController {
       //  this.addAbility('primary', new TargetedAbility(slashOptions, this.eventRouter));
     }
 
-    protected spawnClassItems() {
+    public spawnClassItems() {
         this.swordEntity = new Entity({
             name: 'sword',
             modelUri: 'models/items/sword.gltf',
@@ -140,11 +138,9 @@ export class FighterAbilityController extends AbilityController {
         );
     }
 
-    protected destroyClassItems() {
-        if (this.swordEntity) {
-            this.swordEntity.despawn();
-            this.swordEntity = undefined;
-        }
+    public destroyClassItems() {
+        this.swordEntity?.despawn();
+        this.swordEntity = undefined;
     }
 
     tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number) {
@@ -211,7 +207,7 @@ export class ArcherAbilityController extends AbilityController {
         this.addAbility('secondary', new SelfAbility(rollOptions, this.eventRouter, this));
     }
 
-    protected spawnClassItems() {
+    public spawnClassItems() {
         this.bowEntity = new Entity({
             name: 'bow',
             modelUri: 'models/items/bone.gltf',
@@ -226,11 +222,9 @@ export class ArcherAbilityController extends AbilityController {
         );
     }
 
-    protected destroyClassItems() {
-        if (this.bowEntity) {
-            this.bowEntity.despawn();
-            this.bowEntity = undefined;
-        }
+    public destroyClassItems() {
+        this.bowEntity?.despawn();
+        this.bowEntity = undefined;
     }
 
     

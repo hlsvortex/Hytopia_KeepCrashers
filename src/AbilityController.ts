@@ -14,7 +14,7 @@ export abstract class AbilityController {
     constructor(protected eventRouter: EventRouter) {}
 
     // Properly typed attach/detach with cleanup
-    attach(entity: PlayerEntity) {
+    public attach(entity: PlayerEntity) {
         this.attachedEntity = entity;
         this.setupAbilities();
         
@@ -29,15 +29,15 @@ export abstract class AbilityController {
         }
     }
 
-    detach() {
+    public detach() {
         this.destroyClassItems();
         this.cleanupAbilities();
         this.attachedEntity = undefined;
     }
 
     protected abstract setupAbilities(): void;
-    protected abstract spawnClassItems(): void;
-    protected abstract destroyClassItems(): void;
+    public abstract spawnClassItems(): void;
+    public abstract destroyClassItems(): void;
 
     // Example cleanup implementation
     private cleanupAbilities() {

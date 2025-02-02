@@ -26,7 +26,7 @@ import { DamageableEntity } from './DamageableEntity';
 import { PlayerEvents } from './events';
 import type { PlayerDeathEventPayload, PlayerRespawnEventPayload } from './events';
 import { world } from './GlobalContext';
-import { ArcherAbilityController, WizardAbilityController } from './PlayerClass';
+import { ArcherAbilityController, WizardAbilityController, FighterAbilityController } from './PlayerClass';
 import { AbilityController } from './AbilityController';
 
 
@@ -80,12 +80,27 @@ export default class AbilityEntityController extends MyEntityController {
         this.currentAbilityController.detach();
     }
 
-    public setClass(controllerClass: new (eventRouter: EventRouter) => AbilityController) {
+    public setClass(className: string) {
         // Clean up previous controller
-        this.currentAbilityController.detach();
-        
-        // Create and attach new controller
-        this.currentAbilityController = new controllerClass(world.eventRouter);
+        if (this.currentAbilityController) {
+            this.currentAbilityController.detach(); // Handles destroyClassItems through detach()
+        }
+
+        // Create new controller based on class name
+        switch(className.toLowerCase()) {
+            case 'wizard':
+                this.currentAbilityController = new WizardAbilityController(world.eventRouter);
+                break;
+            case 'fighter':
+                this.currentAbilityController = new FighterAbilityController(world.eventRouter);
+                break;
+            case 'archer':
+                this.currentAbilityController = new ArcherAbilityController(world.eventRouter);
+                break;
+            default: return;
+        }
+
+        // Initialize new controller - attach() handles spawning if entity exists
         if (this.ownerEntity) {
             this.currentAbilityController.attach(this.ownerEntity);
         }
@@ -102,7 +117,7 @@ export default class AbilityEntityController extends MyEntityController {
         this.currentAbilityController.tick(entity, input, deltaTimeMs);
     
         if (input.c) {
-            this.setClass(ArcherAbilityController);
+            this.setClass('wizard');
             input.c = false;
         }
      

@@ -194,7 +194,7 @@ export class GameManager {
 
 
         // Set initial class
-        entityController.setClass(WizardAbilityController);
+        entityController.setClass('wizard');
 
 
         const light = new Light({
@@ -216,6 +216,44 @@ export class GameManager {
         this.addPlayer(player, playerEntity);
 
         this.worldEventRouter.emit('PLAYER.CREATED', playerEntity);
+
+        playerEntity.player.ui.onData = (playerUI: PlayerUI, data: Record<string, any>) => {
+            console.log('Got data from player UI:', data);
+
+            if (data.type === 'PLAYER_READY') {
+                this.setPlayerReady(player.id, true);
+                // Update only this player's UI immediately
+                playerUI.sendData({
+                    type: 'gameStateUpdate',
+                    state: this.gameStateController.getState(),
+                    message: this.gameStateController.getStateMessage(),
+                    isReady: true
+                });
+            }
+
+            if (data.type === 'classSelected') {
+                // Switch class using the AbilityEntityController
+                switch (data.class) { // Use the class directly from the UI data
+                    case 'Wizard':
+                        entityController.setClass('wizard');
+                        break;
+                    case 'Fighter':
+                        entityController.setClass('fighter');
+
+                        break;
+                    case 'Archer':
+                        entityController.setClass('archer');
+                        break;
+
+                }
+
+                console.log(`Switched player to ${data.class}!`);
+            }
+
+            if (data.type === 'CLASS_CHANGE') {
+                this.handleClassChange(player, data.className);
+            }
+        };
     }
 
     public InitUI(entity: PlayerEntity) {
@@ -241,41 +279,6 @@ export class GameManager {
         
         // Store reference to update later
         (entity as DamageableEntity).nameplateUI = nameplateUI;
-        
-        // DEBUG BUTTTOn
-        entity.player.ui.onData = (playerUI: PlayerUI, data: Record<string, any>) => {
-            console.log('Got data from player UI:', data);
-
-            if (data.type === 'PLAYER_READY') {
-                this.setPlayerReady(entity.player.id, true);
-                // Update only this player's UI immediately
-                entity.player.ui.sendData({
-                    type: 'gameStateUpdate',
-                    state: this.gameStateController.getState(),
-                    message: this.gameStateController.getStateMessage(),
-                    isReady: true
-                });
-            }
-
-            if (data.type === 'classSelected') {
-                // Switch class using the AbilityEntityController
-                const entityController = entity.controller as AbilityEntityController;
-                switch (data.class) { // Use the class directly from the UI data
-                    case 'Wizard':
-
-                        entityController.setClass(WizardAbilityController);
-                        break;
-                    case 'Fighter':
-                        entityController.setClass(FighterAbilityController);
-                        break;
-                    case 'Archer':
-                        entityController.setClass(ArcherAbilityController);
-                        break;
-                }
-
-                console.log(`Switched player to ${data.class}!`);
-            }
-        };
     }
     
     public InitCamera(entity: PlayerEntity) {
@@ -462,6 +465,13 @@ export class GameManager {
 
     public getGameState(): GameState {
         return this.gameStateController.getState();
+    }
+
+    public handleClassChange(player: Player, className: string) {
+        const entity = this.players.get(player.id);
+        if (entity?.controller instanceof AbilityEntityController) {
+            entity.controller.setClass(className);
+        }
     }
 
 }

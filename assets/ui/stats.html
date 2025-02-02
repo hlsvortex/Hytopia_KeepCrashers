@@ -415,6 +415,141 @@
             color: #4444ff;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
+
+        .class-select-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            gap: 30px;
+            padding: 30px;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .class-select-menu.active {
+            display: flex;
+        }
+
+        .class-button {
+            background: linear-gradient(145deg, rgba(30,30,30,0.9), rgba(0,0,0,0.9));
+            border: 2px solid rgba(255,255,255,0.15);
+            width: 220px;
+            padding: 25px 20px;
+            min-height: 280px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: center;
+        }
+
+        .class-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Wizard hover effects */
+        .class-button.wizard:hover {
+            border-color: rgba(168, 106, 248, 0.5);
+            box-shadow: 0 0 25px rgba(168, 106, 248, 0.2);
+        }
+
+        /* Fighter hover effects */
+        .class-button.fighter:hover {
+            border-color: rgba(255, 94, 94, 0.5);
+            box-shadow: 0 0 25px rgba(255, 94, 94, 0.2);
+        }
+
+        /* Archer hover effects */
+        .class-button.archer:hover {
+            border-color: rgba(107, 255, 184, 0.5);
+            box-shadow: 0 0 25px rgba(107, 255, 184, 0.2);
+        }
+
+        .class-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background-size: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .class-info h3 {
+            color: #fff;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            padding: 8px 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 1.4em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .wizard .class-info h3 {
+            color: #883aea;
+            text-shadow: 0 0 8px rgba(136,58,234,0.3);
+        }
+
+        .fighter .class-info h3 {
+            color: #ea3a3a;
+            text-shadow: 0 0 8px rgba(234,58,58,0.3);
+        }
+
+        .archer .class-info h3 {
+            color: #3aeb88;
+            text-shadow: 0 0 8px rgba(58,234,136,0.3);
+        }
+
+        .class-info p {
+            color: #ddd;
+            font-size: 1em;
+            margin: 0;
+            line-height: 1.4;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+
+        .wizard { 
+            background-image: url('icons/wizard.png');
+            border-color: rgba(136, 58, 234, 0.3);
+        }
+        .fighter { 
+            background-image: url('icons/fighter.png');
+            border-color: rgba(234, 58, 58, 0.3);
+        }
+        .archer { 
+            background-image: url('icons/archer.png');
+            border-color: rgba(58, 234, 136, 0.3);
+        }
+
+        /* Add these color overrides */
+        .class-button.wizard .class-info h3 {
+            color: #a86af8 !important;
+            text-shadow: 0 0 12px rgba(168,106,248,0.4);
+        }
+
+        .class-button.fighter .class-info h3 {
+            color: #ff5e5e !important;
+            text-shadow: 0 0 12px rgba(255,94,94,0.4);
+        }
+
+        .class-button.archer .class-info h3 {
+            color: #6bffb8 !important;
+            text-shadow: 0 0 12px rgba(107,255,184,0.4);
+        }
+
+        .class-info p {
+            color: #eee !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 
@@ -526,6 +661,31 @@
             </div>
             <div class="team-list" id="blue-team">
                 <h3>TEAM BLUE</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add before closing </body> -->
+    <div id="class-select-menu" class="class-select-menu">
+        <div class="class-button wizard" data-class="wizard">
+            <div class="class-icon"></div>
+            <div class="class-info">
+                <h3>Wizard</h3>
+                <p>Arcane spellcaster with ranged attacks</p>
+            </div>
+        </div>
+        <div class="class-button fighter" data-class="fighter">
+            <div class="class-icon"></div>
+            <div class="class-info">
+                <h3>Fighter</h3>
+                <p>Stealthy melee specialist</p>
+            </div>
+        </div>
+        <div class="class-button archer" data-class="archer">
+            <div class="class-icon"></div>
+            <div class="class-info">
+                <h3>Archer</h3>
+                <p>Precision ranged attacker</p>
             </div>
         </div>
     </div>
@@ -765,6 +925,38 @@
             if (e.key === 'f' || e.key === 'F') {
                 // Only toggle the stats panel, not the capture point
                 document.getElementById('match-stats').style.display = 'none';
+            }
+        });
+
+        const classMenu = document.getElementById('class-select-menu');
+        let menuVisible = false;
+
+        // Toggle menu with K key
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'k') {
+                menuVisible = !menuVisible;
+                classMenu.classList.toggle('active', menuVisible);
+            }
+        });
+
+        // Handle class selection
+        document.querySelectorAll('.class-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const className = button.dataset.class;
+                hytopia.sendData({
+                    type: 'CLASS_CHANGE',
+                    className: className
+                });
+                menuVisible = false;
+                classMenu.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (menuVisible && !classMenu.contains(e.target)) {
+                menuVisible = false;
+                classMenu.classList.remove('active');
             }
         });
     </script>
