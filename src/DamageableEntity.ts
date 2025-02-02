@@ -32,9 +32,8 @@ export class DamageableEntity extends PlayerEntity {
 
    
     updateUI() {
-        if (!this.player) return;
+        if (!this.player || !this.player.ui) return;
         
-        // Change sendData to emit
         this.player.ui.sendData({
             type: 'statsUpdate',
             health: this.health,
@@ -42,7 +41,6 @@ export class DamageableEntity extends PlayerEntity {
             stamina: this.stamina
         });
 
-        // Update nameplate health
         if (this.nameplateUI) {
             this.nameplateUI.setState({
                 health: this.health,

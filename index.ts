@@ -8,8 +8,6 @@ import { setWorld, initializeGameManager, gameManager } from './src/GlobalContex
 import { RespawnSystem } from './src/RespawnSystem';
 import  AbilityEntityController  from './src/AbilityEntityController';
 
-
-
 function buildKeeps(world: World)
 {
   const towerRed1 = new Entity({
@@ -24,6 +22,7 @@ function buildKeeps(world: World)
   towerRed1.spawn(world, { x: -18, y: 2.5, z: 24 }); 
   towerRed1.setRotation ({ x: 0, y: 180, z: 0, w: 0 });
 }
+
 
 startServer(world => {
   

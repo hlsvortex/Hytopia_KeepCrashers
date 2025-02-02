@@ -1,0 +1,646 @@
+/* Core stats panel */
+.stats-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    font-family: Arial, sans-serif;
+    z-index: 900;
+}
+
+.stats-panel div {
+    margin: 5px 0;
+}
+
+.abilities {
+    margin-top: 10px;
+}
+
+.ability {
+    margin: 5px 0;
+}
+
+.cooldown {
+    color: #ff5555;
+}
+
+.stat-bar {
+    width: 200px;
+    height: 20px;
+    background-color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 5px 0;
+}
+
+.stat-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.health-fill {
+    background-color: #ff4444;
+}
+
+.stamina-fill {
+    background-color: #44ff44;
+}
+
+.mana-fill {
+    background-color: #4444ff;
+}
+
+.stat-value {
+    position: absolute;
+    right: 10px;
+    color: white;
+}
+
+/* Class Selection Menu */
+.class-select-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    gap: 30px;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.class-select-menu.active {
+    display: flex;
+}
+
+.class-button {
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(0, 0, 0, 0.9));
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    width: 220px;
+    padding: 25px 20px;
+    min-height: 280px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.class-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific Class Button Hover Effects */
+.class-button.wizard:hover {
+    border-color: rgba(168, 106, 248, 0.5);
+    box-shadow: 0 0 25px rgba(168, 106, 248, 0.2);
+}
+
+.class-button.fighter:hover {
+    border-color: rgba(255, 94, 94, 0.5);
+    box-shadow: 0 0 25px rgba(255, 94, 94, 0.2);
+}
+
+.class-button.archer:hover {
+    border-color: rgba(107, 255, 184, 0.5);
+    box-shadow: 0 0 25px rgba(107, 255, 184, 0.2);
+}
+
+/* Other UI Elements */
+.crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.crosshair::before,
+.crosshair::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+}
+
+.crosshair::before {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.crosshair::after {
+    height: 2px;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Ensure the template is visible when initialized */
+#player-ui-template {
+    display: block !important;
+}
+
+.nameplate {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    padding: 2px 8px;
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.health-bar {
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 2px 0;
+}
+
+.health-fill {
+    height: 100%;
+    background: #ff4444;
+    transition: width 0.2s ease;
+}
+
+.left-ui-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ready-button {
+    position: static;
+    transform: none;
+    margin-bottom: 10px;
+}
+
+.charging-bar {
+    position: fixed;
+    left: 52%;
+    top: 45%;
+    width: 5px;
+    height: 50px;
+    background-color: #000000;
+    border: 1px solid #000000;
+    border-radius: 2px;
+    display: none;
+}
+
+.charging-bar-fill {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #0011ff;
+    border-radius: 1px;
+    transition: height 0.05s linear;
+}
+
+/* Update nameplate styles */
+.nameplate {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    text-align: center;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    padding: 2px 8px;
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    /* Set initial border as transparent */
+}
+
+.name {
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+}
+
+.health-bar {
+    width: 100%;
+    /* Make health bar full width of nameplate */
+    height: 2px;
+    /* Thinner health bar */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1px;
+    margin: 2px 0 1px;
+    /* Reduced margins */
+    overflow: hidden;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff3333 0%, #ff4444 100%);
+    transition: width 0.2s ease;
+}
+
+.game-state-display {
+    position: fixed;
+    top: 20px;
+    left: 25%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    display: none;
+}
+
+.ready-button {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    font-size: 18px;
+    background: #29cc80;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+}
+
+.ready-button:hover {
+    background: #66ff66;
+}
+
+.teams-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.team-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 200px;
+    padding: 15px;
+    position: relative;
+}
+
+.team-list h3 {
+    text-align: center;
+    font-size: 1.5em;
+    padding: 4px;
+    border-radius: 2px;
+    margin: 0 0 5px 0;
+}
+
+.player-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    margin: 2px 0;
+}
+
+.player-stat>div {
+    min-width: 80px;
+    margin-left: 10px;
+    /* Add space between name and stats */
+}
+
+/* Red team specific styles */
+#red-team h3 {
+    background-color: rgba(255, 68, 68, 0.0);
+    color: #ff4444;
+}
+
+#red-team .player-stat {
+    background-color: rgba(255, 68, 68, 0.3);
+}
+
+/* Blue team specific styles */
+#blue-team h3 {
+    background-color: rgba(68, 68, 255, 0.0);
+    color: #4444ff;
+}
+
+#blue-team .player-stat {
+    background-color: rgba(68, 68, 255, 0.3);
+}
+
+/* Match stats panel */
+#match-stats {
+    top: 25%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 80%;
+    max-width: 700px;
+    transform: translateY(-30%);
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    margin: 0 0 5px 0;
+    font-weight: 200;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stats-header span {
+    flex: 1;
+    text-align: left;
+}
+
+.stats-header span:nth-child(2),
+.stats-header span:last-child {
+    text-align: right;
+    width: 20px;
+}
+
+.stats-header span:nth-child(2) {
+    text-align: right;
+    width: 15px;
+    margin-left: 100px;
+    /* Increased from 15px */
+}
+
+.stats-header span:last-child {
+    text-align: right;
+    width: 30px;
+    margin-left: 0;
+    /* Ensure no left margin */
+}
+
+.left-ui-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ready-button {
+    position: static;
+    transform: none;
+    margin-bottom: 10px;
+}
+
+/* Add this to ensure capture point stays on top */
+#capture-point-ui {
+    z-index: 1000;
+    pointer-events: none;
+    /* Make it non-interactive */
+}
+
+/* Add capture point styles */
+.capture-point-ui {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.capture-title {
+    font-size: 1.2em;
+    color: #fff;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.capture-progress-container {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.capture-progress-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    /* Background color will be set dynamically */
+}
+
+.capture-team {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.control-info {
+    flex-grow: 1;
+    max-width: 200px;
+    text-align: center;
+}
+
+.team-timer {
+    width: 80px;
+    text-align: center;
+    font-size: 1.4em;
+}
+
+.capture-team {
+    margin-top: 8px;
+    font-size: 1.1em;
+}
+
+.overtime-indicator {
+    text-align: center;
+    margin-top: 8px;
+    color: burlywood;
+}
+
+.red-timer {
+    color: #ff4444;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.blue-timer {
+    color: #4444ff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.class-select-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    gap: 30px;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.class-select-menu.active {
+    display: flex;
+}
+
+.class-button {
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(0, 0, 0, 0.9));
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    width: 220px;
+    padding: 25px 20px;
+    min-height: 280px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center;
+}
+
+.class-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Wizard hover effects */
+.class-button.wizard:hover {
+    border-color: rgba(168, 106, 248, 0.5);
+    box-shadow: 0 0 25px rgba(168, 106, 248, 0.2);
+}
+
+/* Fighter hover effects */
+.class-button.fighter:hover {
+    border-color: rgba(255, 94, 94, 0.5);
+    box-shadow: 0 0 25px rgba(255, 94, 94, 0.2);
+}
+
+/* Archer hover effects */
+.class-button.archer:hover {
+    border-color: rgba(107, 255, 184, 0.5);
+    box-shadow: 0 0 25px rgba(107, 255, 184, 0.2);
+}
+
+.class-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background-size: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.class-info h3 {
+    color: #fff;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    padding: 8px 20px;
+    border-radius: 5px;
+    margin: 15px 0;
+    font-size: 1.4em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.wizard .class-info h3 {
+    color: #883aea;
+    text-shadow: 0 0 8px rgba(136, 58, 234, 0.3);
+}
+
+.fighter .class-info h3 {
+    color: #ea3a3a;
+    text-shadow: 0 0 8px rgba(234, 58, 58, 0.3);
+}
+
+.archer .class-info h3 {
+    color: #3aeb88;
+    text-shadow: 0 0 8px rgba(58, 234, 136, 0.3);
+}
+
+.class-info p {
+    color: #ddd;
+    font-size: 1em;
+    margin: 0;
+    line-height: 1.4;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.wizard {
+    background-image: url('icons/wizard.png');
+    border-color: rgba(136, 58, 234, 0.3);
+}
+
+.fighter {
+    background-image: url('icons/fighter.png');
+    border-color: rgba(234, 58, 58, 0.3);
+}
+
+.archer {
+    background-image: url('icons/archer.png');
+    border-color: rgba(58, 234, 136, 0.3);
+}
+
+/* Add these color overrides */
+.class-button.wizard .class-info h3 {
+    color: #a86af8 !important;
+    text-shadow: 0 0 12px rgba(168, 106, 248, 0.4);
+}
+
+.class-button.fighter .class-info h3 {
+    color: #ff5e5e !important;
+    text-shadow: 0 0 12px rgba(255, 94, 94, 0.4);
+}
+
+.class-button.archer .class-info h3 {
+    color: #6bffb8 !important;
+    text-shadow: 0 0 12px rgba(107, 255, 184, 0.4);
+}
+
+.class-info p {
+    color: #eee !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}

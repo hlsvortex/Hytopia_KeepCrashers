@@ -243,27 +243,23 @@ export class GameManager {
     }
 
     public InitUI(entity: PlayerEntity) {
-        entity.player.ui.load('ui/stats.html');
+        entity.player.ui.load('ui/index.html');
 
         const team = this.getPlayerTeam(entity.player);
-        const teamColor = team?.name === 'Red' ? '#ff0000' : '#0000ff';
+        const teamColor = team?.color || '#ffffff';
 
         const nameplateUI = new SceneUI({
             templateId: 'player-nameplate',
             attachedToEntity: entity,
-            offset: { x: 0, y: 1, z: 0 },
+            offset: { x: 0, y: 1.2, z: 0 },
             state: {
                 name: entity.player.username.substring(0, 15),
                 health: 100,
-                hidden: false,
                 teamColor: teamColor
             }
         });
 
-        // Load the UIs
         nameplateUI.load(world);
-        
-        // Store reference to update later
         (entity as DamageableEntity).nameplateUI = nameplateUI;
     }
     
