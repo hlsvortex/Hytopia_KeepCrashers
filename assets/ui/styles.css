@@ -28,12 +28,13 @@
 }
 
 .stat-bar {
-    width: 200px;
+    width: 100%;
     height: 20px;
-    background-color: #333;
-    border-radius: 10px;
-    overflow: hidden;
+    background: rgba(255, 255, 255, 0.2);
     margin: 5px 0;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
 }
 
 .stat-fill {
@@ -42,11 +43,11 @@
 }
 
 .health-fill {
-    background-color: #ff4444;
+    background: #ff4444;
 }
 
 .stamina-fill {
-    background-color: #44ff44;
+    background: #44ff44;
 }
 
 .mana-fill {
@@ -55,8 +56,12 @@
 
 .stat-value {
     position: absolute;
-    right: 10px;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
     color: white;
+    font-size: 12px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* Class Selection Menu */
@@ -643,4 +648,40 @@
 .class-info p {
     color: #eee !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Menu system styles */
+#menu-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.panel {
+    pointer-events: auto;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    min-width: 200px;
+}
+
+.panel-header {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.panel-content {
+    min-width: 200px;
+    min-height: 100px;
 }

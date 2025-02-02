@@ -13,6 +13,9 @@ import { GameStateController } from './GameStateController';
 import { CapturePoint } from './CapturePoint';
 import { GameModeController } from './GameModeController';
 import { KingOfTheHill } from './GameModeController';
+import { Menu } from './ui/Menu';
+import { Panel } from './ui/Panel';
+import { MenuSystem } from './ui/MenuSystem';
 
 export class GameManager {
     private readonly teams: Team[] = [
@@ -38,11 +41,18 @@ export class GameManager {
     private capturePoints: CapturePoint[] = [];
     private gameModeController!: GameModeController;
 
+    private menuSystem!: MenuSystem;
+
     constructor(private readonly worldEventRouter: EventRouter) {
         this.gameStateController = new GameStateController(worldEventRouter);
         this.initGame();
         this.startGameLoop();
         this.setupEventListeners();
+        
+        // Add debug log
+        console.log('Setting up UI_LOADED listener');
+        
+        
     }
 
     private initGame() {
@@ -219,7 +229,7 @@ export class GameManager {
 
         // Updated UI handler
         playerEntity.player.ui.onData = (playerUI: PlayerUI, data: Record<string, any>) => {
-            console.log('Got data from player UI:', data);
+            //console.log('Got data from player UI:', data);
 
             if (data.type === 'PLAYER_READY') {
                 this.setPlayerReady(player.id, true);
@@ -239,11 +249,26 @@ export class GameManager {
             if (data.type === 'TOGGLE_POINTER_LOCK') {
                 playerUI.lockPointer(!data.enabled);
             }
+
+            if (data.type === 'MENU_SYSTEM_READY') {
+                console.log('InitUI: Initializing client-side menu system');
+                this.menuSystem.initializeOnClient(data.containerId);
+            }
         };
     }
 
     public InitUI(entity: PlayerEntity) {
+        
+        this.menuSystem = new MenuSystem();
+        
         entity.player.ui.load('ui/index.html');
+        
+        console.log('InitUI: Sending INIT_MENU_SYSTEM message');
+        entity.player.ui.sendData({ 
+            type: 'INIT_MENU_SYSTEM' 
+        });
+
+      
 
         const team = this.getPlayerTeam(entity.player);
         const teamColor = team?.color || '#ffffff';
@@ -456,4 +481,11 @@ export class GameManager {
         }
     }
 
+    public toggleClassSelection() {
+        this.menuSystem.showMenu('class');
+    }
+
+    public showStats() {
+        this.menuSystem.showMenu('stats');
+    }
 }

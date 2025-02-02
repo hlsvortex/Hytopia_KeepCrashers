@@ -7,31 +7,22 @@
     <link rel="stylesheet" href="{{CDN_ASSETS_URL}}/ui/styles.css">
     <title>Player Stats</title>
     <style>
-
         div[style="z-index: 10000"] {
             display: none !important;
         }
         #chat-window {
-        display: none !important;
+            display: none !important;
         }
-        
     </style>
 </head>
 
 <body>
+    <div id="menu-container" style="border: 2px solid blue;"></div> <!-- Debug border -->
+    
+    
     <div class="left-ui-container">
         <!-- Ready Check -->
         <button id="ready-button" class="ready-button">READY UP</button>
-
-        <!-- Health/Stamina -->
-        <div class="stats-panel">
-            <div class="stat-bar">
-                <div id="health-fill" class="stat-fill health-fill"></div>
-            </div>
-            <div class="stat-bar">
-                <div id="stamina-fill" class="stat-fill stamina-fill"></div>
-            </div>
-        </div>
     </div>
 
     <div class="stats-panel">
@@ -126,78 +117,68 @@
 </html>
 
     <script>
-        console.log('UI loaded'); // Add this to verify the HTML is loading
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded'); // Verify DOM is ready
-        });
+        console.log('UI Script: Loading...');
+        
+        // Create a global menu container for the client side
+        window.menuContainer = document.getElementById('menu-container');
 
-        // Initialize stats and cooldowns
-        let stats = {
-            health: 100,
-            stamina: 100,
-            mana: 100
+        window.createPanel = function(id, title) {
+            const element = document.createElement('div');
+            element.className = 'panel';
+            element.innerHTML = `
+                <div class="panel-header">${title}</div>
+                <div class="panel-content" id="${id}-content"></div>
+            `;
+            return element;
         };
 
-        let cooldowns = {
-            primary: { current: 0, timer: null },
-            secondary: { current: 0, timer: null }
-        };
-
-        // Update stat bars and values
-        function updateStatBars() {
-            //console.log('Updating stat bars with:', stats); // Debug update
-            for (const stat of ['health', 'stamina', 'mana']) {
-                const value = stats[stat];
-                const fill = document.getElementById(`${stat}-fill`);
-                const text = document.getElementById(`${stat}-value`);
-                
-                if (fill && text) {
-                    // Ensure width is at least 0%
-                    fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
-                    // Use Math.floor instead of Math.round for more accurate display
-                    text.textContent = Math.floor(value);
-                } else {
-                    console.error(`Could not find elements for ${stat}`);
-                }
-            }
-        }
-
-        // Start cooldown countdown
-        function startCooldown(ability, duration) {
-            //console.log(`Starting cooldown for ${ability}: ${duration}s`); // Debug log
-            const abilityInfo = cooldowns[ability];
-            const element = document.getElementById(`cooldown${ability === 'primary' ? '1' : '2'}`);
-            
-            if (!element) {
-                console.error(`Could not find cooldown element for ${ability}`);
+        // Client-side menu initialization
+        window.initializeStatsMenu = function(containerId) {
+            console.log('Client: Initializing stats menu');
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error('Client: Container not found:', containerId);
                 return;
             }
 
-            // Clear existing timer if any
-            if (abilityInfo.timer) {
-                clearInterval(abilityInfo.timer);
-            }
+            // Create panel
+            const element = document.createElement('div');
+            element.className = 'panel';
+            element.style.display = 'block'; // Make sure it's visible
+            element.innerHTML = `
+                <div class="panel-header">Player Stats</div>
+                <div class="panel-content">
+                    <div class="stat-bar">
+                        <div id="health-fill" class="stat-fill health-fill"></div>
+                        <span class="stat-value" id="health-value">100</span>
+                    </div>
+                    <div class="stat-bar">
+                        <div id="stamina-fill" class="stat-fill stamina-fill"></div>
+                        <span class="stat-value" id="stamina-value">100</span>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(element);
+            console.log('Client: Stats menu element created and added to container');
+            return element;
+        };
 
-            abilityInfo.current = duration;
-            element.textContent = `${duration}s`;
-            element.style.color = '#ff5555';
-
-            abilityInfo.timer = setInterval(() => {
-                abilityInfo.current--;
-                
-                if (abilityInfo.current <= 0) {
-                    clearInterval(abilityInfo.timer);
-                    abilityInfo.timer = null;
-                    element.textContent = 'Ready';
-                    element.style.color = '#55ff55';
-                } else {
-                    element.textContent = `${abilityInfo.current}s`;
-                }
-            }, 1000);
-        }
-
-        // Listen for stats updates from the server
         hytopia.onData(data => {
+            console.log('UI Script: Received data:', data);
+            
+            if (data.type === 'INIT_MENU_SYSTEM') {
+                console.log('UI Script: Initializing menu system');
+                const element = window.initializeStatsMenu('menu-container');
+                if (element) {
+                    hytopia.sendData({
+                        type: 'MENU_SYSTEM_READY',
+                        containerId: 'menu-container'
+                    });
+                    console.log('UI Script: Menu system initialized');
+                }
+            }
+            
             if (data.type === 'statsUpdate') {
                 stats = {
                     health: Number(data.health),
@@ -294,6 +275,71 @@
             }
         });
 
+        // Initialize stats and cooldowns
+        let stats = {
+            health: 100,
+            stamina: 100,
+            mana: 100
+        };
+
+        let cooldowns = {
+            primary: { current: 0, timer: null },
+            secondary: { current: 0, timer: null }
+        };
+
+        // Update stat bars and values
+        function updateStatBars() {
+            //console.log('Updating stat bars with:', stats); // Debug update
+            for (const stat of ['health', 'stamina', 'mana']) {
+                const value = stats[stat];
+                const fill = document.getElementById(`${stat}-fill`);
+                const text = document.getElementById(`${stat}-value`);
+                
+                if (fill && text) {
+                    // Ensure width is at least 0%
+                    fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
+                    // Use Math.floor instead of Math.round for more accurate display
+                    text.textContent = Math.floor(value);
+                } else {
+                    console.error(`Could not find elements for ${stat}`);
+                }
+            }
+        }
+
+        // Start cooldown countdown
+        function startCooldown(ability, duration) {
+            //console.log(`Starting cooldown for ${ability}: ${duration}s`); // Debug log
+            const abilityInfo = cooldowns[ability];
+            const element = document.getElementById(`cooldown${ability === 'primary' ? '1' : '2'}`);
+            
+            if (!element) {
+                console.error(`Could not find cooldown element for ${ability}`);
+                return;
+            }
+
+            // Clear existing timer if any
+            if (abilityInfo.timer) {
+                clearInterval(abilityInfo.timer);
+            }
+
+            abilityInfo.current = duration;
+            element.textContent = `${duration}s`;
+            element.style.color = '#ff5555';
+
+            abilityInfo.timer = setInterval(() => {
+                abilityInfo.current--;
+                
+                if (abilityInfo.current <= 0) {
+                    clearInterval(abilityInfo.timer);
+                    abilityInfo.timer = null;
+                    element.textContent = 'Ready';
+                    element.style.color = '#55ff55';
+                } else {
+                    element.textContent = `${abilityInfo.current}s`;
+                }
+            }, 1000);
+        }
+
         // Initial stat bar update
         updateStatBars();
 
@@ -387,6 +433,10 @@
             });
             
             return clone;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded');
         });
     </script>
 

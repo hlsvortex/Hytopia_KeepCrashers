@@ -54,9 +54,9 @@ export class CapturePoint {
             relativePosition: this.position,
             onCollision: (other: BlockType | Entity, started: boolean) => {
                 if (started) {
-                    console.log('something touched or entered/intersected!');
+                    //console.log('something touched or entered/intersected!');
                 } else {
-                    console.log('something stopped touching or exited/unintersected!');
+                    //console.log('something stopped touching or exited/unintersected!');
                 }
 
                 if(other instanceof DamageableEntity) {
