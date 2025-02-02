@@ -13,9 +13,6 @@ import { GameStateController } from './GameStateController';
 import { CapturePoint } from './CapturePoint';
 import { GameModeController } from './GameModeController';
 import { KingOfTheHill } from './GameModeController';
-import { Menu } from './ui/Menu';
-import { Panel } from './ui/Panel';
-import { MenuSystem } from './ui/MenuSystem';
 
 export class GameManager {
     private readonly teams: Team[] = [
@@ -40,8 +37,6 @@ export class GameManager {
     // Add to existing properties
     private capturePoints: CapturePoint[] = [];
     private gameModeController!: GameModeController;
-
-    private menuSystem!: MenuSystem;
 
     constructor(private readonly worldEventRouter: EventRouter) {
         this.gameStateController = new GameStateController(worldEventRouter);
@@ -140,39 +135,44 @@ export class GameManager {
             teamName: this.gameModeController.getCurrentControllingTeam()?.name || 'Neutral'
         };
 
-        /*
-        console.log('[GameManager] Sending UI update:', {
-            captureProgress: captureData.progress,
-            controllingTeam: captureData.teamName
-        });
-        */
-
-
+        // Send match stats update
         const teamStats = {
             Red: players.filter(p => this.getPlayerTeam(p.player)?.name === 'Red')
-                       .map(p => ({ 
-                           username: p.player.username, 
-                           kills: p.matchStats.kills,
-                           deaths: p.matchStats.deaths 
-                       })),
+                     .map(p => ({ 
+                         username: p.player.username, 
+                         kills: p.matchStats.kills,
+                         deaths: p.matchStats.deaths 
+                     })),
             Blue: players.filter(p => this.getPlayerTeam(p.player)?.name === 'Blue')
-                        .map(p => ({
-                            username: p.player.username,
-                            kills: p.matchStats.kills,
-                            deaths: p.matchStats.deaths
-                        })),
+                      .map(p => ({
+                          username: p.player.username,
+                          kills: p.matchStats.kills,
+                          deaths: p.matchStats.deaths
+                      })),
             capturePoint: captureData
         };
 
+        // Send both stats updates to each player
         this.players.forEach(entity => {
-            entity.player.ui.sendData({
-                type: 'matchStatsUpdate',
-                teams: teamStats,
-                capturePoint: teamStats.capturePoint,
-                redTime: this.gameModeController.getTeamTime('Red'),
-                blueTime: this.gameModeController.getTeamTime('Blue'),
-                overtime: this.gameModeController.isInOvertime
-            });
+            if (entity instanceof DamageableEntity) {
+                // Send player stats
+                entity.player.ui.sendData({
+                    type: 'statsUpdate',
+                    health: entity.health,
+                    stamina: entity.stamina,
+                    mana: entity.mana
+                });
+
+                // Send match stats
+                entity.player.ui.sendData({
+                    type: 'matchStatsUpdate',
+                    teams: teamStats,
+                    capturePoint: teamStats.capturePoint,
+                    redTime: this.gameModeController.getTeamTime('Red'),
+                    blueTime: this.gameModeController.getTeamTime('Blue'),
+                    overtime: this.gameModeController.isInOvertime
+                });
+            }
         });
     }
 
@@ -252,23 +252,18 @@ export class GameManager {
 
             if (data.type === 'MENU_SYSTEM_READY') {
                 console.log('InitUI: Initializing client-side menu system');
-                this.menuSystem.initializeOnClient(data.containerId);
+               //this.menuSystem.initializeOnClient(data.containerId);
             }
         };
     }
 
     public InitUI(entity: PlayerEntity) {
-        
-        this.menuSystem = new MenuSystem();
-        
         entity.player.ui.load('ui/index.html');
         
-        console.log('InitUI: Sending INIT_MENU_SYSTEM message');
+        // Initialize UI
         entity.player.ui.sendData({ 
             type: 'INIT_MENU_SYSTEM' 
         });
-
-      
 
         const team = this.getPlayerTeam(entity.player);
         const teamColor = team?.color || '#ffffff';
@@ -482,10 +477,21 @@ export class GameManager {
     }
 
     public toggleClassSelection() {
-        this.menuSystem.showMenu('class');
+        // Send toggle message directly
+        this.players.forEach(player => {
+            player.player.ui.sendData({
+                type: 'TOGGLE_MENU',
+                menuId: 'class'
+            });
+        });
     }
 
     public showStats() {
-        this.menuSystem.showMenu('stats');
+        this.players.forEach(player => {
+            player.player.ui.sendData({
+                type: 'TOGGLE_MENU',
+                menuId: 'stats'
+            });
+        });
     }
 }

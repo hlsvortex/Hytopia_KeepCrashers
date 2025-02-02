@@ -14,45 +14,61 @@
             display: none !important;
         }
     </style>
+
+    <!-- Initialize after scripts load -->
+    <script>
+        console.log('Setting up initialization...');
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function initializePanels() {
+            console.log('Loading scripts...');
+            
+            try {
+                // Load scripts in order
+                await loadScript('{{CDN_ASSETS_URL}}/ui/js/panels/playerStats.js');
+                await loadScript('{{CDN_ASSETS_URL}}/ui/js/panels/matchStats.js');
+                await loadScript('{{CDN_ASSETS_URL}}/ui/js/panelManager.js');
+                
+                console.log('Scripts loaded, checking objects:');
+                console.log('PlayerStatsPanel:', window.PlayerStatsPanel);
+                console.log('PanelManager:', window.PanelManager);
+                
+                // Initialize panel system
+                await window.PanelManager.initialize('menu-container');
+                console.log('Panel system initialized');
+                
+                hytopia.sendData({
+                    type: 'MENU_SYSTEM_READY',
+                    containerId: 'menu-container'
+                });
+            } catch (error) {
+                console.error('Failed to initialize panel system:', error);
+            }
+        }
+
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePanels);
+        } else {
+            initializePanels();
+        }
+    </script>
 </head>
 
 <body>
-    <div id="menu-container" style="border: 2px solid blue;"></div> <!-- Debug border -->
-    
+    <div id="menu-container" style="position: fixed; top: 20px; right: 20px; min-width: 200px; min-height: 100px; border: 2px solid red; z-index: 1000;"></div>
     
     <div class="left-ui-container">
-        <!-- Ready Check -->
         <button id="ready-button" class="ready-button">READY UP</button>
-    </div>
-
-    <div class="stats-panel">
-        <div>Health:
-            <div class="stat-bar">
-                <div id="health-fill" class="stat-fill health-fill"></div>
-            </div>
-            <span class="stat-value" id="health-value">100</span>
-        </div>
-        <div>Stamina:
-            <div class="stat-bar">
-                <div id="stamina-fill" class="stat-fill stamina-fill"></div>
-            </div>
-            <span class="stat-value" id="stamina-value">100</span>
-        </div>
-        <div>Mana:
-            <div class="stat-bar">
-                <div id="mana-fill" class="stat-fill mana-fill"></div>
-            </div>
-            <span class="stat-value" id="mana-value">100</span>
-        </div>
-        <div class="abilities">
-            <h3>Abilities</h3>
-            <div class="ability" id="ability1">
-                Ability 1: <span class="cooldown" id="cooldown1">Ready</span>
-            </div>
-            <div class="ability" id="ability2">
-                Ability 2: <span class="cooldown" id="cooldown2">Ready</span>
-            </div>
-        </div>
     </div>
 
     <!-- Add crosshair -->
@@ -78,17 +94,7 @@
         <div id="overtime" class="overtime-indicator">OVERTIME</div>
     </div>
 
-    <div class="stats-panel" id="match-stats">
-        <div class="teams-container">
-            <div class="team-list" id="red-team">
-                <h3>TEAM RED</h3>
-            </div>
-            <div class="team-list" id="blue-team">
-                <h3>TEAM BLUE</h3>
-            </div>
-        </div>
-    </div>
-
+    
     <div id="class-select-menu" class="class-select-menu">
         <div class="class-button wizard" data-class="wizard">
             <div class="class-icon"></div>
@@ -112,72 +118,22 @@
             </div>
         </div>
     </div>
-</body>
 
-</html>
+    <template id="player-nameplate-template">
+        <div class="nameplate">
+            <div class="name"></div>
+            <div class="health-bar">
+                <div class="health-fill"></div>
+            </div>
+        </div>
+    </template>
 
     <script>
         console.log('UI Script: Loading...');
         
-        // Create a global menu container for the client side
-        window.menuContainer = document.getElementById('menu-container');
-
-        window.createPanel = function(id, title) {
-            const element = document.createElement('div');
-            element.className = 'panel';
-            element.innerHTML = `
-                <div class="panel-header">${title}</div>
-                <div class="panel-content" id="${id}-content"></div>
-            `;
-            return element;
-        };
-
-        // Client-side menu initialization
-        window.initializeStatsMenu = function(containerId) {
-            console.log('Client: Initializing stats menu');
-            const container = document.getElementById(containerId);
-            if (!container) {
-                console.error('Client: Container not found:', containerId);
-                return;
-            }
-
-            // Create panel
-            const element = document.createElement('div');
-            element.className = 'panel';
-            element.style.display = 'block'; // Make sure it's visible
-            element.innerHTML = `
-                <div class="panel-header">Player Stats</div>
-                <div class="panel-content">
-                    <div class="stat-bar">
-                        <div id="health-fill" class="stat-fill health-fill"></div>
-                        <span class="stat-value" id="health-value">100</span>
-                    </div>
-                    <div class="stat-bar">
-                        <div id="stamina-fill" class="stat-fill stamina-fill"></div>
-                        <span class="stat-value" id="stamina-value">100</span>
-                    </div>
-                </div>
-            `;
-            
-            container.appendChild(element);
-            console.log('Client: Stats menu element created and added to container');
-            return element;
-        };
-
+        // Keep only the essential event handlers
         hytopia.onData(data => {
-            console.log('UI Script: Received data:', data);
-            
-            if (data.type === 'INIT_MENU_SYSTEM') {
-                console.log('UI Script: Initializing menu system');
-                const element = window.initializeStatsMenu('menu-container');
-                if (element) {
-                    hytopia.sendData({
-                        type: 'MENU_SYSTEM_READY',
-                        containerId: 'menu-container'
-                    });
-                    console.log('UI Script: Menu system initialized');
-                }
-            }
+
             
             if (data.type === 'statsUpdate') {
                 stats = {
@@ -185,7 +141,7 @@
                     stamina: Number(data.stamina),
                     mana: Number(data.mana)
                 };
-                updateStatBars();
+                //updateStatBars();
             }
             else if (data.type === 'chargeUpdate') {
                 const chargingBar = document.getElementById('charging-bar');
@@ -316,109 +272,38 @@
                 console.error(`Could not find cooldown element for ${ability}`);
                 return;
             }
-
-            // Clear existing timer if any
-            if (abilityInfo.timer) {
-                clearInterval(abilityInfo.timer);
-            }
-
+            
             abilityInfo.current = duration;
-            element.textContent = `${duration}s`;
-            element.style.color = '#ff5555';
-
             abilityInfo.timer = setInterval(() => {
                 abilityInfo.current--;
-                
+                element.textContent = abilityInfo.current > 0 ? abilityInfo.current : 'Ready';
                 if (abilityInfo.current <= 0) {
                     clearInterval(abilityInfo.timer);
-                    abilityInfo.timer = null;
                     element.textContent = 'Ready';
-                    element.style.color = '#55ff55';
-                } else {
-                    element.textContent = `${abilityInfo.current}s`;
                 }
             }, 1000);
         }
 
-        // Initial stat bar update
-        updateStatBars();
-
-        const classMenu = document.getElementById('class-select-menu');
-        let menuVisible = false;
-
-        // Update menu toggle handler
-        document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'k') {
-                const wasVisible = menuVisible;
-                menuVisible = !wasVisible;
-                classMenu.classList.toggle('active', menuVisible);
-                hytopia.sendData({
-                    type: 'TOGGLE_POINTER_LOCK',
-                    enabled: menuVisible
-                });
-            }
+        // Handle ready button
+        document.getElementById('ready-button').addEventListener('click', () => {
+            hytopia.sendData({ type: 'PLAYER_READY' });
+            document.getElementById('ready-button').style.display = 'none';
         });
 
-        // Restore class selection functionality
-        document.querySelectorAll('.class-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const className = button.dataset.class;
-                // Send class change
-                hytopia.sendData({
-                    type: 'CLASS_CHANGE',
-                    className: className
-                });
-                // Close menu
-                menuVisible = false;
-                classMenu.classList.remove('active');
-                // Lock pointer
-                hytopia.sendData({
-                    type: 'TOGGLE_POINTER_LOCK',
-                    enabled: false
-                });
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            if (menuVisible && !classMenu.contains(e.target)) {
-                menuVisible = false;
-                classMenu.classList.remove('active');
-                hytopia.sendData({
-                    type: 'TOGGLE_POINTER_LOCK',
-                    enabled: false
-                });
-            }
-        });
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${String(secs).padStart(2, '0')}`;
-        }
-
+        // Handle match stats toggle
         document.addEventListener('keydown', (e) => {
             if (e.key === 'f' || e.key === 'F') {
-                // Only toggle the stats panel, not the capture point
                 document.getElementById('match-stats').style.display = 'block';
             }
         });
         
         document.addEventListener('keyup', (e) => {
             if (e.key === 'f' || e.key === 'F') {
-                // Only toggle the stats panel, not the capture point
                 document.getElementById('match-stats').style.display = 'none';
             }
         });
 
-        // Add back the ready button handler
-        document.getElementById('ready-button').addEventListener('click', () => {
-            hytopia.sendData({
-                type: 'PLAYER_READY'
-            });
-            // Hide immediately on click
-            document.getElementById('ready-button').style.display = 'none';
-        });
-
+        // Register nameplate template
         hytopia.registerSceneUITemplate('player-nameplate', (id, onState) => {
             const template = document.getElementById('player-nameplate-template');
             const clone = template.content.cloneNode(true);
@@ -435,19 +320,13 @@
             return clone;
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded');
-        });
+        // Format time helper
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${String(secs).padStart(2, '0')}`;
+        }
     </script>
-
-    <template id="player-nameplate-template">
-        <div class="nameplate">
-            <div class="name"></div>
-            <div class="health-bar">
-                <div class="health-fill"></div>
-            </div>
-        </div>
-    </template>
 </body>
 
 </html>
