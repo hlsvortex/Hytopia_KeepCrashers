@@ -3,11 +3,17 @@ import { Entity, BlockType } from 'hytopia';
 import type { Vector3Like } from 'hytopia';
 import type { EmitterOptions } from '../particles/ParticleEmitter';
 
+export type AbilityUseType = 
+    'instant' |          // Single activation (e.g. fireball)
+    'hold_continuous' |  // Active while holding input (e.g. beam)
+    'toggle_continuous'; // Toggle on/off with input (e.g. aura)
+
 export interface AbilityOptions {
     name: string;
     cooldown: number;
     resourceCost: number;
     resourceType: Resource;
+    useType?: AbilityUseType; // Default: 'instant'
     useFX?: EmitterOptions;
 }
 

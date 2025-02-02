@@ -8,6 +8,7 @@ import { ParticleFX } from './particles/ParticleFX';
 import type { DamageableEntity } from './DamageableEntity';
 import type MyEntityController from './MyEntityController';
 import type { Ability } from './Ability';
+import { BeamAbility } from './abilities/BeamAbility';
 
 
 
@@ -51,7 +52,20 @@ export class WizardAbilityController extends AbilityController {
             range: 10,
             distance: 10,
         };
-        this.addAbility('secondary', new SelfAbility(teleportOptions, this.eventRouter, this));
+        //this.addAbility('secondary', new SelfAbility(teleportOptions, this.eventRouter, this));
+
+        const beamOptions = {
+            name: 'Fire Beam',
+            cooldown: 0,
+            resourceCost: 2,
+            resourceType: Resource.Mana,
+            useType: 'hold_continuous' as const,
+            range: 15,
+            damagePerTick: 5,
+            tickInterval: 100,
+        };
+
+        this.addAbility('secondary', new BeamAbility(beamOptions, this.eventRouter, this));
     }
 
     public spawnClassItems() {
@@ -328,11 +342,13 @@ export class ArcherAbilityController extends AbilityController {
     tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number) {
 
         const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
-        const abilitySecondary = this._abilities.get('secondary') as SelfAbility;
+        const abilitySecondary = this._abilities.get('secondary') as PhysicsProjectileAbility;
 
         this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
 
+
+        
         const myController = entity.controller as MyEntityController;
         const damageableEntity = entity  as DamageableEntity;
         // Archer-specific tick logic

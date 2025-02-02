@@ -69,10 +69,30 @@ export abstract class AbilityController {
                 this.useAbility(ability, entity);
             }
         }
-        else {
-            if (buttonDown) {
+        else if (buttonDown) {
+
+            if (!ability.options.useType || ability.options.useType === 'instant') {
                 this.useAbility(ability, entity);
             }
+            else if (ability.options.useType === 'hold_continuous') {
+                this.useAbilityTick(ability, entity);
+            }
+            else if (ability.options.useType === 'toggle_continuous') {
+                // Tick the ability
+                const interval = setInterval(() => {
+                    this.useAbilityTick(ability, entity);
+                }, 100);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                }, 1000);
+            }
+            
+
+
+
+
+
         }
     }
 
@@ -85,6 +105,16 @@ export abstract class AbilityController {
         ability.consumeResources(entity as DamageableEntity);
     }
 
+    protected useAbilityTick(ability: Ability, entity: PlayerEntity) {
+        const aim = this.calculateAimDirection(entity, 50);
+        if (!aim) return;
+        ability.use(aim.origin, aim.direction, entity);
+        //entity.startModelOneshotAnimations(['simple_interact']);
+        //ability.startCooldown();
+        ability.consumeResources(entity as DamageableEntity);
+    }
+    
+    
     abstract tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number): void;
 
     public updateChargeUI(isCharging: boolean, chargeLevel: number) {
