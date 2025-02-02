@@ -116,11 +116,6 @@ export default class AbilityEntityController extends MyEntityController {
 
         this.currentAbilityController.tick(entity, input, deltaTimeMs);
     
-        if (input.c) {
-            this.setClass('wizard');
-            input.c = false;
-        }
-     
         // Regenerate stats
         if (entity instanceof DamageableEntity) {
             this.regenerateStats(entity, deltaTimeMs);

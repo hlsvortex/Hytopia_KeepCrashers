@@ -612,11 +612,6 @@
         </div>
     </div>
 
-    <!-- Add class switcher button -->
-    <div class="class-switcher" id="class-switcher">
-        Switch to Fighter
-    </div>
-
     <!-- Add crosshair -->
     <div class="crosshair"></div>
 
@@ -857,55 +852,51 @@
         // Initial stat bar update
         updateStatBars();
 
-        const classSwitcher = document.getElementById('class-switcher');
-        const classes = ['Wizard', 'Fighter', 'Archer'];
-        let currentClassIndex = 0;
+        const classMenu = document.getElementById('class-select-menu');
+        let menuVisible = false;
 
-        classSwitcher.addEventListener('click', () => {
-            const newClassIndex = (currentClassIndex + 1) % classes.length;
-            const selectedClass = classes[newClassIndex];
-            console.log(`Switching to class: ${selectedClass}`);
-            // Change sendData to emit
-            hytopia.sendData({
-                type: 'classSelected',
-                class: selectedClass
-            });
-
-            // Update UI for next potential switch
-            currentClassIndex = newClassIndex;
-            const nextClass = classes[(newClassIndex + 1) % classes.length];
-            classSwitcher.textContent = `Switch to ${nextClass}`;
+        // Update menu toggle handler
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'k') {
+                const wasVisible = menuVisible;
+                menuVisible = !wasVisible;
+                classMenu.classList.toggle('active', menuVisible);
+                hytopia.sendData({
+                    type: 'TOGGLE_POINTER_LOCK',
+                    enabled: menuVisible
+                });
+            }
         });
 
-        // Update nameplate template registration
-        hytopia.registerSceneUITemplate('player-nameplate', (id, onState) => {
-            const template = document.getElementById('nameplate-template');
-            const clone = template.content.cloneNode(true);
-            
-            const container = clone.querySelector('.nameplate');
-            const nameElement = clone.querySelector('.name');
-            const healthFill = clone.querySelector('.health-fill');
-          
-            onState(state => {
-                nameElement.textContent = state.name;
-                healthFill.style.width = `${Math.max(0, Math.min(100, state.health))}%`;
-                container.style.borderColor = state.teamColor; // Set border color here
-                
-                if (state.hidden == true) {
-                    container.style.display = 'none';
-                }
+        // Restore class selection functionality
+        document.querySelectorAll('.class-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const className = button.dataset.class;
+                // Send class change
+                hytopia.sendData({
+                    type: 'CLASS_CHANGE',
+                    className: className
+                });
+                // Close menu
+                menuVisible = false;
+                classMenu.classList.remove('active');
+                // Lock pointer
+                hytopia.sendData({
+                    type: 'TOGGLE_POINTER_LOCK',
+                    enabled: false
+                });
             });
-            
-            return clone;
         });
 
-        // Add ready button handler
-        document.getElementById('ready-button').addEventListener('click', () => {
-            hytopia.sendData({
-                type: 'PLAYER_READY'
-            });
-            // Hide immediately on click
-            document.getElementById('ready-button').style.display = 'none';
+        document.addEventListener('click', (e) => {
+            if (menuVisible && !classMenu.contains(e.target)) {
+                menuVisible = false;
+                classMenu.classList.remove('active');
+                hytopia.sendData({
+                    type: 'TOGGLE_POINTER_LOCK',
+                    enabled: false
+                });
+            }
         });
 
         function formatTime(seconds) {
@@ -928,36 +919,13 @@
             }
         });
 
-        const classMenu = document.getElementById('class-select-menu');
-        let menuVisible = false;
-
-        // Toggle menu with K key
-        document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'k') {
-                menuVisible = !menuVisible;
-                classMenu.classList.toggle('active', menuVisible);
-            }
-        });
-
-        // Handle class selection
-        document.querySelectorAll('.class-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const className = button.dataset.class;
-                hytopia.sendData({
-                    type: 'CLASS_CHANGE',
-                    className: className
-                });
-                menuVisible = false;
-                classMenu.classList.remove('active');
+        // Add back the ready button handler
+        document.getElementById('ready-button').addEventListener('click', () => {
+            hytopia.sendData({
+                type: 'PLAYER_READY'
             });
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (menuVisible && !classMenu.contains(e.target)) {
-                menuVisible = false;
-                classMenu.classList.remove('active');
-            }
+            // Hide immediately on click
+            document.getElementById('ready-button').style.display = 'none';
         });
     </script>
 </body>

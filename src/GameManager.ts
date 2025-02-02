@@ -217,12 +217,12 @@ export class GameManager {
 
         this.worldEventRouter.emit('PLAYER.CREATED', playerEntity);
 
+        // Updated UI handler
         playerEntity.player.ui.onData = (playerUI: PlayerUI, data: Record<string, any>) => {
             console.log('Got data from player UI:', data);
 
             if (data.type === 'PLAYER_READY') {
                 this.setPlayerReady(player.id, true);
-                // Update only this player's UI immediately
                 playerUI.sendData({
                     type: 'gameStateUpdate',
                     state: this.gameStateController.getState(),
@@ -230,28 +230,14 @@ export class GameManager {
                     isReady: true
                 });
             }
-
-            if (data.type === 'classSelected') {
-                // Switch class using the AbilityEntityController
-                switch (data.class) { // Use the class directly from the UI data
-                    case 'Wizard':
-                        entityController.setClass('wizard');
-                        break;
-                    case 'Fighter':
-                        entityController.setClass('fighter');
-
-                        break;
-                    case 'Archer':
-                        entityController.setClass('archer');
-                        break;
-
-                }
-
-                console.log(`Switched player to ${data.class}!`);
-            }
-
+            
+            // Add proper CLASS_CHANGE handler
             if (data.type === 'CLASS_CHANGE') {
                 this.handleClassChange(player, data.className);
+            }
+
+            if (data.type === 'TOGGLE_POINTER_LOCK') {
+                playerUI.lockPointer(!data.enabled);
             }
         };
     }
