@@ -1,0 +1,10 @@
+<script>
+    hytopia.onData(data => {
+        if (data.type === 'captureUpdate') {
+            document.getElementById('capture-progress').style.width = data.progress + '%';
+            document.getElementById('capture-progress').style.background = data.teamColor;
+            document.getElementById('capture-team').textContent = data.teamName;
+            document.getElementById('capture-team').style.color = data.teamColor;
+        }
+    });
+</script> 

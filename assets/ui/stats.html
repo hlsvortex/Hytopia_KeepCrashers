@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats</title>
+    <style>
+        div[style="z-index: 10000"] {
+            display: none !important;
+        }
+        #chat-window {
+        display: none !important;
+        }
+        /* Core stats panel */
+        .stats-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 900;
+        }
+        
+        .stats-panel div {
+            margin: 5px 0;
+        }
+
+        .abilities {
+            margin-top: 10px;
+        }
+
+        .ability {
+            margin: 5px 0;
+        }
+
+        .cooldown {
+            color: #ff5555;
+        }
+
+        .stat-bar {
+            width: 200px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .health-fill { background-color: #ff4444; }
+        .stamina-fill { background-color: #44ff44; }
+        .mana-fill { background-color: #4444ff; }
+
+        .stat-value {
+            position: absolute;
+            right: 10px;
+            color: white;
+        }
+
+        .class-switcher {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Add crosshair styles */
+        .crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: white;
+        }
+        .crosshair::before {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .crosshair::after {
+            height: 2px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .charging-bar {
+            position: fixed;
+            left: 52%;
+            top: 45%;
+            width: 5px;
+            height: 50px;
+            background-color: #000000;
+            border: 1px solid #000000;
+            border-radius: 2px;
+            display: none;
+        }
+
+        .charging-bar-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #0011ff;
+            border-radius: 1px;
+            transition: height 0.05s linear;
+        }
+
+        /* Update nameplate styles */
+        .nameplate {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            text-align: center;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 2px 8px;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent; /* Set initial border as transparent */
+        }
+
+        .name {
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.1;
+        }
+
+        .health-bar {
+            width: 100%;  /* Make health bar full width of nameplate */
+            height: 2px;  /* Thinner health bar */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1px;
+            margin: 2px 0 1px;  /* Reduced margins */
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333 0%, #ff4444 100%);
+            transition: width 0.2s ease;
+        }
+
+        .game-state-display {
+            position: fixed;
+            top: 20px;
+            left: 25%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .ready-button {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #29cc80;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .ready-button:hover {
+            background: #66ff66;
+        }
+
+        .teams-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 200px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .team-list h3 {
+            text-align: center;
+            font-size: 1.5em;
+            padding: 4px;
+            border-radius: 2px;
+            margin: 0 0 5px 0;
+        }
+        
+        .player-stat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            margin: 2px 0;
+        }
+
+        .player-stat > div {
+            min-width: 80px;
+            margin-left: 10px; /* Add space between name and stats */
+        }
+
+        /* Red team specific styles */
+        #red-team h3 {
+            background-color: rgba(255, 68, 68, 0.0);
+            color: #ff4444;
+        }
+
+        #red-team .player-stat {
+            background-color: rgba(255, 68, 68, 0.3);
+        }
+
+        /* Blue team specific styles */
+        #blue-team h3 {
+            background-color: rgba(68, 68, 255, 0.0);
+            color: #4444ff;
+        }
+
+        #blue-team .player-stat {
+            background-color: rgba(68, 68, 255, 0.3);
+        }
+
+        /* Match stats panel */
+        #match-stats {
+            top: 25%;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            width: 80%;
+            max-width: 700px;
+            transform: translateY(-30%);
+            z-index: 1000;
+            background: rgba(0,0,0,0.9);
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            margin: 0 0 5px 0;
+            font-weight: 200;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-header span {
+            flex: 1;
+            text-align: left;
+        }
+
+        .stats-header span:nth-child(2),
+        .stats-header span:last-child {
+            text-align: right;
+            width: 20px;
+        }
+
+        .stats-header span:nth-child(2) {
+            text-align: right;
+            width: 15px;
+            margin-left: 100px; /* Increased from 15px */
+        }
+
+        .stats-header span:last-child {
+            text-align: right;
+            width: 30px;
+            margin-left: 0; /* Ensure no left margin */
+        }
+
+        .left-ui-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ready-button {
+            position: static;
+            transform: none;
+            margin-bottom: 10px;
+        }
+
+        /* Add this to ensure capture point stays on top */
+        #capture-point-ui {
+            z-index: 1000;
+            pointer-events: none; /* Make it non-interactive */
+        }
+
+        /* Add capture point styles */
+        .capture-point-ui {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .capture-title {
+            font-size: 1.2em;
+            color: #fff;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .capture-progress-container {
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .capture-progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, rgba(255,68,68,1) 0%, rgba(68,68,255,1) 100%);
+        }
+
+        .capture-team {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 6px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .control-info {
+            flex-grow: 1;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .team-timer {
+            width: 80px;
+            text-align: center;
+            font-size: 1.4em;
+        }
+
+        .capture-team {
+            margin-top: 8px;
+            font-size: 1.1em;
+        }
+
+        .overtime-indicator {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .red-timer { 
+            color: #ff4444;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .blue-timer { 
+            color: #4444ff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="left-ui-container" style="
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    ">
+        <!-- Ready Check -->
+        <button id="ready-button" class="ready-button" style="
+            position: static;
+            transform: none;
+            margin-bottom: 10px;
+        ">
+            READY UP
+        </button>
+
+        <!-- Health/Stamina -->
+        <div class="stats-panel">
+            <div class="stat-bar">
+                <div id="health-fill" class="stat-fill health-fill"></div>
+            </div>
+            <div class="stat-bar">
+                <div id="stamina-fill" class="stat-fill stamina-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div>Health: 
+            <div class="stat-bar">
+                <div id="health-fill" class="stat-fill health-fill" style="width: 100%"></div>
+            </div>
+            <span class="stat-value" id="health-value">100</span>
+        </div>
+        <div>Stamina: 
+            <div class="stat-bar">
+                <div id="stamina-fill" class="stat-fill stamina-fill" style="width: 100%"></div>
+            </div>
+            <span class="stat-value" id="stamina-value">100</span>
+        </div>
+        <div>Mana: 
+            <div class="stat-bar">
+                <div id="mana-fill" class="stat-fill mana-fill" style="width: 100%"></div>
+            </div>
+            <span class="stat-value" id="mana-value">100</span>
+        </div>
+        <div class="abilities">
+            <h3>Abilities</h3>
+            <div class="ability" id="ability1">
+                Ability 1: <span class="cooldown" id="cooldown1">Ready</span>
+            </div>
+            <div class="ability" id="ability2">
+                Ability 2: <span class="cooldown" id="cooldown2">Ready</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add class switcher button -->
+    <div class="class-switcher" id="class-switcher">
+        Switch to Fighter
+    </div>
+
+    <!-- Add crosshair -->
+    <div class="crosshair"></div>
+
+    <div id="charging-bar" class="charging-bar">
+        <div id="charging-bar-fill" class="charging-bar-fill"></div>
+    </div>
+
+    <!-- Add nameplate template -->
+    <template id="nameplate-template">
+        <div class="nameplate">
+            <div class="name">{{name}}</div>
+            <div class="health-bar">
+                <div class="health-fill"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Add to body section -->
+    <div id="game-state-display" class="game-state-display"></div>
+
+    <!-- Updated capture point UI with classes -->
+    <div class="capture-point-ui">
+        <div class="timer-container">
+            <div class="team-timer red-timer">3:00</div>
+            <div class="control-info">
+                <div class="capture-progress-container">
+                    <div id="capture-progress" class="capture-progress-bar"></div>
+                </div>
+                <div id="capture-team" class="capture-team">NEUTRAL</div>
+            </div>
+            <div class="team-timer blue-timer">3:00</div>
+        </div>
+        <div id="overtime" class="overtime-indicator">OVERTIME</div>
+    </div>
+
+    <!-- Match stats panel (toggleable with F key) -->
+    <div class="stats-panel" id="match-stats" style="display: none;">
+        <!-- Existing teams container below -->
+        <div class="teams-container">
+            <div class="team-list" id="red-team">
+                <h3>TEAM RED</h3>
+            </div>
+            <div class="team-list" id="blue-team">
+                <h3>TEAM BLUE</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize stats and cooldowns
+        let stats = {
+            health: 100,
+            stamina: 100,
+            mana: 100
+        };
+
+        let cooldowns = {
+            primary: { current: 0, timer: null },
+            secondary: { current: 0, timer: null }
+        };
+
+        // Update stat bars and values
+        function updateStatBars() {
+            //console.log('Updating stat bars with:', stats); // Debug update
+            for (const stat of ['health', 'stamina', 'mana']) {
+                const value = stats[stat];
+                const fill = document.getElementById(`${stat}-fill`);
+                const text = document.getElementById(`${stat}-value`);
+                
+                if (fill && text) {
+                    // Ensure width is at least 0%
+                    fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
+                    // Use Math.floor instead of Math.round for more accurate display
+                    text.textContent = Math.floor(value);
+                } else {
+                    console.error(`Could not find elements for ${stat}`);
+                }
+            }
+        }
+
+        // Start cooldown countdown
+        function startCooldown(ability, duration) {
+            //console.log(`Starting cooldown for ${ability}: ${duration}s`); // Debug log
+            const abilityInfo = cooldowns[ability];
+            const element = document.getElementById(`cooldown${ability === 'primary' ? '1' : '2'}`);
+            
+            if (!element) {
+                console.error(`Could not find cooldown element for ${ability}`);
+                return;
+            }
+
+            // Clear existing timer if any
+            if (abilityInfo.timer) {
+                clearInterval(abilityInfo.timer);
+            }
+
+            abilityInfo.current = duration;
+            element.textContent = `${duration}s`;
+            element.style.color = '#ff5555';
+
+            abilityInfo.timer = setInterval(() => {
+                abilityInfo.current--;
+                
+                if (abilityInfo.current <= 0) {
+                    clearInterval(abilityInfo.timer);
+                    abilityInfo.timer = null;
+                    element.textContent = 'Ready';
+                    element.style.color = '#55ff55';
+                } else {
+                    element.textContent = `${abilityInfo.current}s`;
+                }
+            }, 1000);
+        }
+
+        // Listen for stats updates from the server
+        hytopia.onData(data => {
+            if (data.type === 'statsUpdate') {
+                stats = {
+                    health: Number(data.health),
+                    stamina: Number(data.stamina),
+                    mana: Number(data.mana)
+                };
+                updateStatBars();
+            }
+            else if (data.type === 'chargeUpdate') {
+                const chargingBar = document.getElementById('charging-bar');
+                const chargingBarFill = document.getElementById('charging-bar-fill');
+                
+                if (data.isCharging) {
+                    chargingBar.style.display = 'block';
+                    // Ensure at least 5% height for visibility
+                    const fillHeight = Math.max(1, data.chargeLevel * 100);
+                    chargingBarFill.style.height = `${fillHeight}%`;
+                } else {
+                    chargingBar.style.display = 'none';
+                    chargingBarFill.style.height = '0%';
+                }
+            }
+            else if (data.type === 'abilityUpdate') {
+                const cooldown = Math.ceil(Number(data.cooldown) || 0);
+                if (cooldown > 0) {
+                    startCooldown(data.ability, cooldown);
+                }
+            }
+            else if (data.type === 'gameStateUpdate') {
+                const display = document.getElementById('game-state-display');
+                const readyButton = document.getElementById('ready-button');
+                
+                display.textContent = data.message;
+                display.style.display = 'block';
+                
+                // Only show button if in ready state AND player isn't already ready
+                readyButton.style.display = 
+                    data.state === 'WaitingForPlayersReady' && !data.isReady ? 'block' : 'none';
+            }
+            else if (data.type === 'matchStatsUpdate') {
+                const updateTeamList = (teamElement, players) => {
+                    // Ensure header exists
+                    let header = teamElement.querySelector('h3');
+                    if (!header) {
+                        header = document.createElement('h3');
+                        teamElement.prepend(header);
+                    }
+                    
+                    // Set header text based on team
+                    const teamName = teamElement.id === 'red-team' ? 'TEAM RED' : 'TEAM BLUE';
+                    header.textContent = teamName;
+
+                    // Clear existing content
+                    teamElement.innerHTML = `
+                        <div class="stats-header">
+                            <span>Player</span>
+                            <span>Deaths</span>
+                            <span>Kills</span>
+                        </div>
+                    `;
+
+                    // Add new player stats
+                    players.forEach(player => {
+                        const div = document.createElement('div');
+                        div.className = 'player-stat';
+                        div.innerHTML = `
+                            <span style="flex: 1; text-align: left;">${player.username}</span>
+                            <span style="text-align: right; width: 50px; margin-right: 15px;">${player.deaths || 0}</span>
+                            <span style="text-align: right; width: 50px;">${player.kills || 0}</span>
+                        `;
+                        teamElement.appendChild(div);
+                    });
+                };
+                
+                updateTeamList(document.getElementById('red-team'), data.teams.Red);
+                updateTeamList(document.getElementById('blue-team'), data.teams.Blue);
+
+                // Update team timers
+                document.querySelector('.red-timer').textContent = formatTime(data.redTime);
+                document.querySelector('.blue-timer').textContent = formatTime(data.blueTime);
+                
+                // Update overtime display
+                const overtimeElement = document.getElementById('overtime');
+                overtimeElement.style.display = data.overtime ? 'block' : 'none';
+                
+                // Update progress bar and team status
+                const progressBar = document.getElementById('capture-progress');
+                progressBar.style.width = data.capturePoint.progress + '%';
+                progressBar.style.background = data.capturePoint.teamColor || '#666';
+                
+                const teamElement = document.getElementById('capture-team');
+                teamElement.textContent = data.capturePoint.teamName || 'NEUTRAL';
+                teamElement.style.color = data.capturePoint.teamColor || '#666';
+            }
+        });
+
+        // Initial stat bar update
+        updateStatBars();
+
+        const classSwitcher = document.getElementById('class-switcher');
+        const classes = ['Wizard', 'Fighter', 'Archer'];
+        let currentClassIndex = 0;
+
+        classSwitcher.addEventListener('click', () => {
+            const newClassIndex = (currentClassIndex + 1) % classes.length;
+            const selectedClass = classes[newClassIndex];
+            console.log(`Switching to class: ${selectedClass}`);
+            // Change sendData to emit
+            hytopia.sendData({
+                type: 'classSelected',
+                class: selectedClass
+            });
+
+            // Update UI for next potential switch
+            currentClassIndex = newClassIndex;
+            const nextClass = classes[(newClassIndex + 1) % classes.length];
+            classSwitcher.textContent = `Switch to ${nextClass}`;
+        });
+
+        // Update nameplate template registration
+        hytopia.registerSceneUITemplate('player-nameplate', (id, onState) => {
+            const template = document.getElementById('nameplate-template');
+            const clone = template.content.cloneNode(true);
+            
+            const container = clone.querySelector('.nameplate');
+            const nameElement = clone.querySelector('.name');
+            const healthFill = clone.querySelector('.health-fill');
+          
+            onState(state => {
+                nameElement.textContent = state.name;
+                healthFill.style.width = `${Math.max(0, Math.min(100, state.health))}%`;
+                container.style.borderColor = state.teamColor; // Set border color here
+                
+                if (state.hidden == true) {
+                    container.style.display = 'none';
+                }
+            });
+            
+            return clone;
+        });
+
+        // Add ready button handler
+        document.getElementById('ready-button').addEventListener('click', () => {
+            hytopia.sendData({
+                type: 'PLAYER_READY'
+            });
+            // Hide immediately on click
+            document.getElementById('ready-button').style.display = 'none';
+        });
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${String(secs).padStart(2, '0')}`;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'f' || e.key === 'F') {
+                // Only toggle the stats panel, not the capture point
+                document.getElementById('match-stats').style.display = 'block';
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'f' || e.key === 'F') {
+                // Only toggle the stats panel, not the capture point
+                document.getElementById('match-stats').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,130 @@
+import {
+    Audio,
+    BaseEntityController,
+    ColliderShape,
+    CoefficientCombineRule,
+    CollisionGroup,
+    Entity,
+    PlayerEntity,
+    BlockType,
+    EventRouter,
+    RigidBodyType,
+    Quaternion,
+} from 'hytopia';
+
+import { Vector3 } from 'hytopia';
+
+import type {
+    PlayerInput,
+    PlayerCameraOrientation,
+    Vector3Like,
+} from 'hytopia';
+
+import MyEntityController from './MyEntityController';
+import type { MyEntityControllerOptions } from './MyEntityController';
+import { DamageableEntity } from './DamageableEntity';
+import { PlayerEvents } from './events';
+import type { PlayerDeathEventPayload, PlayerRespawnEventPayload } from './events';
+import { world } from './GlobalContext';
+import { ArcherAbilityController, WizardAbilityController } from './PlayerClass';
+import { AbilityController } from './AbilityController';
+
+
+
+
+export default class AbilityEntityController extends MyEntityController {
+    private currentAbilityController: AbilityController;
+    
+    protected ownerEntity: PlayerEntity | undefined;
+    
+    
+
+    constructor(options: MyEntityControllerOptions = {}) {
+        super(options);
+        this.currentAbilityController = new WizardAbilityController(world.eventRouter); //new DefaultAbilityController(); // Fallback controller
+    }
+
+
+    public attach(entity: Entity) {
+        super.attach(entity);
+        this.ownerEntity = entity as PlayerEntity;
+        // Initialize the current controller with the entity
+        this.currentAbilityController.attach(this.ownerEntity);
+        //const direction = Vector3.fromVector3Like(entity.directionFromRotation);
+
+        world?.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
+            console.log('Player death event received' + payload.player);
+            if (payload.player == this.ownerEntity?.player) {
+                this.pauseInput = true;
+                
+                this.ownerEntity.setAdditionalMass(100000);
+                
+            }
+        });
+
+        world?.eventRouter.on<PlayerRespawnEventPayload>(PlayerEvents.Respawn, (payload) => {
+            console.log('RESPAWNING' + payload.player);
+            if (payload.player == this.ownerEntity?.player) {
+                this.pauseInput = false;
+                const damageable = this.ownerEntity as DamageableEntity;
+                damageable.respawn();
+                this.ownerEntity.setAdditionalMass(1);
+            }
+        });
+
+    }
+
+    public detach() {
+        // Clean up current controller
+        super.detach(this.ownerEntity as Entity);
+        this.currentAbilityController.detach();
+    }
+
+    public setClass(controllerClass: new (eventRouter: EventRouter) => AbilityController) {
+        // Clean up previous controller
+        this.currentAbilityController.detach();
+        
+        // Create and attach new controller
+        this.currentAbilityController = new controllerClass(world.eventRouter);
+        if (this.ownerEntity) {
+            this.currentAbilityController.attach(this.ownerEntity);
+        }
+    }
+    
+
+    public tickWithPlayerInput(entity: PlayerEntity, input: PlayerInput, cameraOrientation: PlayerCameraOrientation, deltaTimeMs: number) {
+        if (!entity.isSpawned || !entity.world) return;
+
+        if (this.pauseInput) return;
+        // Call parent class for default movement
+        super.tickWithPlayerInput(entity, input, cameraOrientation, deltaTimeMs);
+
+        this.currentAbilityController.tick(entity, input, deltaTimeMs);
+    
+        if (input.c) {
+            this.setClass(ArcherAbilityController);
+            input.c = false;
+        }
+     
+        // Regenerate stats
+        if (entity instanceof DamageableEntity) {
+            this.regenerateStats(entity, deltaTimeMs);
+        }
+  
+    }
+
+    private regenerateStats(entity: DamageableEntity, deltaTimeMs: number) {
+        const regenerationRate = 10; // per second
+        const amount = regenerationRate * (deltaTimeMs / 1000);
+        
+        if (!entity.isMoving) {
+            entity.regenerateStamina(amount);
+        }
+        entity.regenerateMana(amount);
+    }
+    
+}
+
+
+
+

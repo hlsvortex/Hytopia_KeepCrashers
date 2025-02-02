@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Selection</title>
+    <style>
+        .class-selection {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .class-selection button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="class-selection">
+        <h1>Choose Your Class</h1>
+        <button id="wizard">Wizard</button>
+        <button id="fighter">Fighter</button>
+        <button id="archer">Archer</button>
+    </div>
+
+    <script>
+        // Send class selection data to the server
+        document.getElementById('wizard').addEventListener('click', () => {
+            hytopia.sendData({ type: 'classSelected', class: 'Wizard' });
+        });
+
+        document.getElementById('fighter').addEventListener('click', () => {
+            hytopia.sendData({ type: 'classSelected', class: 'Fighter' });
+        });
+
+        document.getElementById('archer').addEventListener('click', () => {
+            hytopia.sendData({ type: 'classSelected', class: 'Archer' });
+        });
+    </script>
+</body>
+
+</html>
