@@ -56,7 +56,7 @@ export class GameManager {
 
         this.buildStartAreaDoors(world);
 
-        this.buildCapturePoint(world, new Vector3(0, 2.1, 0));
+        this.capturePoints.push(controlPoint);
 
     }
 
@@ -124,7 +124,9 @@ export class GameManager {
         const players = Array.from(this.players.values());
         const captureData = {
             progress: this.gameModeController.getCaptureProgress(),
-            teamColor: this.gameModeController.getCurrentControllingTeam()?.color || '#666',
+            teamColor: this.gameModeController.getCapturePoint()?.partialControlTeam?.color 
+                || this.gameModeController.getCurrentControllingTeam()?.color 
+                || '#666',
             teamName: this.gameModeController.getCurrentControllingTeam()?.name || 'Neutral'
         };
 

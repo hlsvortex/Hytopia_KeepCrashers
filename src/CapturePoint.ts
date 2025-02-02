@@ -6,7 +6,7 @@ import { gameManager, world } from './GlobalContext';
 export class CapturePoint {
     public progress: number = 0;
     public controllingTeam: Team | null = null;
-    private partialControlTeam: Team | null = null;
+    public partialControlTeam: Team | null = null;
     private playersOnPoint: Set<DamageableEntity> = new Set();
     private collider: Collider;
     private entityModel: Entity;

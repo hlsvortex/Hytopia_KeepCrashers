@@ -23,6 +23,10 @@ export abstract class GameModeController {
     get isInOvertime(): boolean {
         return this._isInOvertime;
     }
+
+    public getCapturePoint(): CapturePoint {
+        return this.capturePoint;
+    }
 }
 
 export class KingOfTheHill extends GameModeController {
@@ -143,5 +147,9 @@ export class KingOfTheHill extends GameModeController {
         
         // Return current decreasing time for active controller
         return this.teamTimes.get(team)!;
+    }
+
+    public getCapturePoint(): CapturePoint {
+        return this.controlPoint;
     }
 } 
