@@ -2,6 +2,7 @@ import { EventRouter } from 'hytopia';
 import { Team } from './Team';
 import { GameManager } from './GameManager';
 import { CapturePoint } from './CapturePoint';
+import { GameState } from './GameState';
 
 export abstract class GameModeController {
     protected _isInOvertime: boolean = false;
@@ -53,8 +54,13 @@ export class KingOfTheHill extends GameModeController {
     }
 
     update(deltaTime: number): void {
-        this.controlPoint.update(deltaTime);
+        // Only update if game is in MatchPlay state
+        if (this.gameManager.getGameState() !== GameState.MatchPlay) {
+            return;
+        }
 
+        this.controlPoint.update(deltaTime);
+        
         const controllingTeam = this.controlPoint.controllingTeam;
         if (controllingTeam) {
             const remainingTime = this.teamTimes.get(controllingTeam)!;
@@ -65,10 +71,8 @@ export class KingOfTheHill extends GameModeController {
             // Check for win conditions when time hits zero
             if (remainingTime <= 0) {
                 if (this.controlPoint.progress === 100) {
-                    // Full capture with zero time = instant win
                     this.gameManager.handleGameWin(controllingTeam);
                 } else if (!this._isInOvertime) {
-                    // Enter overtime if not already in it
                     this._isInOvertime = true;
                     this.eventRouter.emit('OVERTIME_STARTED', controllingTeam);
                 }

@@ -444,19 +444,6 @@ export class GameManager {
         this.gameModeController.reset();
     }
 
-    // Add new method
-    public handlePointCaptured(team: Team) {
-        console.log(`${team.name} team captured the point!`);
-        this.gameStateController.setState(GameState.MatchEnd);
-        
-        // Add proper reset sequence
-        setTimeout(() => {
-            this.gameModeController.reset();
-            this.resetMatch();
-            this.gameStateController.setState(GameState.WaitingForEnoughPlayers);
-        }, 10000);
-    }
-
     public getTeam(teamName: string): Team | undefined {
         return this.teams.find(t => t.name === teamName);
     }
@@ -471,6 +458,10 @@ export class GameManager {
             this.resetMatch();
             this.gameStateController.setState(GameState.WaitingForEnoughPlayers);
         }, 10000);
+    }
+
+    public getGameState(): GameState {
+        return this.gameStateController.getState();
     }
 
 }
