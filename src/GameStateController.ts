@@ -73,14 +73,14 @@ export class GameStateController {
         // Handle state transitions
         switch(newState) {
             case GameState.MatchEnd:
-                // Show victory screen for 5 seconds
+                // Show victory screen for 5 seconds then transition to stats
                 setTimeout(() => {
                     this.setState(GameState.MatchStats);
                 }, 5000);
                 break;
             
             case GameState.MatchStats:
-                // Show stats for 10 seconds
+                // Show stats for 10 seconds then reset
                 setTimeout(() => {
                     this.resetMatch();
                     this.setState(GameState.WaitingForEnoughPlayers);

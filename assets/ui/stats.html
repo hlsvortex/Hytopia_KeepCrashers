@@ -277,6 +277,7 @@
                 const display = document.getElementById('game-state-display');
                 const readyButton = document.getElementById('ready-button');
                 const victoryScreen = document.getElementById('victory-screen');
+                const matchStats = document.getElementById('match-stats');
                 
                 display.textContent = data.message;
                 
@@ -291,22 +292,27 @@
                 readyButton.style.display = 
                     data.state === 'WaitingForPlayersReady' && !data.isReady ? 'block' : 'none';
 
-                if (data.state == 'MatchPlay')
-                {
+                if (data.state == 'MatchPlay') {
                     display.style.display = 'none';
                 }
                 else {
                     display.style.display = 'block';
-                        
                 }
 
-
-
-                // Handle victory screen
-                if (data.state != 'MatchEnd') {
-                    victoryScreen.style.display = 'none';
-                } 
-                    
+                // Handle victory and stats screens
+                switch(data.state) {
+                    case 'MatchEnd':
+                        victoryScreen.style.display = 'flex';
+                        matchStats.style.display = 'none';
+                        break;
+                    case 'MatchStats':
+                        victoryScreen.style.display = 'none';
+                        matchStats.style.display = 'block';
+                        break;
+                    default:
+                        victoryScreen.style.display = 'none';
+                        matchStats.style.display = 'none';
+                }
             }
             else if (data.type === 'matchStatsUpdate') {
                 const updateTeamList = (teamElement, players) => {
