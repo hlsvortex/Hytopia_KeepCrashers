@@ -445,7 +445,7 @@ export class GameManager {
 
     
 
-    private resetMatch() {
+    public resetMatch() {
         // Reset player positions and stats
         this.players.forEach(player => {
             player.respawn();
@@ -463,14 +463,16 @@ export class GameManager {
 
     public handleGameWin(winningTeam: Team) {
         console.log(`${winningTeam.name} team wins!`);
-        this.gameStateController.setState(GameState.MatchEnd);
         
-        // Handle reset after delay
-        setTimeout(() => {
-            this.gameModeController.reset();
-            this.resetMatch();
-            this.gameStateController.setState(GameState.WaitingForEnoughPlayers);
-        }, 10000);
+        this.players.forEach(player => {
+            player.player.ui.sendData({
+                type: 'gameStateUpdate',
+                state: GameState.MatchEnd,
+                winningTeam: winningTeam.name,
+                teamColor: winningTeam.color
+            });
+        });
+        this.gameStateController.setState(GameState.MatchEnd);
     }
 
     public getGameState(): GameState {

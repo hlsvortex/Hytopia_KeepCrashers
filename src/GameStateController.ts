@@ -60,8 +60,8 @@ export class GameStateController {
                 break;
 
             case GameState.MatchEnd:
-                this.setState(GameState.MatchStats);
-                setTimeout(() => this.resetMatch(), 10000);
+                //this.setState(GameState.MatchStats);
+                //setTimeout(() => this.resetMatch(), 10000);
                 break;
         }
     }
@@ -70,10 +70,27 @@ export class GameStateController {
         this.currentState = newState;
         this.eventRouter.emit('GAME_STATE_CHANGED', newState);
 
+        // Handle state transitions
+        switch(newState) {
+            case GameState.MatchEnd:
+                // Show victory screen for 5 seconds
+                setTimeout(() => {
+                    this.setState(GameState.MatchStats);
+                }, 5000);
+                break;
+            
+            case GameState.MatchStats:
+                // Show stats for 10 seconds
+                setTimeout(() => {
+                    this.resetMatch();
+                    this.setState(GameState.WaitingForEnoughPlayers);
+                }, 10000);
+                break;
+        }
+
         if (newState === GameState.MatchPlay) {
             gameManager.openDoors();
         }
-        
     }
 
     public getState(): GameState {
@@ -123,6 +140,7 @@ export class GameStateController {
     public resetMatch() {
         this.matchStartTimer = 5;
         this.readyPlayers.clear();
+        gameManager.resetMatch();
         this.setState(GameState.WaitingForEnoughPlayers);
         console.log("Resetting match");
     }
