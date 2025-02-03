@@ -258,7 +258,7 @@ export class GameManager {
     }
 
     public InitUI(entity: PlayerEntity) {
-        entity.player.ui.load('ui/index.html');
+        entity.player.ui.load('ui/stats.html');
         
         // Initialize UI
         entity.player.ui.sendData({ 
