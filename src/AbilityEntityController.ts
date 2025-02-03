@@ -25,7 +25,7 @@ import type { MyEntityControllerOptions } from './MyEntityController';
 import { DamageableEntity } from './DamageableEntity';
 import { PlayerEvents } from './events';
 import type { PlayerDeathEventPayload, PlayerRespawnEventPayload } from './events';
-import { world } from './GlobalContext';
+import { gameManager, world } from './GlobalContext';
 import { ArcherAbilityController, WizardAbilityController, FighterAbilityController } from './PlayerClass';
 import { AbilityController } from './AbilityController';
 
@@ -57,7 +57,7 @@ export default class AbilityEntityController extends MyEntityController {
             if (payload.player == this.ownerEntity?.player) {
                 this.pauseInput = true;
                 
-                this.ownerEntity.setAdditionalMass(100000);
+                //this.ownerEntity.setAdditionalMass(100000);
                 
             }
         });
@@ -68,7 +68,8 @@ export default class AbilityEntityController extends MyEntityController {
                 this.pauseInput = false;
                 const damageable = this.ownerEntity as DamageableEntity;
                 damageable.respawn();
-                this.ownerEntity.setAdditionalMass(1);
+                //this.ownerEntity.setAdditionalMass(0.1);
+                gameManager.setTeamSpawnArea
             }
         });
 

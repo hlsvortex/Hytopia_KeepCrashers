@@ -42,7 +42,7 @@ export class WizardAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
-            icon: '{{CDN_ASSETS_URL}}/ui/icons/fireball.png',
+            icon: 'ui/icons/fireball.png',
         };
 
         this.addAbility('primary', new PhysicsProjectileAbility(fireballOptions, this.eventRouter, this));

@@ -27,7 +27,7 @@ export class RespawnSystem {
         const timer = setTimeout(() => {
             this.respawnPlayer(payload.player);
             this.respawnTimers.delete(payload.player.id);
-        }, 10000); // 10 seconds
+        }, 5000); // 10 seconds
 
         this.respawnTimers.set(payload.player.id, timer);
     }

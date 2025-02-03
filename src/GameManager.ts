@@ -107,8 +107,14 @@ export class GameManager {
                 }
             }
 
+            setTimeout(() => {
+                this.setPlayerToTeamSpawnArea(payload.victim);
+            }, 1500);
+
+
             this.updateStatsUI();
         });
+
        
     }
 
@@ -216,7 +222,8 @@ export class GameManager {
 
         playerEntity.light = light;
 
-        light.spawn(world);
+        //light.spawn(world);
+        //light.
 
         this.InitCamera(playerEntity);
 
@@ -259,12 +266,7 @@ export class GameManager {
 
     public InitUI(entity: PlayerEntity) {
         entity.player.ui.load('ui/stats.html');
-        
-        // Initialize UI
-        entity.player.ui.sendData({ 
-            type: 'INIT_MENU_SYSTEM' 
-        });
-
+       
         const team = this.getPlayerTeam(entity.player);
         const teamColor = team?.color || '#ffffff';
 
@@ -286,7 +288,6 @@ export class GameManager {
     public InitCamera(entity: PlayerEntity) {
 
         entity.player.camera.setFilmOffset(7);
-        //entity.player.camera.setForwardOffset(12.5);
         entity.player.camera.setOffset({ x: 0, y: 0.85, z: 0 });
         entity.player.camera.setZoom(1.3);
         entity.player.camera.setFov(75 );
@@ -348,8 +349,15 @@ export class GameManager {
         }
     }
 
+    public setPlayerToTeamSpawnArea(entity: PlayerEntity) {
+        const team = this.getPlayerTeam(entity.player);
+        const spawnPosition = this.getTeamSpawnPosition(team?.name || 'Red');
+        entity.setPosition(spawnPosition);
+    }
+
     private getTeamSpawnPosition(teamName: string): Vector3 {
         const spawnArea = this.teamSpawnAreas.get(teamName);
+
         if (!spawnArea) {
             throw new Error(`No spawn area defined for team ${teamName}`);
         }
