@@ -1,14 +1,16 @@
 /* Core stats panel */
 .stats-panel {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 5px;
+    bottom: 15px;
+    left: 20px;
+    background: rgba(20, 15, 0, 0.9); /* Dark amber background */
+    padding: 8px;
+    border-radius: 6px;
     color: white;
     font-family: Arial, sans-serif;
-    z-index: 900;
+    z-index: 950;
+    width: 140px; /* Match other panels */
+    border: 1px solid rgba(255, 220, 150, 0.2);
 }
 
 .stats-panel div {
@@ -29,11 +31,10 @@
 
 .stat-bar {
     width: 100%;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 5px 0;
-    border-radius: 3px;
-    overflow: hidden;
+    height: 12px;
+    background: rgba(80, 70, 30, 0.4); /* Yellow-tinged background */
+    margin: 0px 0px;
+    border-radius: 4px;
     position: relative;
 }
 
@@ -43,11 +44,13 @@
 }
 
 .health-fill {
-    background: #ff4444;
+    background: linear-gradient(to right, #ffd700 0%, #ffaa00 100%); /* Gold gradient */
+    box-shadow: 0 0 8px rgba(255, 170, 0, 0.3);
 }
 
 .stamina-fill {
-    background: #44ff44;
+    background: linear-gradient(to right, #c8ff00 0%, #a0d000 100%); /* Lime gold */
+    box-shadow: 0 0 8px rgba(200, 255, 0, 0.2);
 }
 
 .mana-fill {
@@ -216,7 +219,7 @@
 
 .health-fill {
     height: 100%;
-    background: #ff4444;
+    background: linear-gradient(90deg, #ff3333 0%, #ff4444 100%);
     transition: width 0.2s ease;
 }
 
@@ -472,13 +475,13 @@
 /* Add capture point styles */
 .capture-point-ui {
     position: fixed;
-    top: 20px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
     background: rgba(0, 0, 0, 0.8);
-    border-radius: 8px;
-    padding: 10px;
+    border-radius: 6px;
+    padding: 8px;
     text-align: center;
     z-index: 1000;
     pointer-events: none;
@@ -493,12 +496,15 @@
 }
 
 .capture-progress-container {
-    height: 10px;
+    height: 5px;
+    max-height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    border-radius: 2px;
     overflow: hidden;
     position: relative;
+
 }
+
 
 .capture-progress-bar {
     height: 100%;
@@ -779,33 +785,39 @@
 /* Ability Container */
 .ability-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 12px;
+    right: 22px; /* Moved left slightly */
     display: flex;
-    gap: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    border-radius: 8px;
+    gap: 15px;
+    z-index: 900;
+    width: 150px;
 }
 
 .ability-slot {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 64px;
+    height: 64px;
+    margin: 0 0px;
+    min-width: 64px; /* Prevent collapse */
     background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
+    border-radius: 6px;
     border: 2px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
+    border: 2px solid rgb(80, 80, 80); /* Verify element size */
 }
 
 .ability-icon {
     width: 100%;
     height: 100%;
-    background-size: contain;
+    display: block; /* Fix flex/grid issues */
+    background-image: url('icons/fireball.png'); /* 1x1 transparent pixel */
+    background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
     padding: 15%;
+    z-index: 1; /* Below overlay */
+
+    border: 2px solid rgb(56, 56, 77); /* Verify image container */
 }
 
 .cooldown-overlay {
@@ -816,7 +828,7 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
     display: none;
-    z-index: 1;
+    z-index: 2; /* Should be above icon */
 }
 
 .cooldown-fill {
@@ -850,4 +862,42 @@
 .archer .ability-icon {
     background-image: url('icons/archer.png');
     border-color: rgba(58, 234, 136, 0.3);
+}
+
+/* Mana Container */
+#mana-fill-container {
+    position: fixed;
+    bottom: 90px; /* Position above abilities */
+    right: 25px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 4px;
+    border-radius: 4px;
+    color: white;
+    z-index: 950;
+    width: 140px; /* Match ability container width */
+
+}
+
+/* Mana Bar */
+#mana-fill-container .stat-bar {
+    width: 100%; /* Full width of container */
+    height: 12px;
+}
+
+.stat-value-overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: regular;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* Hide original stat values */
+.stat-value {
+    display: none;
 }

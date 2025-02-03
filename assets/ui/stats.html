@@ -46,45 +46,44 @@
     </div>
 
     <div class="stats-panel">
-        <div>Health: 
+        <div>
             <div class="stat-bar">
                 <div id="health-fill" class="stat-fill health-fill" style="width: 100%"></div>
+                <span class="stat-value-overlay" id="health-value">100</span>
             </div>
-            <span class="stat-value" id="health-value">100</span>
         </div>
-        <div>Stamina: 
+        <div>
             <div class="stat-bar">
                 <div id="stamina-fill" class="stat-fill stamina-fill" style="width: 100%"></div>
+                <span class="stat-value-overlay" id="stamina-value">100</span>
             </div>
-            <span class="stat-value" id="stamina-value">100</span>
         </div>
-        <div>Mana: 
+    </div>
+
+    <!-- Add mana to bottom right -->
+    <div id="mana-fill-container">
+        <div>
             <div class="stat-bar">
                 <div id="mana-fill" class="stat-fill mana-fill" style="width: 100%"></div>
+                <span class="stat-value-overlay" id="mana-value">100</span>
             </div>
-            <span class="stat-value" id="mana-value">100</span>
         </div>
     </div>
 
     <!-- Ability Container -->
     <div class="ability-container">
         <div class="ability-slot" id="ability1">
-            <div class="ability-icon" style="background-image: none">
-            </div>
+            <div class="ability-icon"></div>
             <div class="cooldown-overlay">
                 <div class="cooldown-fill"></div>
                 <div class="cooldown-text">Ready</div>
             </div>
         </div>
         <div class="ability-slot" id="ability2">
-            <div class="ability-icon"
-                data-class="wizard" style="background-image: url('{{CDN_ASSETS_URL}}/ui/icons/iceshard.png')"
-                data-class="archer" style="background-image: url('{{CDN_ASSETS_URL}}/ui/icons/bomb.png')">
-            </div>
+            <div class="ability-icon"></div>
             <div class="cooldown-overlay">
                 <div class="cooldown-fill"></div>
                 <div class="cooldown-text">Ready</div>
-
             </div>
         </div>
     </div>
@@ -318,14 +317,20 @@
                 teamElement.style.color = data.capturePoint.teamColor || '#666';
             }
             else if (data.type === 'classUpdate') {
-                const ability1 = document.getElementById('ability1').querySelector('.ability-icon');
-                const ability2 = document.getElementById('ability2').querySelector('.ability-icon');
+                console.log('Received classUpdate:', data);
+                const ability1Icon = document.querySelector('#ability1');
+                console.log('Ability 1 computed styles:', getComputedStyle(ability1Icon).backgroundImage);
                 
-                console.log('data.primaryIcon', data.primaryIcon);
-                console.log('data.secondaryIcon', data.secondaryIcon);
-                ability1.style.backgroundImage = data.primaryIcon;
-                ability2.style.backgroundImage = data.secondaryIcon;
-             
+                const ability2Icon = document.querySelector('#ability2 .ability-icon');
+                console.log('Ability 2 computed styles:', getComputedStyle(ability2Icon).backgroundImage);
+                
+                if (!data.primaryIcon || !data.secondaryIcon) {
+                    console.error('Missing icons in classUpdate:', data);
+                    return;
+                }
+
+                ability1Icon.style.backgroundImage = "url('{{CDN_ASSETS_URL}}/ui/icons/firebeam.png')";//`url('icons/firebeam.png')`;//url('icons/firebeam.png')//data.primaryIcon;//`url('${data.primaryIcon}')`;
+                ability2Icon.style.backgroundImage = data.secondaryIcon;//`url('${data.secondaryIcon}')`;
             }
         });
 
@@ -423,6 +428,12 @@
             });
             
             return clone;
+        });
+
+        // Initialize after DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            hytopia.initialize();
+            PanelManager.initialize('ui-container');
         });
 
     </script>

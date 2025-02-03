@@ -109,6 +109,11 @@ export default class AbilityEntityController extends MyEntityController {
             const secondaryIcon = this.currentAbilityController.abilities.get('secondary')?.options.icon;
 
             // Send to UI
+            console.log('Sending classUpdate with icons:', {
+                primary: primaryIcon,
+                secondary: secondaryIcon
+            });
+            
             this.ownerEntity.player.ui.sendData({
                 type: 'classUpdate',
                 className: className.toLowerCase(),
