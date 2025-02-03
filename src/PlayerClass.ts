@@ -42,6 +42,7 @@ export class WizardAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
+            icon: '{{CDN_ASSETS_URL}}/ui/icons/fireball.png',
         };
 
         this.addAbility('primary', new PhysicsProjectileAbility(fireballOptions, this.eventRouter, this));
@@ -69,6 +70,7 @@ export class WizardAbilityController extends AbilityController {
             damagePerTick: 5,
 
             tickInterval: 100,
+            icon: '{{CDN_ASSETS_URL}}/ui/icons/firebeam.png',
         };
 
         this.addAbility('secondary', new BeamAbility(beamOptions, this.eventRouter, this));
@@ -154,8 +156,7 @@ export class FighterAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
-
-
+            icon: '{{CDN_ASSETS_URL}}/ui/icons/bomb.png',
         };
 
         this.addAbility('primary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
@@ -235,9 +236,11 @@ export class ArcherAbilityController extends AbilityController {
             knockback: 0.5,
             gravityScale: 0.5,
             hitFX: ParticleFX.CLOUD_PUFF,
+            icon: '{{CDN_ASSETS_URL}}/ui/icons/arrow.png',
             charging: {
                 minChargeTime: 0.0,
                 maxChargeTime: 0.8,
+
                 chargeEffects: {
                     speed: {
                         min: 16,
@@ -253,6 +256,7 @@ export class ArcherAbilityController extends AbilityController {
                     }
                 }
             }
+            
         };
 
         const arrowAbility = new PhysicsProjectileAbility(shootArrowOptions, this.eventRouter, this);
@@ -283,7 +287,7 @@ export class ArcherAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
-
+            icon: '{{CDN_ASSETS_URL}}/ui/icons/bomb.png',
         };
 
         this.addAbility('secondary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));

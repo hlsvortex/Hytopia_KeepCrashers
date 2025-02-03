@@ -14,6 +14,7 @@ export interface AbilityOptions {
     cooldown: number;
     resourceCost: number;
     resourceType: Resource;
+    icon?: string;
     useType?: AbilityUseType; // Default: 'instant'
     useFX?: EmitterOptions;
 }

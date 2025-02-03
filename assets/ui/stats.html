@@ -15,6 +15,10 @@
         }
        
     </style>
+    <script>
+        // Set this from server-side config
+        window.CDN_ASSETS_URL = 'https://your-cdn-domain.com/assets'; 
+    </script>
 </head>
 
 <body>
@@ -65,9 +69,7 @@
     <!-- Ability Container -->
     <div class="ability-container">
         <div class="ability-slot" id="ability1">
-            <div class="ability-icon" 
-                data-class="wizard" style="background-image: url('{{CDN_ASSETS_URL}}/ui/icons/fireball.png')"
-                data-class="archer" style="background-image: url('{{CDN_ASSETS_URL}}/ui/icons/arrow.png')">
+            <div class="ability-icon" style="background-image: none">
             </div>
             <div class="cooldown-overlay">
                 <div class="cooldown-fill"></div>
@@ -192,22 +194,15 @@
         }
 
         // Start cooldown countdown
-        function startCooldown(abilitySlotNumber, duration) {
+        function startCooldown(abilitySlotNumber, duration, iconUrl) {
             const abilitySlot = document.getElementById(`ability${abilitySlotNumber}`);
-            if (!abilitySlot) {
-                console.error('Ability slot not found:', abilitySlotNumber);
-                return;
-            }
+            if (!abilitySlot) return;
 
-            // Get class name from player data
-            //const playerClass =  'wizard'; // Default to archer
-            //console.log('Player class:', playerClass);
-
+            let remaining = duration;
             const cooldownOverlay = abilitySlot.querySelector('.cooldown-overlay');
             const cooldownFill = abilitySlot.querySelector('.cooldown-fill');
             const cooldownText = abilitySlot.querySelector('.cooldown-text');
 
-            let remaining = duration;
             cooldownOverlay.style.display = 'block';
             cooldownText.textContent = `${remaining.toFixed(1)}s`;
             cooldownFill.style.height = '100%';
@@ -250,7 +245,11 @@
                 }
             }
             else if (data.type === 'abilityUpdate') {
-                startCooldown(data.ability === 'primary' ? 1 : 2, data.cooldown);
+                startCooldown(
+                    data.ability === 'primary' ? 1 : 2, 
+                    data.cooldown,
+                    data.icon
+                );
             }
             else if (data.type === 'gameStateUpdate') {
                 const display = document.getElementById('game-state-display');
@@ -319,8 +318,14 @@
                 teamElement.style.color = data.capturePoint.teamColor || '#666';
             }
             else if (data.type === 'classUpdate') {
-                //window.playerClass = data.className;
-                //updateAbilityIcons();
+                const ability1 = document.getElementById('ability1').querySelector('.ability-icon');
+                const ability2 = document.getElementById('ability2').querySelector('.ability-icon');
+                
+                console.log('data.primaryIcon', data.primaryIcon);
+                console.log('data.secondaryIcon', data.secondaryIcon);
+                ability1.style.backgroundImage = data.primaryIcon;
+                ability2.style.backgroundImage = data.secondaryIcon;
+             
             }
         });
 

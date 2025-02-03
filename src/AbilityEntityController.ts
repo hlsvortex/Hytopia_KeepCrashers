@@ -103,6 +103,18 @@ export default class AbilityEntityController extends MyEntityController {
         // Initialize new controller - attach() handles spawning if entity exists
         if (this.ownerEntity) {
             this.currentAbilityController.attach(this.ownerEntity);
+            
+            // Get ability icons
+            const primaryIcon = this.currentAbilityController.abilities.get('primary')?.options.icon;
+            const secondaryIcon = this.currentAbilityController.abilities.get('secondary')?.options.icon;
+
+            // Send to UI
+            this.ownerEntity.player.ui.sendData({
+                type: 'classUpdate',
+                className: className.toLowerCase(),
+                primaryIcon,
+                secondaryIcon
+            });
         }
     }
     
