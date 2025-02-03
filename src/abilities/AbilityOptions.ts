@@ -10,6 +10,7 @@ export type AbilityUseType =
 
 export interface AbilityOptions {
     name: string;
+    slot: 'primary' | 'secondary';
     cooldown: number;
     resourceCost: number;
     resourceType: Resource;

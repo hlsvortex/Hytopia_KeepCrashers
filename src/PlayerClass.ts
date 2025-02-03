@@ -8,8 +8,8 @@ import { ParticleFX } from './particles/ParticleFX';
 import type { DamageableEntity } from './DamageableEntity';
 import type MyEntityController from './MyEntityController';
 import type { Ability } from './Ability';
-import { BeamAbility } from './abilities/BeamAbility';
-
+import { BeamAbility, type BeamAbilityOptions } from './abilities/BeamAbility';
+import type { PhysicsProjectileOptions } from './abilities/AbilityOptions';
 
 
 export class WizardAbilityController extends AbilityController {
@@ -20,14 +20,16 @@ export class WizardAbilityController extends AbilityController {
     }
 
     protected setupAbilities() {
-        const fireballOptions = {
+        const fireballOptions: PhysicsProjectileOptions = {
             name: 'Fireball',
+            slot: 'primary',
             cooldown: 1,
             resourceCost: 20,
             resourceType: Resource.Mana,
             maxRange: 15,
             speed: 20,
             damage: 15,
+
             modelUri: 'models/projectiles/fireball.gltf',
             modelScale: 0.5,
             projectileRadius: 0.05,
@@ -46,22 +48,26 @@ export class WizardAbilityController extends AbilityController {
 
         const teleportOptions = {
             name: 'Teleport',
+            slot: 'secondary',
             cooldown: 1,
             resourceCost: 20,
             resourceType: Resource.Mana,
             range: 10,
             distance: 10,
+
         };
         //this.addAbility('secondary', new SelfAbility(teleportOptions, this.eventRouter, this));
 
-        const beamOptions = {
+        const beamOptions: BeamAbilityOptions = {
             name: 'Fire Beam',
+            slot: 'secondary',
             cooldown: 0,
             resourceCost: 2,
             resourceType: Resource.Mana,
             useType: 'hold_continuous' as const,
             range: 15,
             damagePerTick: 5,
+
             tickInterval: 100,
         };
 
@@ -125,8 +131,9 @@ export class FighterAbilityController extends AbilityController {
 
     protected setupAbilities() {
         // Add fighter abilities
-        const bombOptions = {
+        const bombOptions: PhysicsProjectileOptions = {
             name: 'Bomb',
+            slot: 'primary',
             cooldown: 1,
             resourceCost: 15,
             resourceType: Resource.Mana,
@@ -139,7 +146,7 @@ export class FighterAbilityController extends AbilityController {
             knockback: 0.8,
             gravityScale: 0.6,
             hitFX: ParticleFX.EXPLOSION,
-            notHitOnCollision: true,
+            noHitOnBlockCollision: true,
             lifeTime: 2,
             aoe: {
                 radius: 2.5,
@@ -147,6 +154,7 @@ export class FighterAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
+
 
         };
 
@@ -211,13 +219,15 @@ export class ArcherAbilityController extends AbilityController {
     }
 
     protected setupAbilities() {
-        const shootArrowOptions = {
+        const shootArrowOptions: PhysicsProjectileOptions = {
             name: 'Arrow',
+            slot: 'primary',
             cooldown: 1,
             resourceCost: 20,
             resourceType: Resource.Mana,
             maxRange: 100,
             speed: 30,
+
             damage: 25,
             modelUri: 'models/projectiles/arrow.gltf',
             modelScale: 0.5,
@@ -248,13 +258,15 @@ export class ArcherAbilityController extends AbilityController {
         const arrowAbility = new PhysicsProjectileAbility(shootArrowOptions, this.eventRouter, this);
         this.addAbility('primary', arrowAbility);
 
-        const bombOptions = {
+        const bombOptions: PhysicsProjectileOptions = {
             name: 'Bomb',
+            slot: 'secondary',
             cooldown: 4,
             resourceCost: 15,
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 15,
+
             damage: 15,
             modelUri: 'models/projectiles/fireball.gltf',
             modelScale: 0.8,

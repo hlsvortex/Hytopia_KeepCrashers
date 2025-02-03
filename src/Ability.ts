@@ -93,16 +93,13 @@ export abstract class Ability {
     public startCooldown() {
         this.lastUseTime = Date.now();
         
-        
-        // Notify UI of cooldown start
         if (this.abilityController.getAttachedEntity()?.player) {
             this.abilityController.getAttachedEntity()?.player.ui.sendData({
                 type: 'abilityUpdate',
-                ability: this.options.name,
+                ability: this.options.slot || 'primary',
                 cooldown: this.options.cooldown
             });
         }
-        
     }
 
     public canUseAbility(source: DamageableEntity): boolean {
