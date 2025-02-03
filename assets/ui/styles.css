@@ -405,7 +405,8 @@
 
 /* Match stats panel */
 #match-stats {
-    top: 25%;
+    position: fixed;
+    top: 30%;
     left: 0;
     right: 0;
     margin: 0 auto;
