@@ -192,16 +192,20 @@ export class GameManager {
         // Create entity controller first
         const entityController = new AbilityEntityController();
 
+        const playerModel = team.name === 'Red' ? 'models/players/red_player.gltf' : 'models/players/blue_player.gltf';
+
         // Create player entity with controller
         const playerEntity = new DamageableEntity({
             player,
             name: 'Player',
-            modelUri: 'models/players/player.gltf',
+            modelUri: playerModel,
+        
             modelLoopedAnimations: ['idle'],
             modelScale: 0.5,
             controller: entityController, // Use the entity controller
         }, 100, 100, 100);
 
+        
         // Get spawn position based on team
         const spawnPosition = this.getTeamSpawnPosition(team.name);
         playerEntity.spawn(world, spawnPosition);
