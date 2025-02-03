@@ -205,4 +205,8 @@ export abstract class AbilityController {
 
         return { origin, direction };
     }
+
+    public getAttachedEntity(): PlayerEntity | undefined {
+        return this.attachedEntity;
+    }
 } 

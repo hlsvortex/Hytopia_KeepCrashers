@@ -95,20 +95,27 @@ window.PlayerStatsPanel = {
     },
 
     startCooldown(ability, duration) {
-        const element = document.getElementById(`cooldown${ability === 'primary' ? '1' : '2'}`);
-        if (!element) return;
+        const abilitySlot = document.getElementById(`ability${ability === 'primary' ? '1' : '2'}`);
+        if (!abilitySlot) return;
 
-        element.textContent = `${duration}s`;
-        element.style.color = '#ff5555';
+        const cooldownOverlay = abilitySlot.querySelector('.cooldown-overlay');
+        const cooldownFill = abilitySlot.querySelector('.cooldown-fill');
+        const cooldownText = abilitySlot.querySelector('.cooldown-text');
+
+        let remaining = duration;
+        cooldownOverlay.style.display = 'block';
+        cooldownText.textContent = `${remaining}s`;
+        cooldownFill.style.height = '100%';
 
         const timer = setInterval(() => {
-            duration--;
-            if (duration <= 0) {
+            remaining--;
+            if (remaining <= 0) {
                 clearInterval(timer);
-                element.textContent = 'Ready';
-                element.style.color = '#55ff55';
+                cooldownOverlay.style.display = 'none';
+                cooldownText.textContent = 'Ready';
             } else {
-                element.textContent = `${duration}s`;
+                cooldownText.textContent = `${remaining}s`;
+                cooldownFill.style.height = `${(remaining / duration) * 100}%`;
             }
         }, 1000);
     }
