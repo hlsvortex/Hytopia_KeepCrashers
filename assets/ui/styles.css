@@ -311,24 +311,27 @@
 /* Game State UI */
 .game-state-display {
     position: fixed;
-    bottom: 10px;
+    top: 70px;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: rgba(226, 223, 53, 0.9); /* Slightly less bright white */
     font-size: 18px;
+    font-family: 'Segoe UI', Arial, sans-serif; /* Cleaner font */
+    font-weight: 400; /* Lighter weight */
     text-align: center;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     padding: 5px 5px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 5px;
     min-width: 200px;
     white-space: nowrap;
     z-index: 1000;
+    letter-spacing: 0.5px; /* Slight letter spacing for better readability */
 }
 
 .ready-button {
     position: fixed;
-    bottom: 100px;  /* Move higher above game state text */
+    bottom: 30px;  /* Move higher above game state text */
     left: 50%;
     transform: translateX(-50%);
     padding: 15px 30px;
