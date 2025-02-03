@@ -901,3 +901,36 @@
 .stat-value {
     display: none;
 }
+
+.victory-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.victory-content {
+    text-align: center;
+}
+
+.winning-team {
+    font-size: 72px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.victory-text {
+    font-size: 48px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}

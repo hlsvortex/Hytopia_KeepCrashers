@@ -466,11 +466,12 @@ export class GameManager {
         
         this.players.forEach(player => {
             player.player.ui.sendData({
-                type: 'gameStateUpdate',
+                type: 'gameOverSequence',
                 state: GameState.MatchEnd,
                 winningTeam: winningTeam.name,
                 teamColor: winningTeam.color
             });
+
         });
         this.gameStateController.setState(GameState.MatchEnd);
     }

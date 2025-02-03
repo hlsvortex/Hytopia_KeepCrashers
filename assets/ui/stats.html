@@ -160,6 +160,14 @@
         </div>
     </div>
 
+    <!-- Add before closing body tag -->
+    <div id="victory-screen" class="victory-screen">
+        <div class="victory-content">
+            <div id="winning-team" class="winning-team"></div>
+            <div class="victory-text">VICTORY</div>
+        </div>
+    </div>
+
     <script>
         // Initialize stats and cooldowns
         let stats = {
@@ -250,16 +258,55 @@
                     data.icon
                 );
             }
+             else if (data.type === 'gameOverSequence') {
+
+                const victoryScreen = document.getElementById('victory-screen');
+                // Handle victory screen
+                if (data.state === 'MatchEnd') {
+
+                    console.log('Showing victory screen' + data.winningTeam + ' ' + data.teamColor);
+                    const winningTeam = document.getElementById('winning-team');
+                    winningTeam.textContent = data.winningTeam;
+                    winningTeam.style.color = data.teamColor;
+                    victoryScreen.style.display = 'flex';
+                } else {
+                    victoryScreen.style.display = 'none';
+                }
+            }
             else if (data.type === 'gameStateUpdate') {
                 const display = document.getElementById('game-state-display');
                 const readyButton = document.getElementById('ready-button');
+                const victoryScreen = document.getElementById('victory-screen');
                 
                 display.textContent = data.message;
-                display.style.display = 'block';
+                
+                if(data.message == "") {
+                    display.style.display = 'none';
+                }
+                else {
+                    display.style.display = 'block';
+                }
                 
                 // Only show button if in ready state AND player isn't already ready
                 readyButton.style.display = 
                     data.state === 'WaitingForPlayersReady' && !data.isReady ? 'block' : 'none';
+
+                if (data.state == 'MatchPlay')
+                {
+                    display.style.display = 'none';
+                }
+                else {
+                    display.style.display = 'block';
+                        
+                }
+
+
+
+                // Handle victory screen
+                if (data.state != 'MatchEnd') {
+                    victoryScreen.style.display = 'none';
+                } 
+                    
             }
             else if (data.type === 'matchStatsUpdate') {
                 const updateTeamList = (teamElement, players) => {
