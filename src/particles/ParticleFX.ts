@@ -3,7 +3,7 @@ import { type EmitterOptions } from "./ParticleEmitter";
 
 export const ParticleFX = {
     BLOODHIT: {
-        count: 10,
+        count: 8,
         speed: 1.5,
         spawnOptions: {
             radius: 0.2,
@@ -22,17 +22,17 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     EXPLOSION: {
-        count: 25,
+        count: 20,
         speed: 3,
         spawnOptions: {
             radius: 0.05,
             shellOnly: false,
             useSpawnDirectionForVelocity: true,
-            velocityRandomness: 0.9 // 30% randomness
+            velocityRandomness: 0.7 // 30% randomness
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 1,
+            size: 1.5,
             sizeRandomness: 0.2, // 30% size variation
             lifetime: 0.5,
             lifetimeRandomness: 0.3, // 30% lifetime variation

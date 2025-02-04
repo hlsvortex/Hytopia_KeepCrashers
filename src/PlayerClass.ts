@@ -23,21 +23,21 @@ export class WizardAbilityController extends AbilityController {
         const fireballOptions: PhysicsProjectileOptions = {
             name: 'Fireball',
             slot: 'primary',
-            cooldown: 1,
-            resourceCost: 20,
+            cooldown: 1.5,
+            resourceCost: 15,
             resourceType: Resource.Mana,
-            maxRange: 15,
-            speed: 20,
+            maxRange: 18,
+            speed: 21,
             damage: 15,
 
             modelUri: 'models/projectiles/fireball.gltf',
-            modelScale: 0.5,
-            projectileRadius: 0.05,
+            modelScale: 0.8,
+            projectileRadius: 0.3,
             knockback: 0.8,
             gravityScale: 0.0,
             hitFX: ParticleFX.EXPLOSION,
             aoe: {
-                radius: 1.5,
+                radius: 2,
                 damage: 10,
                 knockback: 15.5,
                 falloff: true,
@@ -78,12 +78,12 @@ export class WizardAbilityController extends AbilityController {
         */
 
         const firedartsOptions: PhysicsProjectileOptions = {
-            name: 'Fireball',
+            name: 'Firedarts',
             slot: 'primary',
-            cooldown: 0.05,
-            resourceCost: 2,
+            cooldown: 0.1,
+            resourceCost: 3,
             resourceType: Resource.Mana,
-            maxRange: 7,
+            maxRange: 10,
             speed: 15,
             damage: 2,
 

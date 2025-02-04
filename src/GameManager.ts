@@ -13,6 +13,7 @@ import { GameStateController } from './GameStateController';
 import { CapturePoint } from './CapturePoint';
 import { GameModeController } from './GameModeController';
 import { KingOfTheHill } from './GameModeController';
+import { HealthPickup } from './pickups/HealthPickup';
 
 export class GameManager {
     private readonly teams: Team[] = [
@@ -420,7 +421,41 @@ export class GameManager {
         this.buildDoor(world, new Vector3(19, heightY, blueDepthZ * -1), new Quaternion(0, 0, 0, 0));
         this.buildDoor(world, new Vector3(5, heightY, blueDepthZ * -1), new Quaternion(0, 0, 0, 0));
         this.buildDoor(world, new Vector3(31, heightY, blueDepthZ * -1), new Quaternion(0, 0, 0, 0));
+
+
+        // Health Pickups
+        // Blue Team Small outpost
+        new HealthPickup({
+            size: 'large',
+            position: new Vector3(-20, 4.5, -24),
+            respawnTime: 10  // Respawns after 45 seconds
+        });
+        
+        //Red Team Large outpost
+        new HealthPickup({
+            size: 'large',
+            position: new Vector3(21, 4.5, 24),
+            respawnTime: 10  // Respawns after 20 seconds
+        });
+
+
+        // red Team House Top
+        new HealthPickup({
+            size: 'large',
+            position: new Vector3(-30.5, 9.5, 17.5),
+            respawnTime: 10  // Respawns after 45 seconds
+        });
+
+        //Blue Team House TOp
+        new HealthPickup({
+            size: 'large',
+            position: new Vector3(31.5, 9.5, -17),
+            respawnTime: 10  // Respawns after 20 seconds
+        });
+
     }
+
+
 
     public getDoors(): Entity[] {
         return this.doors;

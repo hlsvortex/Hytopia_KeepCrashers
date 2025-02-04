@@ -199,6 +199,10 @@ export class PhysicsProjectileAbility extends Ability {
 
                 // Apply damage and knockback
                 other.takeDamage(damage, source);
+                
+                if (other instanceof DamageableEntity) {
+                    this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), other.position as Vector3);
+                }   
 
                 if (knockback > 0) {
                     const direction = Vector3.fromVector3Like(other.position)

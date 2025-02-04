@@ -80,8 +80,10 @@ export class DamageableEntity extends PlayerEntity {
         // Set tint to red
         //this.setTintColor({ r: 200, g: 0, b: 0 });
         this.light?.setColor({ r: 250, g: 0, b: 0 });
+        //this.respawn();
 
         // Reset after delay
+
         setTimeout(() => {
             console.log('Resetting tint to white');
             //    this.setTintColor({ r: 255, g: 255, b: 255 }); // Reset to white
@@ -101,9 +103,13 @@ export class DamageableEntity extends PlayerEntity {
         return this.health <= 0;
     }
 
+    public hasFullHealth(): boolean {
+        return this.health === 100;
+    }
     
     heal(amount: number) {
         this.health = Math.min(this.health + amount, 100);
+
         this.updateUI();
         
         // Update nameplate health

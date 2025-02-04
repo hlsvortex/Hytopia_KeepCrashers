@@ -42,6 +42,7 @@ export class BeamEffect {
                 rigidBodyOptions: {
                     type: RigidBodyType.DYNAMIC,
                     gravityScale: 0,
+                
                 },
                 
             });
@@ -50,6 +51,7 @@ export class BeamEffect {
                 shape: ColliderShape.BALL,
                 isSensor: true,
                 radius: 0.001,
+                
 
                 onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
 
