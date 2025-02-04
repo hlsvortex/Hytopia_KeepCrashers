@@ -175,11 +175,11 @@ export abstract class AbilityController {
         const originForwardOffset = 0.2;
         const origin = new Vector3(
             entity.position.x + finalDirection.x * originForwardOffset,
-            entity.position.y + 0.6 + finalDirection.y * originForwardOffset,
+            entity.position.y + 0.3 + finalDirection.y * originForwardOffset,
             entity.position.z + finalDirection.z * originForwardOffset
         );
        
-        const originOffset = 0.3;
+        const originOffset = 0.35;
         origin.x += rightVector.x * originOffset;
         origin.z += rightVector.z * originOffset;
 

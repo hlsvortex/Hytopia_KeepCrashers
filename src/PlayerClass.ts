@@ -104,7 +104,7 @@ export class WizardAbilityController extends AbilityController {
     public spawnClassItems() {
         this.bookEntity = new Entity({
             name: 'book',
-            modelUri: 'models/items/book.gltf',
+            modelUri: 'models/items/staff.gltf',
             parent: this.attachedEntity!,
             modelScale: 1.1,
             parentNodeName: 'hand_right_anchor',
@@ -113,7 +113,7 @@ export class WizardAbilityController extends AbilityController {
         this.bookEntity.spawn(
             world,
             { x: 0.0, y: 0.3, z: 0.3 },
-            Quaternion.fromEuler(-90, 0, 90)
+            Quaternion.fromEuler(0, 0, 0)
         );
     }
 
@@ -167,7 +167,7 @@ export class FighterAbilityController extends AbilityController {
             maxRange: -1,
             speed: 25,
             damage: 15,
-            modelUri: 'models/projectiles/fireball.gltf',
+            modelUri: 'models/projectiles/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.1,
             knockback: 0.8,
@@ -248,15 +248,15 @@ export class ArcherAbilityController extends AbilityController {
         const shootArrowOptions: PhysicsProjectileOptions = {
             name: 'Arrow',
             slot: 'primary',
-            cooldown: 1,
-            resourceCost: 20,
+            cooldown: 0.5,
+            resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: 100,
             speed: 30,
 
             damage: 25,
             modelUri: 'models/projectiles/arrow.gltf',
-            modelScale: 0.5,
+            modelScale: 0.6,
             projectileRadius: 0.2,
             knockback: 0.5,
             gravityScale: 0.5,
@@ -269,11 +269,11 @@ export class ArcherAbilityController extends AbilityController {
                 chargeEffects: {
                     speed: {
                         min: 16,
-                        max: 25
+                        max: 26
                     },
                     damage: {
                         min: 20,
-                        max: 40
+                        max: 50
                     },
                     gravity: {
                         min: 0.4,
@@ -290,15 +290,15 @@ export class ArcherAbilityController extends AbilityController {
         const bombOptions: PhysicsProjectileOptions = {
             name: 'Bomb',
             slot: 'secondary',
-            cooldown: 4,
-            resourceCost: 15,
+            cooldown: 3,
+            resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 15,
 
             damage: 15,
-            modelUri: 'models/projectiles/fireball.gltf',
-            modelScale: 0.8,
+            modelUri: 'models/items/bomb.gltf',
+            modelScale: 0.6,
             projectileRadius: 0.3,
             knockback: 0.8,
             gravityScale: 0.6,
@@ -361,7 +361,7 @@ export class ArcherAbilityController extends AbilityController {
     public spawnClassItems() {
         this.bowEntity = new Entity({
             name: 'bow',
-            modelUri: 'models/items/bone.gltf',
+            modelUri: 'models/items/bow.gltf',
             parent: this.attachedEntity!,
             modelScale: 1.1,
             parentNodeName: 'hand_right_anchor',
@@ -369,7 +369,7 @@ export class ArcherAbilityController extends AbilityController {
         this.bowEntity.spawn(
             world,
             { x: 0.0, y: 0.0, z: 0.1 },
-            Quaternion.fromEuler(0, 0, 0)
+            Quaternion.fromEuler(0, 0, 5)
         );
     }
 

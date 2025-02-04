@@ -66,8 +66,7 @@ export abstract class Ability {
 
         const chargeLevel = Math.min(Math.max((chargeTime - minTime) / (maxTime - minTime), 0), 1);
         
-        console.log('chargeLevel', chargeLevel);
-
+      
         this.abilityController.updateChargeUI(this.isCharging, chargeLevel);
 
         return chargeLevel;
