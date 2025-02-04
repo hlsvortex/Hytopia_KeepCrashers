@@ -25,6 +25,20 @@ export function getRotationFromDirection(direction: Vector3Like): QuaternionLike
     };
 } 
 
+export function scaleDirection(direction: Vector3, distance: number) : Vector3
+{
+    const normalizedDir = direction.normalize();
+    const offset = new Vector3(
+        normalizedDir.x * distance,
+        normalizedDir.y * distance,
+        normalizedDir.z * distance
+
+    );
+
+    return offset;
+}
+
+
 export function faceDirection(wantedDirection: Vector3Like): QuaternionLike {
     const direction = Vector3.fromVector3Like(wantedDirection).normalize();
 

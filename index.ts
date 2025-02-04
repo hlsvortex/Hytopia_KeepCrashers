@@ -31,10 +31,10 @@ startServer(world => {
     initializeGameManager();
     
     //buildKeeps(world);
-    world.simulation.enableDebugRaycasting(true);
+    //world.simulation.enableDebugRaycasting(true);
 
     world.setDirectionalLightIntensity(6.5);
-    world.setAmbientLightIntensity(0.3);
+    world.setAmbientLightIntensity(0.4);
     world.setDirectionalLightColor({ r: 100, g: 150, b: 230 });
 
     world.onPlayerJoin = (player: Player) => {

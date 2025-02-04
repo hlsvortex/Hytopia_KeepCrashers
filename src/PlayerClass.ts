@@ -59,6 +59,7 @@ export class WizardAbilityController extends AbilityController {
         };
         //this.addAbility('secondary', new SelfAbility(teleportOptions, this.eventRouter, this));
 
+        /*
         const beamOptions: BeamAbilityOptions = {
             name: 'Fire Beam',
             slot: 'secondary',
@@ -66,7 +67,7 @@ export class WizardAbilityController extends AbilityController {
             resourceCost: 2,
             resourceType: Resource.Mana,
             useType: 'hold_continuous' as const,
-            range: 15,
+            range: 7,
             damagePerTick: 5,
 
             tickInterval: 100,
@@ -74,6 +75,30 @@ export class WizardAbilityController extends AbilityController {
         };
 
         this.addAbility('secondary', new BeamAbility(beamOptions, this.eventRouter, this));
+        */
+
+        const firedartsOptions: PhysicsProjectileOptions = {
+            name: 'Fireball',
+            slot: 'primary',
+            cooldown: 0.05,
+            resourceCost: 2,
+            resourceType: Resource.Mana,
+            maxRange: 7,
+            speed: 15,
+            damage: 2,
+
+            modelUri: 'models/particles/beam_segment.gltf',
+            modelScale: 0.1,
+            projectileRadius: 0.05,
+            knockback: 0.2,
+            gravityScale: 0.1,
+            hitFX: ParticleFX.FIREHIT,
+            
+
+            icon: 'ui/icons/fireball.png',
+        };
+
+        this.addAbility('secondary', new PhysicsProjectileAbility(firedartsOptions, this.eventRouter, this));
     }
 
     public spawnClassItems() {

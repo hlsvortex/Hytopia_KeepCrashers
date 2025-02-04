@@ -108,10 +108,11 @@ export abstract class AbilityController {
     protected useAbilityTick(ability: Ability, entity: PlayerEntity) {
         const aim = this.calculateAimDirection(entity, 50);
         if (!aim) return;
+
         ability.use(aim.origin, aim.direction, entity);
         //entity.startModelOneshotAnimations(['simple_interact']);
         //ability.startCooldown();
-        ability.consumeResources(entity as DamageableEntity);
+        
     }
     
     

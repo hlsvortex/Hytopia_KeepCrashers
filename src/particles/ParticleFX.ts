@@ -41,6 +41,25 @@ export const ParticleFX = {
         }
     } satisfies EmitterOptions,
 
+    FIREHIT: {
+        count: 4,
+        speed: 1,
+        spawnOptions: {
+            radius: 0.05,
+            shellOnly: false,
+            useSpawnDirectionForVelocity: true,
+            velocityRandomness: 0.5 // 30% randomness
+        },
+        particleOptions: {
+            color: { r: 255, g: 0, b: 0 },
+            size: 1,
+            sizeRandomness: 0.2, // 30% size variation
+            lifetime: 0.5,
+            lifetimeRandomness: 0.3, // 30% lifetime variation
+            modelUri: 'models/particles/ember.gltf',
+            gravityScale: 0.2
+        }
+    } satisfies EmitterOptions,    
     DUST: {
         count: 10,
         speed: 3,
