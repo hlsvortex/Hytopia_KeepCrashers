@@ -1,9 +1,10 @@
-import { Player, EventRouter, EntityManager, Light, Vector3, PlayerUI, Entity, PlayerManager, RigidBodyType, World, Quaternion, PlayerCameraMode,  } from 'hytopia';
+import { Player, EventRouter, EntityManager, Light, Vector3, PlayerUI, Entity, PlayerManager, RigidBodyType, World, Quaternion, PlayerCameraMode, Audio } from 'hytopia';
 import { Team } from './Team';
 import { PlayerEvents, type PlayerDeathEventPayload } from './events';
 import { PlayerEntity } from 'hytopia';
 import AbilityEntityController from './AbilityEntityController';
 import { SceneUI } from 'hytopia';
+
 import { ArcherAbilityController, FighterAbilityController, WizardAbilityController } from './PlayerClass';
 import { DamageableEntity } from './DamageableEntity';
 import { world } from './GlobalContext';
@@ -16,6 +17,25 @@ import { KingOfTheHill } from './GameModeController';
 import { HealthPickup } from './pickups/HealthPickup';
 
 export class GameManager {
+    private static readonly GAME_SFX = {
+        COUNTDOWN: {
+            uri: 'audio/sfx/voice/jack/jack_countdown.mp3',
+            volume: 0.7
+        },
+        MATCH_START: {
+            uri: 'audio/sfx/voice/jack/attack!.wav',
+            volume: 0.8
+        },
+        POINT_CAPTURE: {
+            uri: 'audio/sfx/game/Powerup upgrade 33.wav',
+            volume: 0.8
+        },
+        MATCH_END: {
+            uri: 'audio/sfx/game/Success 3.wav',
+            volume: 0.8
+        }
+    };
+
     private readonly teams: Team[] = [
         new Team('Red', '#ff4444'), 
 
@@ -24,7 +44,9 @@ export class GameManager {
     private players: Map<string, DamageableEntity> = new Map();
 
     private localPlayer: DamageableEntity | undefined;
+    private gameMusic: Audio | undefined;
  
+
     // Add team spawn areas
     private teamSpawnAreas: Map<string, { min: Vector3, max: Vector3 }> = new Map([
         ['Red', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
@@ -56,6 +78,14 @@ export class GameManager {
         const controlPoint = new CapturePoint(new Vector3(0, 2.15, 0), 8, 10, 5);
         controlPoint.spawn(world);
         this.gameModeController = new KingOfTheHill(this, this.worldEventRouter, controlPoint);
+
+        this.gameMusic = new Audio({
+            uri: 'audio/music/jungle-theme.mp3',
+            loop: true, // Loop the music when it ends
+            volume: 0.2, // Relative volume 0 to 1
+        });
+
+        this.gameMusic.play(world); // Play the music in our world
 
         // respawn system
         new RespawnSystem(world.eventRouter);
@@ -546,5 +576,33 @@ export class GameManager {
                 menuId: 'stats'
             });
         });
+    }
+
+    private playGameSound(soundEffect: { uri: string, volume: number }) {
+        if (world) {
+            const sound = new Audio({
+                uri: soundEffect.uri,
+                volume: soundEffect.volume
+            });
+            sound.play(world);
+        }
+    }
+
+    public handleGameStateChange(newState: GameState) {
+        switch (newState) {
+            case GameState.MatchStartCountdown:
+                this.playGameSound(GameManager.GAME_SFX.COUNTDOWN);
+                break;
+            case GameState.MatchPlay:
+                this.playGameSound(GameManager.GAME_SFX.MATCH_START);
+                break;
+            case GameState.MatchEnd:
+                this.playGameSound(GameManager.GAME_SFX.MATCH_END);
+                break;
+        }
+    }
+
+    public handlePointCapture() {
+        this.playGameSound(GameManager.GAME_SFX.POINT_CAPTURE);
     }
 }

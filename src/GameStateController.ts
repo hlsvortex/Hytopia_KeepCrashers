@@ -69,6 +69,7 @@ export class GameStateController {
     public setState(newState: GameState) {
         this.currentState = newState;
         this.eventRouter.emit('GAME_STATE_CHANGED', newState);
+        gameManager.handleGameStateChange(newState);
 
         // Handle state transitions
         switch(newState) {

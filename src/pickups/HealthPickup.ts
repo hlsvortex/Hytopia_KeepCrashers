@@ -1,4 +1,4 @@
-import { Entity, ColliderShape, RigidBodyType, Vector3, type RgbColor, CollisionGroup, BlockType } from 'hytopia';
+import { Entity, ColliderShape, RigidBodyType, Vector3, type RgbColor, CollisionGroup, BlockType, Audio } from 'hytopia';
 import { DamageableEntity } from '../DamageableEntity';
 import { world } from '../GlobalContext';
 
@@ -9,6 +9,11 @@ interface HealthPickupOptions {
 }
 
 export class HealthPickup {
+    private static readonly HEAL_SFX = {
+        uri: 'audio/sfx/player/Healing 03.wav',
+        volume: 0.6
+    };
+
     private entity: Entity | undefined;
     private healAmount: number;
     private spawnPosition: Vector3;
@@ -82,6 +87,15 @@ export class HealthPickup {
         
         player.heal(this.healAmount);
 
+        // Play heal sound
+        if (this.entity?.world) {
+            const healSound = new Audio({
+                uri: HealthPickup.HEAL_SFX.uri,
+                volume: HealthPickup.HEAL_SFX.volume,
+                position: this.entity.position
+            });
+            healSound.play(this.entity.world);
+        }
 
         this.entity?.despawn();
         

@@ -2,6 +2,7 @@ import { Resource } from '../Resource';
 import { Entity, BlockType } from 'hytopia';
 import type { Vector3Like } from 'hytopia';
 import type { EmitterOptions } from '../particles/ParticleEmitter';
+import type { ParticleEffectType } from '../particles/ParticleFX';
 
 export type AbilityUseType = 
     'instant' |          // Single activation (e.g. fireball)
@@ -15,8 +16,19 @@ export interface AbilityOptions {
     resourceCost: number;
     resourceType: Resource;
     icon?: string;
+    iconStyle?: any;
     useType?: AbilityUseType; // Default: 'instant'
     useFX?: EmitterOptions;
+    hitFX?: EmitterOptions;
+    useSFX?: {
+        uri: string;
+        volume?: number;
+    };
+    hitSFX?: {
+        uri: string;
+        volume?: number;
+        referenceDistance?: number;
+    };
 }
 
 export interface ChargeOptions {

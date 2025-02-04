@@ -143,7 +143,7 @@ export class PhysicsProjectileAbility extends Ability {
                     target: otherEntity instanceof Entity ? otherEntity : undefined,
                     damage: this.options.damage
                 });
-
+                
                 //projectile.despawn();
             }
         });
@@ -154,6 +154,8 @@ export class PhysicsProjectileAbility extends Ability {
         if (this.options.useFX) {
             this.spawnEffect(new ParticleEmitter(this.options.useFX), origin);
         }
+
+        this.playUseSound(source);
     }
 
     private projectileEnd(projectile: Entity, source: Entity) {
@@ -166,6 +168,7 @@ export class PhysicsProjectileAbility extends Ability {
             this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
         }
 
+        this.playHitSound(projectile.position);
         
         projectile.despawn();
     }

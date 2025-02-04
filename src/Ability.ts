@@ -2,12 +2,14 @@ import {
     Entity,
     EventRouter,
     type Vector3Like,
+    Audio,
 } from 'hytopia';
 
 import { DamageableEntity } from './DamageableEntity';
 import { Resource } from './Resource';
 import type { AbilityOptions } from './abilities/AbilityOptions';
 import type { AbilityController } from './AbilityController';
+import { world } from './GlobalContext';
 
 
 export abstract class Ability {
@@ -145,6 +147,28 @@ export abstract class Ability {
     }
 
     cleanup?(): void;
+
+    protected playUseSound(source: Entity) {
+        if (!this.options.useSFX) return;
+
+        const useSound = new Audio({
+            uri: this.options.useSFX.uri,
+            volume: this.options.useSFX.volume ?? 1
+        });
+        useSound.play(world);
+    }
+
+    protected playHitSound(position: Vector3Like) {
+        if (!this.options.hitSFX) return;
+
+        const hitSound = new Audio({
+            uri: this.options.hitSFX.uri,
+            volume: this.options.hitSFX.volume ?? 1,
+            position: position,
+            referenceDistance: this.options.hitSFX.referenceDistance ?? 10
+        });
+        hitSound.play(world);
+    }
 
     /*
     protected emitAbilityUsed(payload: T) {

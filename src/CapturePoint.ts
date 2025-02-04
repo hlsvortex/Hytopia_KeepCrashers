@@ -127,6 +127,7 @@ export class CapturePoint {
                         this.controllingTeam = currentTeam;
                         this.partialControlTeam = null;
                         this.onCaptured(currentTeam);
+                        gameManager.handlePointCapture();
                     }
                 } else {
                     // Opposing team contesting - fast decay

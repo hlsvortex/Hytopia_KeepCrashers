@@ -1,11 +1,9 @@
-import { Entity, Light, PlayerEntity, SceneUI } from 'hytopia';
+import { Entity, Light, PlayerEntity, SceneUI, Audio } from 'hytopia';
 import { Player, EventRouter } from 'hytopia';
 import type { PlayerDeathEventPayload } from './events';
 import { PlayerEvents } from './events';
 import { PlayerMatchStats } from './PlayerMatchStats';
 import { gameManager } from './GlobalContext';
-
-
 
 export class DamageableEntity extends PlayerEntity {
 
@@ -18,6 +16,21 @@ export class DamageableEntity extends PlayerEntity {
     nameplateUI?: SceneUI;
     hideNameplate: boolean = false;    
 
+    private static readonly DAMAGE_SOUNDS = {
+        LIGHT: {
+            uri: 'audio/sfx/damage/hit.mp3',
+            volume: 0.5
+        },
+        MEDIUM: {
+            uri: 'audio/sfx/damage/hit.mp3',
+            volume: 0.6
+        },
+        HEAVY: {
+            uri: 'audio/sfx/damage/hit.mp3',
+            volume: 0.7
+        }
+    };
+
     onTick = (entity: Entity, tickDeltaMs: number) => {
         //super.onTick(entity, tickDeltaMs);
         //this.updateUI();
@@ -26,9 +39,6 @@ export class DamageableEntity extends PlayerEntity {
         }
     }
 
-
-
-
     constructor(options: any, initialHealth: number = 100, initialStamina: number = 100, initialMana: number = 100) {
         super(options);
         this.health = initialHealth;
@@ -36,7 +46,6 @@ export class DamageableEntity extends PlayerEntity {
         this.mana = initialMana;
     }
 
-   
     updateUI() {
         if (!this.player || !this.player.ui) return;
         
@@ -55,24 +64,21 @@ export class DamageableEntity extends PlayerEntity {
         }
     }
 
-
     takeDamage(amount: number, source?: DamageableEntity) {
-        
         if (this.health <= 0) return;
         
         // Don't allow damage between teammates but can damage self
-        if (source && source.id != this.id)
-
-        {
+        if (source && source.id != this.id) {
             const sourceTeam = gameManager.getPlayerTeam(source?.player);
             const targetTeam = gameManager.getPlayerTeam(this.player);
 
             if (sourceTeam && targetTeam && sourceTeam.name === targetTeam.name) {
-                return; // Don't allow damage between teammates
+                return;
             }
         }
 
-
+        // Play damage sound based on amount
+        this.handleDamageSound(amount);
         this.health = Math.max(0, this.health - amount);
         this.updateUI();
         this.flashRed();
@@ -89,11 +95,30 @@ export class DamageableEntity extends PlayerEntity {
 
             console.log('Player death event received' + this.player);
             this.startModelLoopedAnimations(['sleep']);
-
         }
     }
 
-    // Add this method to flash the player model red
+    private handleDamageSound(amount: number) {
+        if (amount > 0 && this.world) {
+            let soundEffect;
+            if (amount <= 10) {
+                soundEffect = DamageableEntity.DAMAGE_SOUNDS.LIGHT;
+            } else if (amount <= 25) {
+                soundEffect = DamageableEntity.DAMAGE_SOUNDS.MEDIUM;
+            } else {
+                soundEffect = DamageableEntity.DAMAGE_SOUNDS.HEAVY;
+            }
+
+            const damageSound = new Audio({
+                uri: soundEffect.uri,
+                volume: soundEffect.volume,
+                position: this.position
+            });
+            damageSound.play(this.world);
+        }
+    }
+
+
     private flashRed() {
         if (!this.isSpawned) return;
 
@@ -104,7 +129,6 @@ export class DamageableEntity extends PlayerEntity {
         //this.respawn();
 
         // Reset after delay
-
         setTimeout(() => {
             console.log('Resetting tint to white');
             //    this.setTintColor({ r: 255, g: 255, b: 255 }); // Reset to white
@@ -119,7 +143,6 @@ export class DamageableEntity extends PlayerEntity {
         this.updateUI();
     }
 
-    // Add helper methods to check state
     isDead(): boolean {
         return this.health <= 0;
     }

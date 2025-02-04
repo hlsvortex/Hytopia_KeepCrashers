@@ -43,6 +43,16 @@ export class WizardAbilityController extends AbilityController {
                 falloff: true,
             },
             icon: 'ui/icons/fireball.png',
+
+            useSFX: {
+                uri: 'audio/sfx/fire/Fire Spell 01.wav',
+                volume: 0.6
+            },
+            hitSFX: {
+                uri: 'audio/sfx/fire/Fire Spell 18.wav',
+                volume: 0.8,
+                referenceDistance: 25
+            }
         };
 
         this.addAbility('primary', new PhysicsProjectileAbility(fireballOptions, this.eventRouter, this));
@@ -93,7 +103,15 @@ export class WizardAbilityController extends AbilityController {
             knockback: 0.2,
             gravityScale: 0.1,
             hitFX: ParticleFX.FIREHIT,
-            
+            useSFX: {
+                uri: 'audio/sfx/fire/fire-spell-instant-cast.wav',
+                volume: 0.6
+            },
+            hitSFX: {
+                uri: 'audio/sfx/fire/Fire Spell 18.wav',
+                volume: 0.8,
+                referenceDistance: 20
+            },
 
             icon: 'ui/icons/fireball.png',
         };
@@ -262,9 +280,21 @@ export class ArcherAbilityController extends AbilityController {
             gravityScale: 0.5,
             hitFX: ParticleFX.CLOUD_PUFF,
             icon: '{{CDN_ASSETS_URL}}/ui/icons/arrow.png',
+            useSFX: {
+                uri: 'audio/sfx/player/Fantasy_Game_Attack_Bow_A.wav',
+                volume: 0.6
+            },
+            hitSFX: {
+                uri: 'audio/sfx/player/bow-hit.mp3',
+                volume: 1,
+                referenceDistance: 15
+            },
+
+
             charging: {
                 minChargeTime: 0.0,
                 maxChargeTime: 0.8,
+
 
                 chargeEffects: {
                     speed: {
@@ -281,6 +311,7 @@ export class ArcherAbilityController extends AbilityController {
                     }
                 }
             }
+            
             
         };
 
@@ -305,7 +336,15 @@ export class ArcherAbilityController extends AbilityController {
             hitFX: ParticleFX.EXPLOSION,
             noHitOnBlockCollision: true,
             lifeTime: 1.5,
-
+            useSFX: {
+                uri: 'audio/sfx/player/player-swing-woosh.mp3',
+                volume: 0.6
+            },
+            hitSFX: {
+                uri: 'audio/sfx/fire/Fire Spell 18.wav',
+                volume: 0.8,
+                referenceDistance: 20
+            },
             aoe: {
                 radius: 3,
                 damage: 25,
