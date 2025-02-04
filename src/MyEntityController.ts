@@ -14,6 +14,8 @@ import type {
   PlayerCameraOrientation,
 } from 'hytopia';
 
+import AbilityEntityController from './AbilityEntityController';
+
 /** Options for creating a MyEntityController instance. @public */
 export interface MyEntityControllerOptions {
   /** The upward velocity applied to the entity when it jumps. */
@@ -57,6 +59,7 @@ export default class MyEntityController extends BaseEntityController {
 
   public pauseInput: boolean = false;
 
+  public isWalking: boolean = false;
 
   /**
    * A function allowing custom logic to determine if the entity can walk.
@@ -100,6 +103,9 @@ export default class MyEntityController extends BaseEntityController {
     this.canWalk = options.canWalk ?? this.canWalk;
     this.canRun = options.canRun ?? this.canRun;
     this.canJump = options.canJump ?? this.canJump;
+
+    this.isWalking = false//isCharging;
+
   }
 
   /** Whether the entity is grounded. */
@@ -201,87 +207,70 @@ export default class MyEntityController extends BaseEntityController {
 
     super.tickWithPlayerInput(entity, input, cameraOrientation, deltaTimeMs);
 
-    if (this.pauseInput) {
-      return;
-    }
+    if (this.pauseInput) return;
 
-    const { w, a, s, d, sp, sh, ml } = input;
+    const { w, a, s, d, sp } = input;
     const { yaw } = cameraOrientation;
     const currentVelocity = entity.linearVelocity;
     const targetVelocities = { x: 0, y: 0, z: 0 };
-    const isRunning = sh;
 
+    // Get ability controller to check charging state
+    const abilityController = entity.controller as AbilityEntityController;
+    //const isCharging = abilityController?.currentAbilityController?.isAnyAbilityCharging() ?? false;
+    
+    // Use charging state to determine if walking
+   
     // Temporary, animations
     if (this.isGrounded && (w || a || s || d)) {
-      if (isRunning) {
-        const runAnimations = [ 'run_upper', 'run_lower' ];
-        entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !runAnimations.includes(v)));
-        entity.startModelLoopedAnimations(runAnimations);
-        this._stepAudio?.setPlaybackRate(0.81);
-      } else {
-        const walkAnimations = [ 'walk_upper', 'walk_lower' ];
-        entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !walkAnimations.includes(v)));
-        entity.startModelLoopedAnimations(walkAnimations);
-        this._stepAudio?.setPlaybackRate(0.55);
-      }
+        if (!this.isWalking) {
+            const runAnimations = ['run_upper', 'run_lower'];
+            entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !runAnimations.includes(v)));
+            entity.startModelLoopedAnimations(runAnimations);
+            this._stepAudio?.setPlaybackRate(0.81);
+        } else {
+            const walkAnimations = ['walk_upper', 'walk_lower'];
+            entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !walkAnimations.includes(v)));
+            entity.startModelLoopedAnimations(walkAnimations);
+            this._stepAudio?.setPlaybackRate(0.55);
+        }
 
-      this._stepAudio?.play(entity.world, !this._stepAudio?.isPlaying);
+        this._stepAudio?.play(entity.world, !this._stepAudio?.isPlaying);
     } else {
-      this._stepAudio?.pause();
-      const idleAnimations = [ 'idle_upper', 'idle_lower' ];
-      entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !idleAnimations.includes(v)));
-      entity.startModelLoopedAnimations(idleAnimations);
+        this._stepAudio?.pause();
+        const idleAnimations = [ 'idle_upper', 'idle_lower' ];
+        entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !idleAnimations.includes(v)));
+        entity.startModelLoopedAnimations(idleAnimations);
     }
 
-    /*
-    if (ml) {
-      entity.startModelOneshotAnimations([ 'simple_interact' ]);
-
-      // break a block
-      const ray = entity.world.simulation.raycast(
-        entity.position,
-        entity.player.camera.facingDirection,
-        10,
-        { filterExcludeRigidBody: entity.rawRigidBody },
-      );
-
-      if (ray?.hitBlock) {
-        // Remove the block
-        entity.world.chunkLattice.setBlock(ray.hitBlock.globalCoordinate, 0);
-      }
-
-      input.ml = false;
-    }
-    */
+    // Use walking speed when charging, running speed otherwise
+    const moveSpeed = this.isWalking ? this.walkVelocity : this.runVelocity;
     
     // Calculate target horizontal velocities (run/walk)
-    if ((isRunning && this.canRun(this)) || (!isRunning && this.canWalk(this))) {
-      const velocity = isRunning ? this.runVelocity : this.walkVelocity;
-
+    if ((!this.isWalking && this.canRun(this)) || (this.isWalking && this.canWalk(this))) {
       if (w) {
-        targetVelocities.x -= velocity * Math.sin(yaw);
-        targetVelocities.z -= velocity * Math.cos(yaw);
+        targetVelocities.x -= moveSpeed * Math.sin(yaw);
+        targetVelocities.z -= moveSpeed * Math.cos(yaw);
       }
   
       if (s) {
-        targetVelocities.x += velocity * Math.sin(yaw);
-        targetVelocities.z += velocity * Math.cos(yaw);
+        targetVelocities.x += moveSpeed * Math.sin(yaw);
+        targetVelocities.z += moveSpeed * Math.cos(yaw);
       }
       
       if (a) {
-        targetVelocities.x -= velocity * Math.cos(yaw);
-        targetVelocities.z += velocity * Math.sin(yaw);
+        targetVelocities.x -= moveSpeed * Math.cos(yaw);
+        targetVelocities.z += moveSpeed * Math.sin(yaw);
       }
       
       if (d) {
-        targetVelocities.x += velocity * Math.cos(yaw);
-        targetVelocities.z -= velocity * Math.sin(yaw);
+        targetVelocities.x += moveSpeed * Math.cos(yaw);
+        targetVelocities.z -= moveSpeed * Math.sin(yaw);
       }
 
       // Normalize for diagonals
       const length = Math.sqrt(targetVelocities.x * targetVelocities.x + targetVelocities.z * targetVelocities.z);
-      if (length > velocity) {
-        const factor = velocity / length;
+      if (length > moveSpeed) {
+        const factor = moveSpeed / length;
         targetVelocities.x *= factor;
         targetVelocities.z *= factor;
       }

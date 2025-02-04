@@ -1,11 +1,14 @@
 import { Entity, EventRouter, PlayerEntity, Vector3, type PlayerInput } from 'hytopia';
 import type { Ability } from './Ability';
-import type { DamageableEntity } from './DamageableEntity';
+import { DamageableEntity } from './DamageableEntity';
 import { world } from './GlobalContext';
+import type MyEntityController from './MyEntityController';
 
 export abstract class AbilityController {
     protected _abilities: Map<string, Ability> = new Map();
     protected attachedEntity?: PlayerEntity;
+    protected maxHealth: number = 100;
+    protected runSpeed: number = 8;
 
     public get abilities(): Map<string, Ability> {
         return this._abilities;
@@ -18,6 +21,17 @@ export abstract class AbilityController {
         this.attachedEntity = entity;
         this.setupAbilities();
         
+        // Apply class stats
+        if (entity instanceof DamageableEntity) {
+            entity.maxHealth = this.maxHealth;
+            entity.heal(this.maxHealth);
+        }
+        
+        const controller = entity.controller as MyEntityController;
+        if (controller) {
+            controller.runVelocity = this.runSpeed;
+        }
+
         // Only spawn items if entity is already spawned
         if (entity.isSpawned) {
             this.spawnClassItems();

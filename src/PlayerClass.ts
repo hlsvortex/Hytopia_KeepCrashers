@@ -17,6 +17,8 @@ export class WizardAbilityController extends AbilityController {
 
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
+        this.maxHealth = 90;  // Squishier but mobile
+        this.runSpeed = 7;    // Faster run speed
     }
 
     protected setupAbilities() {
@@ -148,6 +150,7 @@ export class WizardAbilityController extends AbilityController {
         this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
         
+        
         //console.log(input.space);
         if (input.sp) {
 
@@ -172,6 +175,8 @@ export class FighterAbilityController extends AbilityController {
 
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
+        this.maxHealth = 120;  // Tankier
+        this.runSpeed = 7;     // Slower but stronger
     }
 
     protected setupAbilities() {
@@ -260,6 +265,8 @@ export class ArcherAbilityController extends AbilityController {
     
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
+        this.maxHealth = 100;   // Medium health
+        this.runSpeed = 8.5;   // Good mobility
     }
 
     protected setupAbilities() {

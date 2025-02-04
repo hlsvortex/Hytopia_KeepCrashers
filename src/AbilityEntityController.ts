@@ -69,7 +69,7 @@ export default class AbilityEntityController extends MyEntityController {
                 const damageable = this.ownerEntity as DamageableEntity;
                 damageable.respawn();
                 //this.ownerEntity.setAdditionalMass(0.1);
-                gameManager.setTeamSpawnArea
+                //gameManager.setTeamSpawnArea
             }
         });
 

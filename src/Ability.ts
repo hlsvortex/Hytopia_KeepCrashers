@@ -10,6 +10,7 @@ import { Resource } from './Resource';
 import type { AbilityOptions } from './abilities/AbilityOptions';
 import type { AbilityController } from './AbilityController';
 import { world } from './GlobalContext';
+import type MyEntityController from './MyEntityController';
 
 
 export abstract class Ability {
@@ -41,6 +42,12 @@ export abstract class Ability {
         this.isCharging = true;
         this.chargeStartTime = Date.now();
         
+        const entity = this.abilityController.getAttachedEntity();
+        if (entity) {
+            const controller = entity.controller as MyEntityController;
+            controller.isWalking = true;
+        }
+
         this.abilityController.updateChargeUI(true, 0);
 
     }
@@ -51,6 +58,13 @@ export abstract class Ability {
         
         this.abilityController.updateChargeUI(false, 0);
         
+        const entity = this.abilityController.getAttachedEntity();
+        if (entity) {
+            const controller = entity.controller as MyEntityController;
+            controller.isWalking = false;
+        }
+
+
         return chargeLevel;
     }
 

@@ -9,9 +9,10 @@ export class DamageableEntity extends PlayerEntity {
 
     public matchStats = new PlayerMatchStats();
 
-    health: number;
-    stamina: number;
-    mana: number;
+    public health: number;
+    public stamina: number;
+    public mana: number;
+    public maxHealth: number = 100;
     light?: Light;
     nameplateUI?: SceneUI;
     hideNameplate: boolean = false;    
@@ -41,6 +42,7 @@ export class DamageableEntity extends PlayerEntity {
 
     constructor(options: any, initialHealth: number = 100, initialStamina: number = 100, initialMana: number = 100) {
         super(options);
+        this.maxHealth = initialHealth;
         this.health = initialHealth;
         this.stamina = initialStamina;
         this.mana = initialMana;
@@ -52,6 +54,7 @@ export class DamageableEntity extends PlayerEntity {
         this.player.ui.sendData({
             type: 'statsUpdate',
             health: this.health,
+            maxHealth: this.maxHealth,
             mana: this.mana,
             stamina: this.stamina
         });
@@ -59,6 +62,7 @@ export class DamageableEntity extends PlayerEntity {
         if (this.nameplateUI) {
             this.nameplateUI.setState({
                 health: this.health,
+                maxHealth: this.maxHealth,
                 hidden: this.hideNameplate
             });
         }
@@ -137,7 +141,7 @@ export class DamageableEntity extends PlayerEntity {
     }
 
     public respawn() {
-        this.health = 100;
+        this.health = this.maxHealth;
         this.stamina = 100;
         this.mana = 100;
         this.updateUI();
@@ -148,12 +152,11 @@ export class DamageableEntity extends PlayerEntity {
     }
 
     public hasFullHealth(): boolean {
-        return this.health === 100;
+        return this.health >= this.maxHealth;
     }
     
     heal(amount: number) {
-        this.health = Math.min(this.health + amount, 100);
-
+        this.health = Math.min(this.health + amount, this.maxHealth);
         this.updateUI();
         
         // Update nameplate health

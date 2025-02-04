@@ -182,22 +182,18 @@
         };
 
         // Update stat bars and values
-        function updateStatBars() {
-            //console.log('Updating stat bars with:', stats); // Debug update
-            for (const stat of ['health', 'stamina', 'mana']) {
-                const value = stats[stat];
-                const fill = document.getElementById(`${stat}-fill`);
-                const text = document.getElementById(`${stat}-value`);
-                
-                if (fill && text) {
-                    // Ensure width is at least 0%
-                    fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
-                    // Use Math.floor instead of Math.round for more accurate display
-                    text.textContent = Math.floor(value);
-                } else {
-                    console.error(`Could not find elements for ${stat}`);
-                }
-            }
+        function updateStatBars(data) {
+            if (!data) return;
+
+            const healthPercent = (data.health / data.maxHealth) * 100;
+            document.getElementById('health-fill').style.width = healthPercent + '%';
+            document.getElementById('health-value').textContent = Math.round(data.health);
+
+            document.getElementById('stamina-fill').style.width = data.stamina + '%';
+            document.getElementById('stamina-value').textContent = Math.round(data.stamina);
+
+            document.getElementById('mana-fill').style.width = data.mana + '%';
+            document.getElementById('mana-value').textContent = Math.round(data.mana);
         }
 
         // Start cooldown countdown
@@ -230,12 +226,7 @@
         // Listen for stats updates from the server
         hytopia.onData(data => {
             if (data.type === 'statsUpdate') {
-                stats = {
-                    health: Number(data.health),
-                    stamina: Number(data.stamina),
-                    mana: Number(data.mana)
-                };
-                updateStatBars();
+                updateStatBars(data);
             }
             else if (data.type === 'chargeUpdate') {
                 const chargingBar = document.getElementById('charging-bar');
@@ -487,6 +478,18 @@
 
             ability1Icon.className = `ability-icon ability-icon-${data.primaryIcon.toLowerCase()}`;
             ability2Icon.className = `ability-icon ability-icon-${data.secondaryIcon.toLowerCase()}`;
+        }
+
+        function updateStats(data) {
+            const healthBar = document.querySelector('.health-bar .fill');
+            const healthText = document.querySelector('.health-bar .text');
+            
+            if (healthBar && healthText) {
+                const healthPercent = (data.health / data.maxHealth) * 100;
+                healthBar.style.width = `${healthPercent}%`;
+                healthText.textContent = `${Math.round(data.health)} / ${data.maxHealth}`;
+            }
+            // ... rest of function
         }
 
     </script>
