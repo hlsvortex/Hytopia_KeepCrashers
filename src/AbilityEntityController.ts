@@ -106,8 +106,8 @@ export default class AbilityEntityController extends MyEntityController {
             this.currentAbilityController.attach(this.ownerEntity);
             
             // Get ability icons
-            const primaryIcon = this.currentAbilityController.abilities.get('primary')?.options.icon;
-            const secondaryIcon = this.currentAbilityController.abilities.get('secondary')?.options.icon;
+            const primaryIcon = this.currentAbilityController.abilities.get('primary')?.options.name//options.icon;
+            const secondaryIcon = this.currentAbilityController.abilities.get('secondary')?.options.name;
 
             // Send to UI
             console.log('Sending classUpdate with icons:', {

@@ -28,7 +28,7 @@ export class WizardAbilityController extends AbilityController {
             resourceType: Resource.Mana,
             maxRange: 18,
             speed: 21,
-            damage: 15,
+            damage: 20,
 
             modelUri: 'models/projectiles/fireball.gltf',
             modelScale: 0.8,
@@ -79,13 +79,13 @@ export class WizardAbilityController extends AbilityController {
 
         const firedartsOptions: PhysicsProjectileOptions = {
             name: 'Firedarts',
-            slot: 'primary',
+            slot: 'secondary',
             cooldown: 0.1,
             resourceCost: 3,
             resourceType: Resource.Mana,
             maxRange: 10,
             speed: 15,
-            damage: 2,
+            damage: 3,
 
             modelUri: 'models/particles/beam_segment.gltf',
             modelScale: 0.1,

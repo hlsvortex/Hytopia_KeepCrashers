@@ -3,6 +3,7 @@ import { Player, EventRouter } from 'hytopia';
 import type { PlayerDeathEventPayload } from './events';
 import { PlayerEvents } from './events';
 import { PlayerMatchStats } from './PlayerMatchStats';
+import { gameManager } from './GlobalContext';
 
 
 
@@ -20,7 +21,12 @@ export class DamageableEntity extends PlayerEntity {
     onTick = (entity: Entity, tickDeltaMs: number) => {
         //super.onTick(entity, tickDeltaMs);
         //this.updateUI();
+        if(entity.position.y <= 2.2) {
+            this.takeDamage(1);
+        }
     }
+
+
 
 
     constructor(options: any, initialHealth: number = 100, initialStamina: number = 100, initialMana: number = 100) {
@@ -52,6 +58,21 @@ export class DamageableEntity extends PlayerEntity {
 
     takeDamage(amount: number, source?: DamageableEntity) {
         
+        if (this.health <= 0) return;
+        
+        // Don't allow damage between teammates but can damage self
+        if (source && source.id != this.id)
+
+        {
+            const sourceTeam = gameManager.getPlayerTeam(source?.player);
+            const targetTeam = gameManager.getPlayerTeam(this.player);
+
+            if (sourceTeam && targetTeam && sourceTeam.name === targetTeam.name) {
+                return; // Don't allow damage between teammates
+            }
+        }
+
+
         this.health = Math.max(0, this.health - amount);
         this.updateUI();
         this.flashRed();

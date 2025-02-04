@@ -157,7 +157,6 @@ export abstract class AbilityController {
             cameraPos.z + rightVector.z * rightOffset
         );
 
-
         // Add forward offset based on zoom
         const forwardOffset = -zoom ;  // Adjust multiplier as needed
         raycastPos.add(Vector3.fromVector3Like(cameraForward).scale(forwardOffset));
