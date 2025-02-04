@@ -1,4 +1,4 @@
-import { Player, EventRouter, EntityManager, Light, Vector3, PlayerUI, Entity, PlayerManager, RigidBodyType, World, Quaternion,  } from 'hytopia';
+import { Player, EventRouter, EntityManager, Light, Vector3, PlayerUI, Entity, PlayerManager, RigidBodyType, World, Quaternion, PlayerCameraMode,  } from 'hytopia';
 import { Team } from './Team';
 import { PlayerEvents, type PlayerDeathEventPayload } from './events';
 import { PlayerEntity } from 'hytopia';
@@ -292,8 +292,11 @@ export class GameManager {
     
     public InitCamera(entity: PlayerEntity) {
 
-        entity.player.camera.setFilmOffset(7);
-        entity.player.camera.setOffset({ x: 0, y: 0.85, z: 0 });
+        entity.player.camera.setMode(PlayerCameraMode.FIRST_PERSON);
+        entity.player.camera.setFilmOffset(8);
+
+        entity.player.camera.setForwardOffset(-2.5)
+        entity.player.camera.setOffset({ x: 0, y: 0.8, z: 0 });
         entity.player.camera.setZoom(1.3);
         entity.player.camera.setFov(75 );
     }

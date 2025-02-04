@@ -150,7 +150,7 @@ export abstract class AbilityController {
 
         // Apply right offset only to camera/raycast position
         const rightOffset = camera.filmOffset * 0.035;
-        const heightOffset = cameraOffset.y + 0.21;
+        const heightOffset = cameraOffset.y ;
         let raycastPos = new Vector3(
             cameraPos.x + rightVector.x * rightOffset,
             cameraPos.y + heightOffset,
@@ -165,14 +165,14 @@ export abstract class AbilityController {
         // Calculate a downward tilt relative to camera orientation
         const rotateAround = new Vector3(0, 1, 0);
         const finalDirection = Vector3.fromVector3Like(cameraForward)
-            .rotateY(rotateAround, -0.2);
+            .rotateY(rotateAround, -0.22);
         
         // Add downward component based on camera orientation
-        finalDirection.y -= 0.15; // Adjust this value to control downward tilt
+        //finalDirection.y -= 0.15; // Adjust this value to control downward tilt
         finalDirection.normalize(); // Normalize to maintain consistent direction
 
         // Original projectile origin without right offset
-        const originForwardOffset = 0.2;
+        const originForwardOffset = 0.15;
         const origin = new Vector3(
             entity.position.x + finalDirection.x * originForwardOffset,
             entity.position.y + 0.3 + finalDirection.y * originForwardOffset,
