@@ -4,7 +4,7 @@ Game was made for Hytopia Game Jam
 
 First time using typscript the code is a mess but i guess it works?
 
--Controls
+- **Controls
  - LMB - Attack 1
  - RMB - Attack 2
  - Space - Jump / Movement Ability
