@@ -50,7 +50,8 @@ export default class AbilityEntityController extends MyEntityController {
         this.ownerEntity = entity as PlayerEntity;
         // Initialize the current controller with the entity
         this.currentAbilityController.attach(this.ownerEntity);
-        //const direction = Vector3.fromVector3Like(entity.directionFromRotation);
+
+       
 
         world?.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
             console.log('Player death event received' + payload.player);
@@ -73,6 +74,17 @@ export default class AbilityEntityController extends MyEntityController {
             }
         });
 
+        setTimeout(() => {
+            // Show class select menu on join
+            if (this.ownerEntity?.player) {
+                this.ownerEntity.player.ui.sendData({
+                    type: 'SHOW_CLASS_SELECT'
+                });
+            }
+
+        }, 200);
+
+       
     }
 
     public detach() {

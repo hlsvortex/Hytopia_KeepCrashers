@@ -141,21 +141,33 @@
             <div class="class-icon"></div>
             <div class="class-info">
                 <h3>Wizard</h3>
-                <p>Arcane spellcaster with ranged attacks</p>
+                <p>
+                    <strong>LMB</strong><span>Fireball</span><br>
+                    <strong>RMB</strong><span>Fire Darts</span><br>
+                    <strong>SPACE</strong><span>Flight</span>
+                </p>
             </div>
         </div>
         <div class="class-button fighter" data-class="fighter">
             <div class="class-icon"></div>
             <div class="class-info">
                 <h3>Barbarian</h3>
-                <p>Brutal melee specialist</p>
+                <p>
+                    <strong>LMB</strong><span>Spirit Axe</span><br>
+                    <strong>RMB</strong><span>Charge Slash</span><br>
+                    <strong>SPACE</strong><span>Glide</span>
+                </p>
             </div>
         </div>
         <div class="class-button archer" data-class="archer">
             <div class="class-icon"></div>
             <div class="class-info">
                 <h3>Archer</h3>
-                <p>Precision ranged attacker</p>
+                <p>
+                    <strong>LMB</strong><span>Precision Shot</span><br>
+                    <strong>RMB</strong><span>Fuse Bomb</span><br>
+                    <strong>SPACE</strong><span>Double Jump</span>
+                </p>
             </div>
         </div>
     </div>
@@ -364,6 +376,17 @@
                 console.log('Received classUpdate:', data);
                 classUpdate(data);
             }
+            else if (data.type === 'SHOW_CLASS_SELECT') {
+                const menu = document.querySelector('.class-select-menu');
+                if (menu) {
+                    menu.style.display = 'flex';
+                    menuVisible = true;
+                    hytopia.sendData({
+                        type: 'TOGGLE_POINTER_LOCK',
+                        enabled: true
+                    });
+                }
+            }
         });
 
         // Initial stat bar update
@@ -373,15 +396,19 @@
         let menuVisible = false;
 
         // Update menu toggle handler
-        document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'k') {
-                const wasVisible = menuVisible;
-                menuVisible = !wasVisible;
-                classMenu.classList.toggle('active', menuVisible);
-            hytopia.sendData({
-                    type: 'TOGGLE_POINTER_LOCK',
-                    enabled: menuVisible
-                });
+        document.addEventListener('keydown', (event) => {
+            if (event.key.toLowerCase() === 'c') {
+                const menu = document.querySelector('.class-select-menu');
+                if (menu) {
+                    const willShow = menu.style.display === 'none';
+                    menu.style.display = willShow ? 'flex' : 'none';
+                    menuVisible = willShow;
+                    // Toggle pointer lock
+                    hytopia.sendData({
+                        type: 'TOGGLE_POINTER_LOCK',
+                        enabled: willShow
+                    });
+                }
             }
         });
 
@@ -395,8 +422,11 @@
                     className: className
                 });
                 // Close menu
-                menuVisible = false;
-                classMenu.classList.remove('active');
+                const menu = document.querySelector('.class-select-menu');
+                if (menu) {
+                    menu.style.display = 'none';
+                    menuVisible = false;
+                }
                 // Lock pointer
                 hytopia.sendData({
                     type: 'TOGGLE_POINTER_LOCK',

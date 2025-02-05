@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500&display=swap');
 
 /* Core stats panel */
 .stats-panel {
@@ -78,7 +79,7 @@
     display: none;
     gap: 30px;
     padding: 30px;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.98); /* More opaque black */
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     backdrop-filter: blur(5px);
@@ -104,6 +105,9 @@
     background-position: center;
     background-repeat: no-repeat;
     padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .class-button:hover {
@@ -134,17 +138,15 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 60%;
+    height: 70%;  /* Increased height for better text visibility */
     background: linear-gradient(
         to top, 
-        rgba(0,0,0,0.95) 20%,
-        rgba(0,0,0,0.8) 60%,
+        rgba(0,0,0,0.95) 30%,
+        rgba(0,0,0,0.8) 70%,
         transparent
     );
     border-radius: 6px;
     z-index: 1;
-    margin: 0;
-    width: 100%;
 }
 
 /* Raise text above overlay */
@@ -235,9 +237,26 @@
 }
 
 .ready-button {
-    position: static;
-    transform: none;
-    margin-bottom: 10px;
+    position: fixed;
+    bottom: 50%;  /* Move down to 50% from bottom */
+    left: 50%;
+    transform: translate(-50%, 50%);  /* Center both horizontally and vertically */
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+.ready-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, 50%) scale(1.05);
 }
 
 .charging-bar {
@@ -329,26 +348,6 @@
     white-space: nowrap;
     z-index: 1000;
     letter-spacing: 0.5px; /* Slight letter spacing for better readability */
-}
-
-.ready-button {
-    position: fixed;
-    bottom: 30px;  /* Move higher above game state text */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 30px;
-    font-size: 18px;
-    background: #29cc80;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    white-space: nowrap;
-    z-index: 1000;
-}
-
-.ready-button:hover {
-    background: #66ff66;
 }
 
 .teams-container {
@@ -465,12 +464,6 @@
     gap: 10px;
 }
 
-.ready-button {
-    position: static;
-    transform: none;
-    margin-bottom: 10px;
-}
-
 /* Add this to ensure capture point stays on top */
 #capture-point-ui {
     z-index: 1000;
@@ -510,7 +503,6 @@
     position: relative;
 
 }
-
 
 .capture-progress-bar {
     height: 100%;
@@ -577,7 +569,7 @@
     display: none;
     gap: 30px;
     padding: 30px;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.98); /* More opaque black */
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     backdrop-filter: blur(5px);
@@ -598,6 +590,7 @@
     text-align: center;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-origin: center;
+    position: relative;  /* Ensure relative positioning for absolute children */
 }
 
 .class-button:hover {
@@ -634,21 +627,58 @@
     padding: 10px;
 }
 
+.class-info {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .class-info h3 {
-    color: #fff;
-    font-family: 'Cinzel', serif;
+    font-family: 'IM Fell English', serif;
     font-size: 1.8em;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
 }
 
 .class-info p {
-    font-family: 'Cinzel', serif;
-    font-size: 1.1em;
-    line-height: 1.4;
-    color: #ddd;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #eee;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    margin: 0;
+    padding: 5px;
+    text-align: left;
+    position: absolute;  /* Position absolutely */
+    bottom: 10%;        /* Start from middle */
+    transform: translateY(10%);  /* Move up by half height */
+
+
+    width: calc(100% - 50px);  /* Account for padding */
+}
+
+/* Style the control labels */
+.class-info p strong {
+    color: #fff;
+    font-weight: 500;
+    display: inline-block;
+    width: 45px;
+    margin-right: 8px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Add new style for ability names */
+.class-info p span {
+    float: right;
+    text-align: right;
+    width: calc(100% - 55px); /* Account for strong width + margin */
+}
+
+/* Add spacing between ability descriptions */
+.class-info p br {
+    content: "";
+    display: block;
+    margin-top: 4px;
 }
 
 .wizard {
@@ -845,7 +875,6 @@
     border-color: rgba(234, 58, 58, 0.3);
 }
 
-
 /* Mana Container */
 #mana-fill-container {
     position: fixed;
@@ -932,7 +961,6 @@
     background-color: rgba(255, 136, 0, 0.1);
 }
 
-
 .ability-icon-firebeam {
     background-image: url('icons/fireball.png');
     filter: drop-shadow(0 0 0.4rem #ff6600);
@@ -962,7 +990,6 @@
     filter: drop-shadow(0 0 0.4rem #1900ff);
     background-color: rgba(255, 102, 0, 0.1);
 }
-
 
 .ability-icon-charge-slash {
     background-image: url('icons/charge-slash.png');
