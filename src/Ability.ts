@@ -3,6 +3,7 @@ import {
     EventRouter,
     type Vector3Like,
     Audio,
+    Vector3,
 } from 'hytopia';
 
 import { DamageableEntity } from './DamageableEntity';
@@ -182,6 +183,31 @@ export abstract class Ability {
             referenceDistance: this.options.hitSFX.referenceDistance ?? 10
         });
         hitSound.play(world);
+    }
+
+    protected applyUseImpulse(source: Entity, aimDirection?: Vector3Like) {
+        if (!this.options.useImpulse) return;
+
+        let impulseDirection: Vector3;
+        if (this.options.useImpulse.useAimDirection && aimDirection) {
+            impulseDirection = Vector3.fromVector3Like(aimDirection);
+        } else {
+            impulseDirection = Vector3.fromVector3Like(source.directionFromRotation);
+        }
+
+        switch (this.options.useImpulse.direction) {
+            case 'backward':
+                impulseDirection.scale(-this.options.useImpulse.force);
+                break;
+            case 'forward':
+                impulseDirection.scale(this.options.useImpulse.force);
+                break;
+            case 'up':
+                impulseDirection = new Vector3(0, this.options.useImpulse.force, 0);
+                break;
+        }
+
+        source.applyImpulse(impulseDirection);
     }
 
     /*

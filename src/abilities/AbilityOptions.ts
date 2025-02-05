@@ -29,6 +29,11 @@ export interface AbilityOptions {
         volume?: number;
         referenceDistance?: number;
     };
+    useImpulse?: {
+        direction: 'forward' | 'backward' | 'up';
+        force: number;
+        useAimDirection?: boolean;  // If true, uses aim direction instead of facing
+    };
 }
 
 export interface ChargeOptions {
@@ -48,6 +53,10 @@ export interface ChargeOptions {
             max: number;
         };
         size?: {
+            min: number;
+            max: number;
+        };
+        impulseForce?: {
             min: number;
             max: number;
         };

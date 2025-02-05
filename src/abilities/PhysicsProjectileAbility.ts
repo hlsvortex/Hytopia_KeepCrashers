@@ -57,6 +57,23 @@ export class PhysicsProjectileAbility extends Ability {
             }
         }
 
+        let impulseForce = this.options.useImpulse?.force ?? 0;
+        
+        // Apply charge effects to impulse force if configured
+        if (this.options.charging?.chargeEffects?.impulseForce) {
+            impulseForce = this.getChargedValue(
+                chargeLevel,
+                this.options.charging.chargeEffects.impulseForce.min,
+                this.options.charging.chargeEffects.impulseForce.max
+            );
+        }
+
+        // Store original force
+        const originalForce = this.options.useImpulse?.force;
+        if (this.options.useImpulse) {
+            this.options.useImpulse.force = impulseForce;
+        }
+
         // Normalize and scale direction vector
         const directionVector = new Vector3(direction.x, direction.y, direction.z).normalize();
         const velocityVector = directionVector.scale(speed);
@@ -241,6 +258,12 @@ export class PhysicsProjectileAbility extends Ability {
 
         this.playUseSound(source);
        
+        this.applyUseImpulse(source, direction);
+
+        // Restore original force
+        if (this.options.useImpulse && originalForce !== undefined) {
+            this.options.useImpulse.force = originalForce;
+        }
     }
 
     private projectileEnd(projectile: Entity, source: Entity) {

@@ -189,7 +189,7 @@ export class FighterAbilityController extends AbilityController {
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 20,
-            damage: 15,
+            damage: 10,
             modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
@@ -249,19 +249,24 @@ export class FighterAbilityController extends AbilityController {
             charging: {
                 minChargeTime: 0.0,
                 maxChargeTime: 1.0,
-
-
-
                 chargeEffects: {
+                    speed: {
+                        min: 15,
+                        max: 30
+                    },
                     damage: {
                         min: 15,
                         max: 30
+
                     },
                     size: {
                         min: 0.6,
                         max: 1.3  
+                    },
+                    impulseForce: {
+                        min: -10,
+                        max: -20  // Stronger push at full charge
                     }
-
                 }
             },
             useSFX: {
@@ -274,6 +279,11 @@ export class FighterAbilityController extends AbilityController {
                 volume: 1,
                 referenceDistance: 15
             },
+            useImpulse: {
+                direction: 'forward',
+                force: -15,
+                useAimDirection: false
+            }
         };
 
 
