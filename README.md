@@ -40,4 +40,7 @@ First time using typscript the code is a mess but i guess it works?
 - **LMB**: Attack 1
 - **RMB**: Attack 2
 - **Space**: Jump / Movement Ability
+- **C**: Open Class Select
+- **F**: Show Scoreboard
+- 
 
