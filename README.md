@@ -4,10 +4,7 @@ Game was made for Hytopia Game Jam
 
 First time using typscript the code is a mess but i guess it works?
 
-- **Controls
- - LMB - Attack 1
- - RMB - Attack 2
- - Space - Jump / Movement Ability
+
 
 **Keep Crashers** is a team-based PvP game where players compete in King of the Hill battles. Capture control points, choose from three distinct classes, and work with your team to secure victory.
 
@@ -35,5 +32,9 @@ First time using typscript the code is a mess but i guess it works?
     - **Precision Shot**: Fire a pinpoint arrow that deals critical damage to a single target.
     - **Explosive Trap**: Set a hidden trap that detonates when triggered, causing area damage and chaos.
 
+## Controls
 
+- **LMB**: Attack 1
+- **RMB**: Attack 2
+- **Space**: Jump / Movement Ability
 
