@@ -62,6 +62,7 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     modelScale: number;
     projectileRadius: number;
     knockback: number;
+    torque?: number;
     lifeTime?: number;
     gravityScale?: number;
     noHitOnEntityCollision?: boolean;
@@ -80,6 +81,16 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     charging?: ChargeOptions;
     onCollision?: (source: Entity, target: Entity | BlockType) => void;
     onProjectileTick?: (projectile: Entity, deltaTimeMs: number) => void;
+    velocityReverse?: {
+        time: number;      // Time in seconds before reversing
+        duration?: number; // How long to take to reverse (gradual if set)
+        speedMultiplier?: number; // Multiplier for return speed (default 1)
+    };
+    isSensor?: boolean;  // Whether the collider is a sensor (trigger) only
+    multiHit?: {
+        maxHits: number;       // Maximum number of hits before despawning
+        hitCooldown?: number;  // Time in seconds before can hit same target again
+    };
 }
 
 export interface RaycastOptions extends AbilityOptions {

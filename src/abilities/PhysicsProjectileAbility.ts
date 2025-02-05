@@ -19,12 +19,22 @@ export class PhysicsProjectileAbility extends Ability {
         super(options, eventRouter, abilityController);
     }
 
-    
+    private hasReversed = false;
+    private startVelocity = new Vector3(0, 0, 0);    
+    private isColliding = false;
+    private hitCount = 0;
+    private staticVelocity = new Vector3(0, 0, 0);
+    private useDirection: Vector3Like = new Vector3(0, 0, 0);
+    private hitABlock = false;
 
     use(origin: Vector3Like, direction: Vector3Like, source: Entity) {
         if (!source.world) return;
 
         const chargeLevel = this.endCharge(); // Get final charge level and reset charging state
+        this.hitCount = 0;
+        this.hasReversed = false;
+        this.useDirection = Vector3.fromVector3Like(direction).normalize();
+        this.hitABlock = false;
 
         // Apply charge effects
         let { speed, damage, gravityScale } = this.getChargedValues(chargeLevel);
@@ -51,11 +61,14 @@ export class PhysicsProjectileAbility extends Ability {
         const directionVector = new Vector3(direction.x, direction.y, direction.z).normalize();
         const velocityVector = directionVector.scale(speed);
 
+        this.startVelocity = velocityVector;
+        this.staticVelocity = velocityVector;
         const projectile = new Entity({
             name: `${this.options.name} Projectile`,
             modelUri: this.options.modelUri,
             modelScale: this.options.modelScale + size,
             rigidBodyOptions: {
+
                 type: RigidBodyType.DYNAMIC,
                 linearVelocity: velocityVector,
                 gravityScale: gravityScale,
@@ -74,6 +87,7 @@ export class PhysicsProjectileAbility extends Ability {
             }
         }
 
+        
         projectile.onTick = (entity: Entity, tickDeltaMs: number) => {
             // Custom tick handler if provided
             if (this.options.onProjectileTick) {
@@ -82,13 +96,48 @@ export class PhysicsProjectileAbility extends Ability {
 
             // Update age in seconds
             age += tickDeltaMs / 1000;
-
-            const currentVelocity = entity.linearVelocity;
             
+            if(this.options.velocityReverse  ) {
+
+                if(age > this.options.velocityReverse.time ) {
+                
+                    this.staticVelocity =  new Vector3(
+                        this.useDirection.x * -1 * this.options.speed,
+                        this.useDirection.y * -1 * this.options.speed,
+                        this.useDirection.z * -1 * this.options.speed
+                    );
+                }
+
+                else {
+                    if(!this.hitABlock) {
+                        this.staticVelocity = new Vector3(
+                            this.useDirection.x * 1 * this.options.speed,
+                            this.useDirection.y * 1 * this.options.speed,
+                            this.useDirection.z * 1 * this.options.speed
+                        );
+                    }
+                    else {
+                        this.staticVelocity = new Vector3(0,0,0);
+                    }
+                }
+
+                console.log("currentVelocity", this.staticVelocity);
+                entity.setLinearVelocity(this.staticVelocity);
+
+            }
+
+           const currentVelocity = entity.linearVelocity;
+
+
             // Check if the projectile is moving (non-zero velocity)
             if (currentVelocity.x !== 0 || currentVelocity.y !== 0 || currentVelocity.z !== 0) {
-                // Set the projectile's rotation
-                projectile.setRotation(faceDirection(currentVelocity));
+
+                if(!this.options.velocityReverse) {
+                    // Set the projectile's rotation
+                    projectile.setRotation(faceDirection(currentVelocity));
+                }
+                
+
             }
             
             // Despawn if exceeded lifetime
@@ -101,19 +150,21 @@ export class PhysicsProjectileAbility extends Ability {
         projectile.createAndAddChildCollider({
             shape: ColliderShape.BALL,
             radius: this.options.projectileRadius,
+            isSensor: this.options.isSensor ?? false,
             friction: 0.6,
             bounciness: 1,
+            
             collisionGroups: {
                 belongsTo: [CollisionGroup.ENTITY],
-                collidesWith: [CollisionGroup.ENTITY, CollisionGroup.BLOCK],
+                collidesWith: [CollisionGroup.PLAYER, CollisionGroup.BLOCK, CollisionGroup.ENTITY],
             },
-
             
-
             onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
+                this.isColliding = started;
                 if (!started) return;
                 if (otherEntity == source) return;
                 
+
                 if (this.options.noHitOnBlockCollision && otherEntity instanceof BlockType) {
                     return;
                 }
@@ -133,9 +184,29 @@ export class PhysicsProjectileAbility extends Ability {
                         this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), otherEntity.position as Vector3);
                     }   
 
+
+                    this.hitCount++;
+
+                    console.log(`Hit count: ${this.hitCount}`);
+                    console.log(`Max hits: ${this.options.multiHit?.maxHits}`);
+
+                    if (this.options.multiHit) {
+                        
+                        if(this.hitCount >= this.options.multiHit.maxHits) {
+                            this.projectileEnd(projectile, source);
+                        }
+                    }
+                    else {
+                        this.projectileEnd(projectile, source);
+                    }
                 }
-                
-                this.projectileEnd(projectile, source);
+                else {
+                    this.hitABlock = true;
+                    
+                    if (!this.options.multiHit) {
+                        this.projectileEnd(projectile, source);
+                    }
+                }
 
                 world.eventRouter.emit('ProjectileHit', {
                     type: source.name,
@@ -150,12 +221,26 @@ export class PhysicsProjectileAbility extends Ability {
        
         projectile.spawn(source.world, origin);
 
+        projectile.setRotation(faceDirection(this.useDirection));
        
+        if (this.options.torque) {
+            
+            const rightVector = new Vector3(
+                -this.useDirection.z,
+                0,
+                this.useDirection.x
+            ).normalize();
+
+            projectile.addTorque(rightVector.scale(this.options.torque));
+        }
+
+
         if (this.options.useFX) {
             this.spawnEffect(new ParticleEmitter(this.options.useFX), origin);
         }
 
         this.playUseSound(source);
+       
     }
 
     private projectileEnd(projectile: Entity, source: Entity) {

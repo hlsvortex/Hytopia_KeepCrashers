@@ -25,7 +25,7 @@ export class WizardAbilityController extends AbilityController {
         const fireballOptions: PhysicsProjectileOptions = {
             name: 'Fireball',
             slot: 'primary',
-            cooldown: 1.5,
+            cooldown: 2,
             resourceCost: 15,
             resourceType: Resource.Mana,
             maxRange: 18,
@@ -181,40 +181,111 @@ export class FighterAbilityController extends AbilityController {
 
     protected setupAbilities() {
         // Add fighter abilities
-        const bombOptions: PhysicsProjectileOptions = {
-            name: 'Bomb',
+        const SpiritAxe: PhysicsProjectileOptions = {
+            name: 'Spirit Axe',
             slot: 'primary',
             cooldown: 1,
-            resourceCost: 15,
+            resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: -1,
-            speed: 25,
+            speed: 20,
             damage: 15,
-            modelUri: 'models/projectiles/bomb.gltf',
+            modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
-            projectileRadius: 0.1,
-            knockback: 0.8,
-            gravityScale: 0.6,
-            hitFX: ParticleFX.EXPLOSION,
-            noHitOnBlockCollision: true,
-            lifeTime: 2,
-            aoe: {
-                radius: 2.5,
-                damage: 25,
-                knockback: 15.5,
-                falloff: true,
-            },
+            projectileRadius: 0.3,
+            knockback: 0.6,
+            gravityScale: 0.0,
+            hitFX: ParticleFX.CLOUD_PUFF,
+            lifeTime: 1.2,
+            torque: 1,
+            //noHitOnBlockCollision: true,
+            //noHitOnEntityCollision: true,
+            isSensor: true,
             icon: '{{CDN_ASSETS_URL}}/ui/icons/bomb.png',
+            velocityReverse: {
+                time: 0.65,        // Reverse after 0.5 seconds
+                duration: 0.2,    // Take 0.2 seconds to reverse
+                speedMultiplier: 1.2  // Return slightly faster
+            },
+            multiHit: {
+                maxHits: 5,           // Can hit up to 3 targets
+                hitCooldown: 0.2      // 0.2s cooldown between hits on same target
+            },
+            useSFX: {
+                uri: 'audio/sfx/player/player-swing-woosh.mp3',
+                volume: 0.6
+            },
+
+
+            hitSFX: {
+                uri: 'audio/sfx/player/bow-hit.mp3',
+                volume: 1,
+                referenceDistance: 15
+            },
         };
 
-        this.addAbility('primary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
-        this.addAbility('secondary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
+        const ChargeSlash: PhysicsProjectileOptions = {
+            name: 'Slash',
+            slot: 'secondary',
+            cooldown: 1,
+            resourceCost: 0,
+            resourceType: Resource.Mana,
+            maxRange: 0.1,
+            speed: 15,
+            damage: 15,
+            modelUri: 'models/projectiles/slash1.gltf',
+            modelScale: 0.5,
+            projectileRadius: 0.5,
+            knockback: 0.1,
+            gravityScale: 0.0,
+            lifeTime: 0.25,
+            //noHitOnBlockCollision: true,
+            //noHitOnEntityCollision: true,
+            isSensor: true,
+            multiHit: {
+                maxHits: 100,           // Can hit up to 3 targets
+                hitCooldown: 0.2      // 0.2s cooldown between hits on same target
+            },
+            charging: {
+                minChargeTime: 0.0,
+                maxChargeTime: 1.0,
+
+
+
+                chargeEffects: {
+                    damage: {
+                        min: 15,
+                        max: 30
+                    },
+                    size: {
+                        min: 0.6,
+                        max: 1.3  
+                    }
+
+                }
+            },
+            useSFX: {
+                uri: 'audio/sfx/player/player-swing-woosh.mp3',
+                volume: 0.6
+            },
+
+            hitSFX: {
+                uri: 'audio/sfx/player/bow-hit.mp3',
+                volume: 1,
+                referenceDistance: 15
+            },
+        };
+
+
+        this.addAbility('primary', new PhysicsProjectileAbility(SpiritAxe, this.eventRouter, this));
+
+        this.addAbility('secondary', new PhysicsProjectileAbility(ChargeSlash, this.eventRouter, this));
     }
 
     public spawnClassItems() {
         this.swordEntity = new Entity({
             name: 'sword',
-            modelUri: 'models/items/sword.gltf',
+            modelUri: 'models/items/battle-axe.gltf',
             parent: this.attachedEntity!,
             modelScale: 1.1,
             parentNodeName: 'hand_right_anchor',
@@ -222,7 +293,7 @@ export class FighterAbilityController extends AbilityController {
         this.swordEntity.spawn(
             world,
             { x: 0.0, y: 0.3, z: 0.3 },
-            Quaternion.fromEuler(-90, 0, 90)
+            Quaternion.fromEuler(-90, 0, 0)
         );
     }
 
@@ -433,8 +504,6 @@ export class ArcherAbilityController extends AbilityController {
 
         this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
-
-
         
         const myController = entity.controller as MyEntityController;
         const damageableEntity = entity  as DamageableEntity;

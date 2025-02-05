@@ -50,7 +50,8 @@ export class GameManager {
     // Add team spawn areas
     private teamSpawnAreas: Map<string, { min: Vector3, max: Vector3 }> = new Map([
         ['Red', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
-        ['Blue', { min: new Vector3(4, 3, -53), max: new Vector3(31, 3, -62) }]
+        ['Blue', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
+        //['Blue', { min: new Vector3(4, 3, -53), max: new Vector3(31, 3, -62) }]
     ]);
 
     private doors: Entity[] = [];
