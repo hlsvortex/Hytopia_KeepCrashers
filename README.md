@@ -23,15 +23,18 @@ First time using typscript the code is a mess but i guess it works?
   - **Fire Mage**: Harness the power of flames with devastating abilities.
     - **Fireball**: Launch a fiery projectile that explodes on impact, dealing massive damage.
     - **Fire Darts**: Rapidly hurl a series of fiery darts, piercing through enemies with precision.
+    - **Movement Ability**: **Flight** - Soar through the air, gaining a tactical advantage over ground-bound foes.
   
   - **Barbarian**: A relentless warrior with unmatched strength and ferocity.
     - **Spirit Axe**: Unleash a powerful axe throw that cleaves through enemies, dealing heavy damage.
     - **Cleaving Surge**: Charge forward with a sweeping attack, knocking back foes and asserting dominance.
+    - **Movement Ability**: **Glide** - Descend gracefully from heights, allowing for strategic positioning.
   
   - **Archer**: A master of ranged combat, striking from the shadows with deadly accuracy.
     - **Precision Shot**: Fire a pinpoint arrow that deals critical damage to a single target.
     - **Explosive Trap**: Set a hidden trap that detonates when triggered, causing area damage and chaos.
-
+    - **Movement Ability**: **Double Jump** - Leap again in mid-air to reach higher ground or evade attacks.
+      
 ## Controls
 
 - **LMB**: Attack 1
