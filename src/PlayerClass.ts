@@ -247,7 +247,7 @@ export class FighterAbilityController extends AbilityController {
             modelUri: 'models/projectiles/slash1.gltf',
             modelScale: 0.5,
             projectileRadius: 0.5,
-            knockback: 0.1,
+            knockback: 0.4,
             gravityScale: 0.0,
             lifeTime: 0.25,
             //noHitOnBlockCollision: true,

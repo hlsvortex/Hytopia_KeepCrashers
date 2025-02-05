@@ -15,10 +15,12 @@ export class CapturePoint {
     constructor(
         public position: Vector3,
         public radius: number = 5,
-        public captureSpeed: number = 1, // % per second per player
-        public decaySpeed: number = 0.5 // % per second when contested
+        public captureSpeed: number = 0.8, // % per second per player
+        public decaySpeed: number = 0.5, // % per second when contested
+        public MAX_CAPTURE_RATE: number = 5.0 // Maximum 15% per second
     ) {
         
+
         //world.simulation.enableDebugRendering(true);
         //world.simulation.enableDebugRendering(true);
         this.entityModel = new Entity({
@@ -53,12 +55,7 @@ export class CapturePoint {
             // equivalent to a typical world position.
             relativePosition: this.position,
             onCollision: (other: BlockType | Entity, started: boolean) => {
-                if (started) {
-                    //console.log('something touched or entered/intersected!');
-                } else {
-                    //console.log('something stopped touching or exited/unintersected!');
-                }
-
+               
                 if(other instanceof DamageableEntity) {
                     this.handleCollision(other, started);
                 }
@@ -119,7 +116,15 @@ export class CapturePoint {
                 if (this.partialControlTeam === currentTeam) {
                     // Friendly team capturing
                     const prevProgress = this.progress;
-                    this.progress += this.captureSpeed * this.getTeamPlayerCount(currentTeam) * deltaTime;
+                    let speed = this.captureSpeed * this.getTeamPlayerCount(currentTeam);
+
+                    if (speed > this.MAX_CAPTURE_RATE) {
+                        this.captureSpeed = this.MAX_CAPTURE_RATE;
+                    }
+                    
+
+                    this.progress += speed * deltaTime;
+
                     this.progress = Math.min(100, this.progress);
                     // console.log(`[CapturePoint] ${currentTeam.name} partial capture: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
 
