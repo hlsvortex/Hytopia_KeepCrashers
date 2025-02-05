@@ -372,17 +372,12 @@ export default class MyEntityController extends BaseEntityController {
         const damageableEntity = entity as DamageableEntity;
         newVelocities.y = this.jumpVelocity;
         this.isJumping = true;
-        console.log('Jump ' + this.isJumping);
-        //input.sp = false;
       }
     }
     
-    
-
-    if (!input.sp && this.isJumping && currentVelocity.y > 4) {
+    if (!input.sp && this.isJumping && currentVelocity.y > 5) {
      
       // Cut jump short if space released and still moving upward
-      console.log('Cut jump short');
       entity.setLinearVelocity(new Vector3(
         currentVelocity.x,
         4,
@@ -393,7 +388,6 @@ export default class MyEntityController extends BaseEntityController {
       this.isJumping = false;
     }
   
-
     return Vector3.fromVector3Like(newVelocities);
   }
 }

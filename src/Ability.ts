@@ -34,7 +34,7 @@ export abstract class Ability {
         return this.abilityController;
     }
 
-    getIsCharging(): boolean {
+    public getIsCharging(): boolean {
         return this.isCharging;
     }
 

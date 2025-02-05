@@ -32,7 +32,7 @@ export class KingOfTheHill extends GameModeController {
     private teamTimes: Map<Team, number> = new Map();
     private currentControllingTeam: Team | null = null;
     private initialLockDuration: number = 10; // Seconds before point unlocks
-    private matchDuration: number = 15;//180; // 3 minutes in seconds
+    private matchDuration: number = 60;//180; // 3 minutes in seconds
     private overtimeThreshold: number = 30; // Seconds remaining for overtime
 
     constructor(gameManager: GameManager, eventRouter: EventRouter, controlPoint: CapturePoint) {

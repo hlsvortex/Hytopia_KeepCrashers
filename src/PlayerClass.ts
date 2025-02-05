@@ -10,6 +10,7 @@ import type MyEntityController from './MyEntityController';
 import type { Ability } from './Ability';
 import { BeamAbility, type BeamAbilityOptions } from './abilities/BeamAbility';
 import type { PhysicsProjectileOptions } from './abilities/AbilityOptions';
+import type AbilityEntityController from './AbilityEntityController';
 
 
 export class WizardAbilityController extends AbilityController {
@@ -324,10 +325,18 @@ export class FighterAbilityController extends AbilityController {
     tick(entity: PlayerEntity, input: PlayerInput, deltaTimeMs: number) {
 
         const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
-        const abilitySecondary = this._abilities.get('secondary') as SelfAbility;
+        const abilitySecondary = this._abilities.get('secondary') as PhysicsProjectileAbility;
 
         this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
+
+        const myController = entity.controller as AbilityEntityController;
+        const damageableEntity = entity as DamageableEntity;
+        
+        if (abilityPrimary.getIsCharging() && !myController.isGrounded && entity.linearVelocity.y < 0.05) {
+
+            entity.applyImpulse(new Vector3(0, 0.25, 0));
+        }
 
         //console.log(input.space);
         if (input.sp) {
@@ -524,14 +533,20 @@ export class ArcherAbilityController extends AbilityController {
         this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
         
-        const myController = entity.controller as MyEntityController;
+        const myController = entity.controller as AbilityEntityController;
         const damageableEntity = entity  as DamageableEntity;
         
+    
+        // GLide a bit when charging
+        if (abilityPrimary.getIsCharging() && !myController.isGrounded && entity.linearVelocity.y < 0.05) {
+
+            entity.applyImpulse(new Vector3(0, 0.25, 0));
+        }
         
-        // Archer-specific tick logic
+        // Double Jump code
         if (input.sp && !myController.isJumping && !this.hasDoubledJumped) {
 
-            const staminaCost = 2; // stamina per second
+            const staminaCost = 5; // stamina per second
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
 

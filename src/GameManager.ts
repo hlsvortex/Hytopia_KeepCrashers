@@ -50,8 +50,8 @@ export class GameManager {
     // Add team spawn areas
     private teamSpawnAreas: Map<string, { min: Vector3, max: Vector3 }> = new Map([
         ['Red', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
-        ['Blue', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
-        //['Blue', { min: new Vector3(4, 3, -53), max: new Vector3(31, 3, -62) }]
+        //['Blue', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
+        ['Blue', { min: new Vector3(4, 3, -53), max: new Vector3(31, 3, -62) }]
     ]);
 
     private doors: Entity[] = [];
@@ -95,7 +95,10 @@ export class GameManager {
 
         this.capturePoints.push(controlPoint);
 
+        this.buildHealthPickup();
+
     }
+
 
     private startGameLoop() {
         setInterval(() => {
@@ -117,9 +120,14 @@ export class GameManager {
             console.log(`GAME_STATE_CHANGED ${newState}!`);
             
             this.updatePlayerUI();
+
+            if (newState === GameState.MatchStats) {
+                this.buildStartAreaDoors(world);
+            }
         });
 
        
+
         this.worldEventRouter.on('MATCH_COUNTDOWN_UPDATE', (timeLeft: number) => {
             this.updatePlayerUI();
         });
@@ -457,14 +465,20 @@ export class GameManager {
         this.buildDoor(world, new Vector3(31, heightY, blueDepthZ * -1), new Quaternion(0, 0, 0, 0));
 
 
-        // Health Pickups
+        
+
+    }
+
+    private buildHealthPickup() {
+        
+
         // Blue Team Small outpost
         new HealthPickup({
             size: 'large',
             position: new Vector3(-20, 4.5, -24),
             respawnTime: 10  // Respawns after 45 seconds
         });
-        
+
         //Red Team Large outpost
         new HealthPickup({
             size: 'large',
@@ -486,7 +500,6 @@ export class GameManager {
             position: new Vector3(31.5, 9.5, -17),
             respawnTime: 10  // Respawns after 20 seconds
         });
-
     }
 
 

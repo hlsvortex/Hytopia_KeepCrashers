@@ -87,6 +87,8 @@ export default class AbilityEntityController extends MyEntityController {
             this.currentAbilityController.detach(); // Handles destroyClassItems through detach()
         }
 
+        this.isJumping = false;
+
         // Create new controller based on class name
         switch(className.toLowerCase()) {
             case 'wizard':
@@ -145,9 +147,10 @@ export default class AbilityEntityController extends MyEntityController {
         const regenerationRate = 10; // per second
         const amount = regenerationRate * (deltaTimeMs / 1000);
         
-        if (!entity.isMoving) {
-            entity.regenerateStamina(amount);
+        if (entity.linearVelocity.y < 0.05 && entity.linearVelocity.y > -0.05) {
+            entity.regenerateStamina(amount/2);
         }
+
         entity.regenerateMana(amount);
     }
     
