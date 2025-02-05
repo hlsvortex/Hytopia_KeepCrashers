@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&display=swap');
 
 /* Core stats panel */
 .stats-panel {
@@ -10,7 +10,7 @@
     padding: 8px;
     border-radius: 6px;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: 'Fira Sans', sans-serif;
     z-index: 950;
     width: 140px; /* Match other panels */
     border: 1px solid rgba(255, 220, 150, 0.2);
@@ -77,16 +77,32 @@
     left: 50%;
     transform: translate(-50%, -50%);
     display: none;
+    flex-direction: row;
     gap: 30px;
     padding: 30px;
-    background: rgba(0, 0, 0, 0.98); /* More opaque black */
+    background: rgba(0, 0, 0, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     backdrop-filter: blur(5px);
+    width: fit-content;  /* Add width constraint */
 }
 
 .class-select-menu.active {
     display: flex;
+}
+
+/* Add hint text */
+.class-select-menu::after {
+    content: 'Press C to Toggle';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.8em;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .class-button {
@@ -238,17 +254,20 @@
 
 .ready-button {
     position: fixed;
-    bottom: 50%;  /* Move down to 50% from bottom */
+    bottom: 10%;
     left: 50%;
-    transform: translate(-50%, 50%);  /* Center both horizontally and vertically */
-    padding: 10px 20px;
+    transform: translate(-50%, 0);
+    padding: 12px 40px;  /* Increase horizontal padding */
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 4px;
     cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 1.2em;
+    font-family: 'IM Fell English', serif;
+    font-size: 1.4em;
+    white-space: nowrap;  /* Keep text on one line */
+    min-width: 200px;    /* Ensure minimum width */
+    text-align: center;
     transition: all 0.2s ease;
     z-index: 1000;
 }
@@ -256,7 +275,7 @@
 .ready-button:hover {
     background: rgba(0, 0, 0, 0.9);
     border-color: rgba(255, 255, 255, 0.4);
-    transform: translate(-50%, 50%) scale(1.05);
+    transform: translate(-50%, 0) scale(1.05);
 }
 
 .charging-bar {
@@ -299,7 +318,7 @@
 }
 
 .name {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Fira Sans', sans-serif;
     color: white;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
     font-size: 11px;
@@ -336,8 +355,8 @@
     left: 50%;
     transform: translateX(-50%);
     color: rgba(226, 223, 53, 0.9); /* Slightly less bright white */
-    font-size: 18px;
-    font-family: 'Segoe UI', Arial, sans-serif; /* Cleaner font */
+    font-size: 22px;
+    font-family: 'IM Fell English', serif;
     font-weight: 400; /* Lighter weight */
     text-align: center;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -371,6 +390,7 @@
     padding: 4px;
     border-radius: 2px;
     margin: 0 0 5px 0;
+    font-family: 'IM Fell English', serif;
 }
 
 .player-stat {
@@ -478,7 +498,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
     border-radius: 6px;
     padding: 8px;
     text-align: center;
@@ -518,6 +538,7 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: 'IM Fell English', serif;
 }
 
 .timer-container {
@@ -538,11 +559,14 @@
     width: 80px;
     text-align: center;
     font-size: 1.4em;
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 500;
 }
 
 .capture-team {
     margin-top: 8px;
     font-size: 1.1em;
+    font-family: 'IM Fell English', serif;
 }
 
 .overtime-indicator {
@@ -559,24 +583,6 @@
 .blue-timer {
     color: #4444ff;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.class-select-menu {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none;
-    gap: 30px;
-    padding: 30px;
-    background: rgba(0, 0, 0, 0.98); /* More opaque black */
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-}
-
-.class-select-menu.active {
-    display: flex;
 }
 
 .class-button {
@@ -755,6 +761,7 @@
     margin-bottom: 10px;
     padding-bottom: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: 'IM Fell English', serif;
 }
 
 .panel-content {
@@ -784,8 +791,9 @@
 }
 
 .capture-team {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
+    font-family: 'IM Fell English', serif;
 }
 
 .team-list {
@@ -800,10 +808,12 @@
 
 .player-name {
     color: #fff;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 .player-kd {
     color: #aaa;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 /* Ability Container */
@@ -857,6 +867,7 @@
     font-weight: bold;
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
     z-index: 2;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 /* Specific class adjustments */
@@ -906,6 +917,7 @@
     z-index: 2;
     font-size: 0.9em;
     opacity: 0.9;
+    font-family: 'Fira Sans', sans-serif;
 }
 
 /* Hide original stat values */
@@ -936,7 +948,7 @@
     text-transform: uppercase;
     margin-bottom: 20px;
     text-shadow: 0 0 20px currentColor;
-    font-family: 'Cinzel', serif;
+    font-family: 'IM Fell English', serif;
 }
 
 .victory-text {
@@ -945,7 +957,7 @@
     text-transform: uppercase;
     letter-spacing: 8px;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    font-family: 'Cinzel', serif;
+    font-family: 'IM Fell English', serif;
 }
 
 /* Ability Icon Styles */

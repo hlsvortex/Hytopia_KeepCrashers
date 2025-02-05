@@ -34,10 +34,8 @@
 
 
         <!-- Ready Check -->
-        <button id="ready-button" class="ready-button" style="
-            margin-bottom: 60px;
-        ">
-            READY UP
+        <button id="ready-button" class="ready-button">
+            READY UP (R)
         </button>
 
 
@@ -473,6 +471,19 @@
             });
             // Hide immediately on click
             document.getElementById('ready-button').style.display = 'none';
+        });
+
+        // Add 'R' key binding for Ready Up
+        document.addEventListener('keydown', (event) => {
+            if (event.key.toLowerCase() === 'r') {
+                const readyButton = document.getElementById('ready-button');
+                if (readyButton && readyButton.style.display !== 'none') {
+                    hytopia.sendData({
+                        type: 'PLAYER_READY'
+                    });
+                    readyButton.style.display = 'none';
+                }
+            }
         });
 
         // Register nameplate template
