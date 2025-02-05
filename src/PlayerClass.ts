@@ -101,9 +101,9 @@ export class WizardAbilityController extends AbilityController {
             name: 'Firedarts',
             slot: 'secondary',
             cooldown: 0.1,
-            resourceCost: 3,
+            resourceCost: 5,
             resourceType: Resource.Mana,
-            maxRange: 10,
+            maxRange: 12,
             speed: 15,
             damage: 3,
 
@@ -159,6 +159,7 @@ export class WizardAbilityController extends AbilityController {
         this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
         
         
+        
         //console.log(input.space);
         if (input.sp) {
 
@@ -168,11 +169,11 @@ export class WizardAbilityController extends AbilityController {
             const damageableEntity = entity as DamageableEntity;
 
             if (entity.linearVelocity.y > 5.1) { return; }
-            if (damageableEntity.mana < manaConsumed) { return; }
+            if (damageableEntity.stamina < 5) { return; }
                 // Apply flying velocity
 
             entity.applyImpulse(new Vector3(0, 1, 0));
-            damageableEntity.useMana(manaConsumed);
+            damageableEntity.useStamina(manaConsumed);
         }
         // Wizard-specific tick logic
     }
@@ -237,9 +238,9 @@ export class FighterAbilityController extends AbilityController {
         const ChargeSlash: PhysicsProjectileOptions = {
             name: 'Charge-Slash',
             slot: 'secondary',
-            cooldown: 1,
-            resourceCost: 10,
-            resourceType: Resource.Stamina,
+            cooldown: 0.8,
+            resourceCost: 40,
+            resourceType: Resource.Mana,
             maxRange: 0.1,
             speed: 15,
             damage: 15,
@@ -332,7 +333,7 @@ export class FighterAbilityController extends AbilityController {
 
         const myController = entity.controller as AbilityEntityController;
         const damageableEntity = entity as DamageableEntity;
-        
+
         if (abilityPrimary.getIsCharging() && !myController.isGrounded && entity.linearVelocity.y < 0.05) {
 
             entity.applyImpulse(new Vector3(0, 0.25, 0));
@@ -341,9 +342,14 @@ export class FighterAbilityController extends AbilityController {
         //console.log(input.space);
         if (input.sp) {
    
+            if(damageableEntity.stamina < 5) { return; }
+
+            damageableEntity.useStamina(6 * deltaTimeMs/1000);
+
             if (entity.linearVelocity.y > 4.1) { return; }
             // Apply flying velocity
             entity.applyImpulse(new Vector3(0, 0.45, 0));
+            
         
         }
         // Wizard-specific tick logic
@@ -427,13 +433,13 @@ export class ArcherAbilityController extends AbilityController {
         const bombOptions: PhysicsProjectileOptions = {
             name: 'Bomb',
             slot: 'secondary',
-            cooldown: 3,
-            resourceCost: 0,
+            cooldown: 0.8,
+            resourceCost: 35,
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 15,
 
-            damage: 15,
+            damage: 25,
             modelUri: 'models/items/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
@@ -452,8 +458,8 @@ export class ArcherAbilityController extends AbilityController {
                 referenceDistance: 20
             },
             aoe: {
-                radius: 3,
-                damage: 25,
+                radius: 3.5,
+                damage: 30,
                 knockback: 15.5,
                 falloff: true,
             },
