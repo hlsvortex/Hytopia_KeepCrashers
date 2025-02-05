@@ -17,7 +17,7 @@ export class WizardAbilityController extends AbilityController {
 
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
-        this.maxHealth = 90;  // Squishier but mobile
+        this.maxHealth = 150;  // Squishier but mobile
         this.runSpeed = 7;    // Faster run speed
         this.jumpVelocity = 10;  // Higher jumps
     }
@@ -182,9 +182,9 @@ export class FighterAbilityController extends AbilityController {
 
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
-        this.maxHealth = 120;  // Tankier
+        this.maxHealth = 200;  // Tankier
         this.runSpeed = 7;     // Slower but stronger
-        this.jumpVelocity = 15;  // Standard jump
+        this.jumpVelocity = 14;  // Standard jump
     }
 
     protected setupAbilities() {
@@ -331,14 +331,10 @@ export class FighterAbilityController extends AbilityController {
 
         //console.log(input.space);
         if (input.sp) {
-
-            
-            const damageableEntity = entity as DamageableEntity;
-
+   
             if (entity.linearVelocity.y > 4.1) { return; }
             // Apply flying velocity
-
-            entity.applyImpulse(new Vector3(0, 0.4, 0));
+            entity.applyImpulse(new Vector3(0, 0.45, 0));
         
         }
         // Wizard-specific tick logic
@@ -349,16 +345,21 @@ export class FighterAbilityController extends AbilityController {
 export class ArcherAbilityController extends AbilityController {
     private bowEntity?: Entity;
     private hasDoubledJumped: boolean = false;
-
+    private jumpCount: number = 0;
     
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
-        this.maxHealth = 100;   // Medium health
+        this.maxHealth = 180;   // Medium health
         this.runSpeed = 8.5;   // Good mobility
         this.jumpVelocity = 12;  // Medium jump height
+        this.useCustomJump = true;
     }
 
+    
+   
+
     protected setupAbilities() {
+        
         const shootArrowOptions: PhysicsProjectileOptions = {
             name: 'Arrow',
             slot: 'primary',
@@ -399,7 +400,7 @@ export class ArcherAbilityController extends AbilityController {
                     },
                     damage: {
                         min: 20,
-                        max: 50
+                        max: 60
                     },
                     gravity: {
                         min: 0.4,
@@ -525,24 +526,47 @@ export class ArcherAbilityController extends AbilityController {
         
         const myController = entity.controller as MyEntityController;
         const damageableEntity = entity  as DamageableEntity;
+        
+        
         // Archer-specific tick logic
-        if (input.sp && !myController.isGrounded && !this.hasDoubledJumped) {
+        if (input.sp && !myController.isJumping && !this.hasDoubledJumped) {
 
-            const staminaCost = 10; // stamina per second
+            const staminaCost = 2; // stamina per second
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
-            entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, 0, entity.linearVelocity.z));
-            entity.applyImpulse(new Vector3(0, 16, 0));
+
+            if(this.jumpCount == 0) {
+                entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, this.jumpVelocity, entity.linearVelocity.z));
+            }
+            else {
+                entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, 1, entity.linearVelocity.z));
+                entity.applyImpulse(new Vector3(0, 16, 0));
+            }
+
             damageableEntity.useStamina(staminaCost);
-            this.hasDoubledJumped = true;
+            this.jumpCount++;
+            if (this.jumpCount > 1) {
+                this.hasDoubledJumped = true;
+            }
+
+        
+            input.sp = false;
         }
         else if (myController.isGrounded) {
             this.hasDoubledJumped = false;
+            this.jumpCount = 0;
         }
+       
+
     }
+
+    
+   
+    
 
     private handleRoll(origin: Vector3Like, direction: Vector3Like, source: Entity) {
         if (source.linearVelocity.x === 0 && source.linearVelocity.z === 0) return;
+
         
         const directionVector = new Vector3(source.linearVelocity.x, 1, source.linearVelocity.z);
         directionVector.normalize().scale(15);

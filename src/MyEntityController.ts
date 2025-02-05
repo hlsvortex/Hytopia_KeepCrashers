@@ -7,14 +7,17 @@ import {
   Entity,
   PlayerEntity,
   BlockType,
+  Vector3,
 } from 'hytopia';
 
 import type {
   PlayerInput,
   PlayerCameraOrientation,
+  Vector3Like,
 } from 'hytopia';
 
 import AbilityEntityController from './AbilityEntityController';
+import { DamageableEntity } from './DamageableEntity';
 
 /** Options for creating a MyEntityController instance. @public */
 export interface MyEntityControllerOptions {
@@ -61,6 +64,13 @@ export default class MyEntityController extends BaseEntityController {
 
   public isWalking: boolean = false;
 
+  public useCustomJump: boolean = false;
+
+  private readonly JUMP_STAMINA_COST = 3;  // Stamina cost per jump
+  public isJumping: boolean = false;
+  private readonly JUMP_CUTOFF_VELOCITY = 4; // Velocity threshold for jump cutoff
+  private readonly JUMP_GRAVITY_MULTIPLIER = 2.5; // Faster fall when jump released
+
   /**
    * A function allowing custom logic to determine if the entity can walk.
    * @param myEntityController - The entity controller instance.
@@ -81,6 +91,8 @@ export default class MyEntityController extends BaseEntityController {
    * @returns Whether the entity of the entity controller can jump.
    */
   public canJump: (myEntityController: MyEntityController) => boolean = () => true;
+
+  //public updateJump: (myEntityController: MyEntityController) => void = () => {};
 
   /** @internal */
   private _stepAudio: Audio | undefined;
@@ -276,14 +288,39 @@ export default class MyEntityController extends BaseEntityController {
       }
     }
 
-    // Calculate target vertical velocity (jump)
+    targetVelocities.y = this.handleJump(entity, input, this, Vector3.fromVector3Like(targetVelocities)).y;
+    /*
+    // Jump handling
     if (sp && this.canJump(this)) {
-      if (this.isGrounded && currentVelocity.y > -0.001 && currentVelocity.y <= 3) {
-        targetVelocities.y = this.jumpVelocity;
-        input.sp = false;
-      }
-      
+        if (this.isGrounded && currentVelocity.y > -0.001 && currentVelocity.y <= 3) {
+            const damageableEntity = entity as DamageableEntity;
+            //if (damageableEntity.stamina < this.JUMP_STAMINA_COST) return;
+
+            //damageableEntity.useStamina(this.JUMP_STAMINA_COST);
+            targetVelocities.y = this.jumpVelocity;
+            this.isJumping = true;
+            console.log('Jump ' + this.isJumping);
+            //input.sp = false;
+        }
+    } 
+    
+    if (!input.sp && this.isJumping && currentVelocity.y > 4) {
+        // Cut jump short if space released and still moving upward
+        console.log('Cut jump short');
+        entity.setLinearVelocity(new Vector3(
+            currentVelocity.x,
+            4,
+            currentVelocity.z 
+        ));
+        
+        //entity.applyImpulse(new Vector3(0, this.JUMP_GRAVITY_MULTIPLIER, 0));
+        this.isJumping = false;
     }
+
+    if (this.isGrounded) {
+        //this.isJumping = false;
+    }
+    */
 
     // Apply impulse relative to target velocities, taking platform velocity into account
     const platformVelocity = this._platform ? this._platform.linearVelocity : { x: 0, y: 0, z: 0 };
@@ -321,5 +358,42 @@ export default class MyEntityController extends BaseEntityController {
         w: Math.fround(Math.cos(halfYaw)),
       });
     }
+  }
+
+  public handleJump(entity: Entity, input: PlayerInput, enittyController: MyEntityController, targetVelocities: Vector3Like): Vector3 {
+   
+    const currentVelocity = entity.linearVelocity;
+    const newVelocities = targetVelocities;
+    
+    if (this.useCustomJump) { return Vector3.fromVector3Like(newVelocities); }
+
+    if (input.sp && this.canJump(this)) {
+      if (this.isGrounded && currentVelocity.y > -0.001 && currentVelocity.y <= 3) {
+        const damageableEntity = entity as DamageableEntity;
+        newVelocities.y = this.jumpVelocity;
+        this.isJumping = true;
+        console.log('Jump ' + this.isJumping);
+        //input.sp = false;
+      }
+    }
+    
+    
+
+    if (!input.sp && this.isJumping && currentVelocity.y > 4) {
+     
+      // Cut jump short if space released and still moving upward
+      console.log('Cut jump short');
+      entity.setLinearVelocity(new Vector3(
+        currentVelocity.x,
+        4,
+        currentVelocity.z
+      ));
+
+      //entity.applyImpulse(new Vector3(0, this.JUMP_GRAVITY_MULTIPLIER, 0));
+      this.isJumping = false;
+    }
+  
+
+    return Vector3.fromVector3Like(newVelocities);
   }
 }

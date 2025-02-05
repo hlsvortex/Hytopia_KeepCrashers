@@ -16,6 +16,8 @@ export class DamageableEntity extends PlayerEntity {
     light?: Light;
     nameplateUI?: SceneUI;
     hideNameplate: boolean = false;    
+    private lastHeightDamageTime: number = 0;
+    private readonly HEIGHT_DAMAGE_INTERVAL = 500; // 1 second in milliseconds
 
     private static readonly DAMAGE_SOUNDS = {
         LIGHT: {
@@ -33,10 +35,13 @@ export class DamageableEntity extends PlayerEntity {
     };
 
     onTick = (entity: Entity, tickDeltaMs: number) => {
-        //super.onTick(entity, tickDeltaMs);
-        //this.updateUI();
-        if(entity.position.y <= 2.2) {
-            this.takeDamage(1);
+        const currentTime = Date.now();
+        
+        if (currentTime - this.lastHeightDamageTime >= this.HEIGHT_DAMAGE_INTERVAL) {
+            if (entity.position.y <= 2.2) {
+                this.takeDamage(5);
+            }
+            this.lastHeightDamageTime = currentTime;
         }
     }
 
