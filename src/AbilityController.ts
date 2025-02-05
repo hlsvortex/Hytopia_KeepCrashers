@@ -9,6 +9,7 @@ export abstract class AbilityController {
     protected attachedEntity?: PlayerEntity;
     protected maxHealth: number = 100;
     protected runSpeed: number = 8;
+    protected jumpVelocity: number = 12;  // Default jump velocity
 
     public get abilities(): Map<string, Ability> {
         return this._abilities;
@@ -30,6 +31,7 @@ export abstract class AbilityController {
         const controller = entity.controller as MyEntityController;
         if (controller) {
             controller.runVelocity = this.runSpeed;
+            controller.jumpVelocity = this.jumpVelocity;  // Apply jump velocity
         }
 
         // Only spawn items if entity is already spawned

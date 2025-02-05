@@ -19,6 +19,7 @@ export class WizardAbilityController extends AbilityController {
         super(eventRouter);
         this.maxHealth = 90;  // Squishier but mobile
         this.runSpeed = 7;    // Faster run speed
+        this.jumpVelocity = 10;  // Higher jumps
     }
 
     protected setupAbilities() {
@@ -37,9 +38,15 @@ export class WizardAbilityController extends AbilityController {
             projectileRadius: 0.3,
             knockback: 0.8,
             gravityScale: 0.0,
+            useImpulse: {
+                direction: 'forward',
+                force: 8,
+                useAimDirection: false
+            },
             hitFX: ParticleFX.EXPLOSION,
             aoe: {
                 radius: 2,
+
                 damage: 10,
                 knockback: 15.5,
                 falloff: true,
@@ -177,6 +184,7 @@ export class FighterAbilityController extends AbilityController {
         super(eventRouter);
         this.maxHealth = 120;  // Tankier
         this.runSpeed = 7;     // Slower but stronger
+        this.jumpVelocity = 17;  // Standard jump
     }
 
     protected setupAbilities() {
@@ -184,7 +192,7 @@ export class FighterAbilityController extends AbilityController {
         const SpiritAxe: PhysicsProjectileOptions = {
             name: 'Spirit Axe',
             slot: 'primary',
-            cooldown: 1,
+            cooldown: 1.5,
             resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: -1,
@@ -228,8 +236,8 @@ export class FighterAbilityController extends AbilityController {
             name: 'Slash',
             slot: 'secondary',
             cooldown: 1,
-            resourceCost: 0,
-            resourceType: Resource.Mana,
+            resourceCost: 10,
+            resourceType: Resource.Stamina,
             maxRange: 0.1,
             speed: 15,
             damage: 15,
@@ -251,8 +259,8 @@ export class FighterAbilityController extends AbilityController {
                 maxChargeTime: 1.0,
                 chargeEffects: {
                     speed: {
-                        min: 15,
-                        max: 30
+                        min: 20,
+                        max: 35
                     },
                     damage: {
                         min: 15,
@@ -264,8 +272,8 @@ export class FighterAbilityController extends AbilityController {
                         max: 1.3  
                     },
                     impulseForce: {
-                        min: -10,
-                        max: -20  // Stronger push at full charge
+                        min: -5,
+                        max: -12  // Stronger push at full charge
                     }
                 }
             },
@@ -323,21 +331,19 @@ export class FighterAbilityController extends AbilityController {
         //console.log(input.space);
         if (input.sp) {
 
-            const manaCost = 0.04; // mana per second
-            const manaConsumed = manaCost * deltaTimeMs;
-
+            
             const damageableEntity = entity as DamageableEntity;
 
-            if (entity.linearVelocity.y > 5.1) { return; }
-            if (damageableEntity.mana < manaConsumed) { return; }
+            if (entity.linearVelocity.y > 4.1) { return; }
             // Apply flying velocity
 
-            entity.applyImpulse(new Vector3(0, 1, 0));
-            damageableEntity.useMana(manaConsumed);
+            entity.applyImpulse(new Vector3(0, 0.4, 0));
+        
         }
         // Wizard-specific tick logic
     }
 }
+
 
 export class ArcherAbilityController extends AbilityController {
     private bowEntity?: Entity;
@@ -348,6 +354,7 @@ export class ArcherAbilityController extends AbilityController {
         super(eventRouter);
         this.maxHealth = 100;   // Medium health
         this.runSpeed = 8.5;   // Good mobility
+        this.jumpVelocity = 12;  // Medium jump height
     }
 
     protected setupAbilities() {

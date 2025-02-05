@@ -100,7 +100,7 @@ export class CapturePoint {
         }
 
         // Debug: Log teams and players
-        console.log(`[CapturePoint] Players on point: ${this.playersOnPoint.size}`);
+        //console.log(`[CapturePoint] Players on point: ${this.playersOnPoint.size}`);
         this.playersOnPoint.forEach(player => {
             const team = gameManager.getPlayerTeam(player.player);
             console.log(`- Player: ${player.player.username}, Team: ${team?.name || 'None'}`);
@@ -121,7 +121,7 @@ export class CapturePoint {
                     const prevProgress = this.progress;
                     this.progress += this.captureSpeed * this.getTeamPlayerCount(currentTeam) * deltaTime;
                     this.progress = Math.min(100, this.progress);
-                    console.log(`[CapturePoint] ${currentTeam.name} partial capture: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
+                    // console.log(`[CapturePoint] ${currentTeam.name} partial capture: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
 
                     if (this.progress >= 100) {
                         this.controllingTeam = currentTeam;
@@ -133,7 +133,7 @@ export class CapturePoint {
                     // Opposing team contesting - fast decay
                     const prevProgress = this.progress;
                     this.progress = Math.max(0, this.progress - (this.decaySpeed * 2 * deltaTime));
-                    console.log(`[CapturePoint] Opposing team contesting: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
+                    //console.log(`[CapturePoint] Opposing team contesting: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
                     
                     if (this.progress <= 0) {
                         this.partialControlTeam = currentTeam; // Switch partial control
@@ -146,7 +146,7 @@ export class CapturePoint {
                     // Normal decay when empty or contested
                     const prevProgress = this.progress;
                     this.progress = Math.max(0, this.progress - this.decaySpeed * deltaTime);
-                    console.log(`[CapturePoint] Neutral decay: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
+                    //console.log(`[CapturePoint] Neutral decay: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
 
                     if (this.progress <= 0) {
                         this.partialControlTeam = null;
@@ -163,28 +163,28 @@ export class CapturePoint {
             if (currentTeamOnPoint && currentTeamOnPoint !== this.controllingTeam) {
                 const prevProgress = this.progress;
                 this.progress = Math.max(0, this.progress - this.decaySpeed * deltaTime);
-                console.log(`[CapturePoint] Decaying - Progress: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
+                //console.log(`[CapturePoint] Decaying - Progress: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
 
                 if (this.progress <= 0) {
-                    console.log(`[CapturePoint] ${this.controllingTeam.name} lost control`);
+                    //console.log(`[CapturePoint] ${this.controllingTeam.name} lost control`);
                     this.controllingTeam = null;
                 }
             } else {
                 // Controlling team is present alone - no decay
-                console.log(`[CapturePoint] Controlled by ${this.controllingTeam.name} - No decay`);
+                //console.log(`[CapturePoint] Controlled by ${this.controllingTeam.name} - No decay`);
 
                 // Rebuild decayed progress if needed
                 if (this.progress < 100) {
                     const teamPlayers = this.getTeamPlayerCount(this.controllingTeam);
                     const prevProgress = this.progress;
                     this.progress = Math.min(100, this.progress + (this.captureSpeed * teamPlayers * deltaTime));
-                    console.log(`[CapturePoint] Rebuilding control: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
+                  //  console.log(`[CapturePoint] Rebuilding control: ${prevProgress.toFixed(1)}% -> ${this.progress.toFixed(1)}%`);
                 }
             }
         }
 
         // Debug: Log final state
-        console.log(`[CapturePoint] End Update - Progress: ${this.progress.toFixed(1)}%, Controlling: ${this.controllingTeam?.name || 'None'}`);
+        //console.log(`[CapturePoint] End Update - Progress: ${this.progress.toFixed(1)}%, Controlling: ${this.controllingTeam?.name || 'None'}`);
         this.updateUI();
     }
 
