@@ -2,11 +2,11 @@
 
 Game was made for Hytopia Game Jam
 
-First time using typscript the code is a mess but i guess it works?
-
-
+First time using typscript! Was fun even tho the code is a complete mess.
 
 **Keep Crashers** is a team-based PvP game where players compete in King of the Hill battles. Capture control points, choose from three distinct classes, and work with your team to secure victory.
+
+![Logo_512](https://github.com/user-attachments/assets/c2fe2a8f-f037-4185-ba4c-27c2cdc63888)
 
 ## Key Features
 
