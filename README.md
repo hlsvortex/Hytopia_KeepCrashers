@@ -32,7 +32,7 @@ First time using typscript the code is a mess but i guess it works?
   
   - **Archer**: A master of ranged combat, striking from the shadows with deadly accuracy.
     - **Precision Shot**: Fire a pinpoint arrow that deals critical damage to a single target.
-    - **Explosive Trap**: Set a hidden trap that detonates when triggered, causing area damage and chaos.
+    - **Fuse Bomb**: Throws a chaotic bouncing bomb that deals aoe damage.
     - **Movement Ability**: **Double Jump** - Leap again in mid-air to reach higher ground or evade attacks.
       
 ## Controls
