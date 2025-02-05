@@ -138,9 +138,7 @@ export class PhysicsProjectileAbility extends Ability {
                     }
                 }
 
-                console.log("currentVelocity", this.staticVelocity);
                 entity.setLinearVelocity(this.staticVelocity);
-
             }
 
            const currentVelocity = entity.linearVelocity;

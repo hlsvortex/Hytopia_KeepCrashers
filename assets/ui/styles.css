@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
 /* Core stats panel */
 .stats-panel {
     position: fixed;
@@ -634,38 +636,19 @@
 
 .class-info h3 {
     color: #fff;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    padding: 8px 20px;
-    border-radius: 5px;
-    margin: 15px 0;
-    font-size: 1.4em;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.wizard .class-info h3 {
-    color: #883aea;
-    text-shadow: 0 0 8px rgba(136, 58, 234, 0.3);
-}
-
-.fighter .class-info h3 {
-    color: #ea3a3a;
-    text-shadow: 0 0 8px rgba(234, 58, 58, 0.3);
-}
-
-.archer .class-info h3 {
-    color: #3aeb88;
-    text-shadow: 0 0 8px rgba(58, 234, 136, 0.3);
+    font-family: 'Cinzel', serif;
+    font-size: 1.8em;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
 }
 
 .class-info p {
-    color: #ddd;
-    font-size: 1em;
-    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
     line-height: 1.4;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: #ddd;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .wizard {
@@ -675,8 +658,9 @@
 }
 
 .fighter {
-    background-image: url('icons/fighter.png');
+    background-image: url('icons/barbarian.png');
     border-color: rgba(234, 58, 58, 0.3);
+    background-size: 90%;
 }
 
 .archer {
@@ -688,17 +672,23 @@
 /* Add these color overrides */
 .class-button.wizard .class-info h3 {
     color: #a86af8 !important;
-    text-shadow: 0 0 12px rgba(168, 106, 248, 0.4);
+    text-shadow: 0 0 12px rgba(168, 106, 248, 0.8),
+                 0 0 20px rgba(168, 106, 248, 0.4),
+                 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .class-button.fighter .class-info h3 {
     color: #ff5e5e !important;
-    text-shadow: 0 0 12px rgba(255, 94, 94, 0.4);
+    text-shadow: 0 0 12px rgba(255, 94, 94, 0.8),
+                 0 0 20px rgba(255, 94, 94, 0.4),
+                 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .class-button.archer .class-info h3 {
     color: #6bffb8 !important;
-    text-shadow: 0 0 12px rgba(107, 255, 184, 0.4);
+    text-shadow: 0 0 12px rgba(107, 255, 184, 0.8),
+                 0 0 20px rgba(107, 255, 184, 0.4),
+                 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .class-info p {
@@ -850,6 +840,12 @@
     border-color: rgba(58, 234, 136, 0.3);
 }
 
+.fighter .ability-icon {
+    background-image: url('icons/barbarian.png');
+    border-color: rgba(234, 58, 58, 0.3);
+}
+
+
 /* Mana Container */
 #mana-fill-container {
     position: fixed;
@@ -911,6 +907,7 @@
     text-transform: uppercase;
     margin-bottom: 20px;
     text-shadow: 0 0 20px currentColor;
+    font-family: 'Cinzel', serif;
 }
 
 .victory-text {
@@ -919,6 +916,7 @@
     text-transform: uppercase;
     letter-spacing: 8px;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-family: 'Cinzel', serif;
 }
 
 /* Ability Icon Styles */
@@ -959,6 +957,18 @@
     background-color: rgba(255, 102, 0, 0.1);
 }
 
+.ability-icon-axe-throw {
+    background-image: url('icons/axethrow.png');
+    filter: drop-shadow(0 0 0.4rem #1900ff);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+
+.ability-icon-charge-slash {
+    background-image: url('icons/charge-slash.png');
+    filter: drop-shadow(0 0 0.4rem #0004ff);
+    background-color: rgba(255, 102, 0, 0.1);
+}
 
 /* Position containers */
 #ability1 {

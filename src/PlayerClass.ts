@@ -184,19 +184,20 @@ export class FighterAbilityController extends AbilityController {
         super(eventRouter);
         this.maxHealth = 120;  // Tankier
         this.runSpeed = 7;     // Slower but stronger
-        this.jumpVelocity = 17;  // Standard jump
+        this.jumpVelocity = 15;  // Standard jump
     }
 
     protected setupAbilities() {
         // Add fighter abilities
         const SpiritAxe: PhysicsProjectileOptions = {
-            name: 'Spirit Axe',
+            name: 'Axe-Throw',
             slot: 'primary',
             cooldown: 1.5,
             resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 20,
+
             damage: 10,
             modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
@@ -233,7 +234,7 @@ export class FighterAbilityController extends AbilityController {
         };
 
         const ChargeSlash: PhysicsProjectileOptions = {
-            name: 'Slash',
+            name: 'Charge-Slash',
             slot: 'secondary',
             cooldown: 1,
             resourceCost: 10,
