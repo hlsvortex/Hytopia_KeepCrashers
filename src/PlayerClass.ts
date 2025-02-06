@@ -27,12 +27,12 @@ export class WizardAbilityController extends AbilityController {
         const fireballOptions: PhysicsProjectileOptions = {
             name: 'Fireball',
             slot: 'primary',
-            cooldown: 2,
+            cooldown: 1.5,
             resourceCost: 15,
             resourceType: Resource.Mana,
             maxRange: 18,
             speed: 21,
-            damage: 20,
+            damage: 30,
 
             modelUri: 'models/projectiles/fireball.gltf',
             modelScale: 0.8,
@@ -41,7 +41,7 @@ export class WizardAbilityController extends AbilityController {
             gravityScale: 0.0,
             useImpulse: {
                 direction: 'forward',
-                force: 8,
+                force: 7,
                 useAimDirection: false
             },
             hitFX: ParticleFX.EXPLOSION,
@@ -100,23 +100,23 @@ export class WizardAbilityController extends AbilityController {
         const firedartsOptions: PhysicsProjectileOptions = {
             name: 'Firedarts',
             slot: 'secondary',
-            cooldown: 0.1,
-            resourceCost: 5,
+            cooldown: 0.15,
+            resourceCost: 4,
             resourceType: Resource.Mana,
             maxRange: 12,
             speed: 20,
-            damage: 3,
+            damage: 5,
 
             modelUri: 'models/projectiles/firedart.gltf',
             modelScale: 0.3,
             projectileRadius: 0.05,
-            knockback: 0.2,
+            knockback: 0.3,
             gravityScale: 0.1,
             hitFX: ParticleFX.FIREHIT,
             useSFX: {
                 uri: 'audio/sfx/fire/Fire Spell 02.wav',
-                volume: 0.6
-                
+                volume: 0.6,
+                referenceDistance: 10
             },
             hitSFX: {
                 uri: 'audio/sfx/fire/fire-ignite.mp3',
@@ -201,7 +201,7 @@ export class FighterAbilityController extends AbilityController {
             maxRange: -1,
             speed: 20,
 
-            damage: 10,
+            damage: 15,
             modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
@@ -239,8 +239,8 @@ export class FighterAbilityController extends AbilityController {
         const ChargeSlash: PhysicsProjectileOptions = {
             name: 'Charge-Slash',
             slot: 'secondary',
-            cooldown: 0.8,
-            resourceCost: 35,
+            cooldown: 0.7,
+            resourceCost: 30,
             resourceType: Resource.Mana,
             maxRange: 0.1,
             speed: 15,
@@ -267,8 +267,8 @@ export class FighterAbilityController extends AbilityController {
                         max: 35
                     },
                     damage: {
-                        min: 15,
-                        max: 30
+                        min: 20,
+                        max: 60
                     },
                     size: {
                         min: 0.6,
@@ -416,8 +416,8 @@ export class ArcherAbilityController extends AbilityController {
 
                 chargeEffects: {
                     speed: {
-                        min: 16,
-                        max: 26
+                        min: 18,
+                        max: 30
                     },
                     damage: {
                         min: 20,
@@ -445,7 +445,7 @@ export class ArcherAbilityController extends AbilityController {
             maxRange: -1,
             speed: 15,
 
-            damage: 25,
+            damage: 20,
             modelUri: 'models/items/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
@@ -465,7 +465,7 @@ export class ArcherAbilityController extends AbilityController {
             },
             aoe: {
                 radius: 3.5,
-                damage: 30,
+                damage: 20,
                 knockback: 15.5,
                 falloff: true,
             },

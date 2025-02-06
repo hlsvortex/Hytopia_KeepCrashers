@@ -37,12 +37,11 @@ export class GameManager {
     };
 
     private readonly teams: Team[] = [
-        new Team('Red', '#ff4444'), 
-
-        new Team('Blue', '#4444ff')
+        new Team('Red', '#f15b5b'), 
+        new Team('Blue', '#5f92f1')
     ];
     private players: Map<string, DamageableEntity> = new Map();
-
+    private keepLight: Light;
     private localPlayer: DamageableEntity | undefined;
     private gameMusic: Audio | undefined;
  
@@ -63,6 +62,15 @@ export class GameManager {
     private gameModeController!: GameModeController;
 
     constructor(private readonly worldEventRouter: EventRouter) {
+        // Initialize the keep light
+        this.keepLight = new Light({
+            position: new Vector3(0, 4.1, 0),
+            color: { r: 255, g: 255, b: 255 },
+            intensity: 15,
+            distance: 12,
+        });
+        this.keepLight.spawn(world);
+
         this.gameStateController = new GameStateController(worldEventRouter);
         this.initGame();
         this.startGameLoop();
@@ -123,8 +131,10 @@ export class GameManager {
 
             if (newState === GameState.MatchStats) {
                 this.buildStartAreaDoors(world);
+                this.updateKeepLightColor(null);
             }
         });
+
 
        
 
@@ -256,19 +266,19 @@ export class GameManager {
         // Set initial class
         entityController.setClass('wizard');
 
-
-        const light = new Light({
+        /*
+        const keepLight = new Light({
             //attachedToEntity: playerEntity, // the entity to follow
             position: new Vector3(0, 4.1, 0),
             color: { r: 255, g: 255, b: 255 },
-            intensity: 5,
-            distance: 10,
-            offset: { x: 0, y: 1.1, z: 0 }, // an offset of the pointlight relative to the attached entity
+            intensity: 15,
+            distance: 12,
         });
+        */
 
         //playerEntity.light = light;
 
-        light.spawn(world);
+        //keepLight.spawn(world);
         //light.
 
         this.InitCamera(playerEntity);
@@ -622,7 +632,25 @@ export class GameManager {
         }
     }
 
-    public handlePointCapture() {
+    public handlePointCapture(team: Team | null) {
         this.playGameSound(GameManager.GAME_SFX.POINT_CAPTURE);
+        this.updateKeepLightColor(team);
+    }
+
+    // Add method to update keep light color
+    private updateKeepLightColor(team: Team | null) {
+        if (!team) {
+            // Neutral - white light
+            this.keepLight.setColor({ r: 255, g: 255, b: 255 });
+            return;
+        }
+
+        // Convert hex color to RGB
+        const hex = team.color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        this.keepLight.setColor({ r, g, b });
     }
 }

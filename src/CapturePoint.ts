@@ -33,14 +33,15 @@ export class CapturePoint {
                     {
                         shape: ColliderShape.ROUND_CYLINDER,
                         borderRadius: 0.05,
-                        halfHeight: 0.05,
+                        halfHeight: 0.01,
                         radius: 3,
                         mass: 1, // if not provided, automatically calculated based on shape volume.
                         bounciness: -0, // very bouncy!
-                        relativePosition: { x: 0, y: 0, z: 0 } // acts like an offset relative to the parent. 
+                        relativePosition: { x: 0, y: -0.05, z: 0 } // acts like an offset relative to the parent. 
                     },
                 ]
             }
+
         });
 
         this.entityModel.spawn(world, this.position);
@@ -132,7 +133,7 @@ export class CapturePoint {
                         this.controllingTeam = currentTeam;
                         this.partialControlTeam = null;
                         this.onCaptured(currentTeam);
-                        gameManager.handlePointCapture();
+                        gameManager.handlePointCapture(currentTeam);
                     }
                 } else {
                     // Opposing team contesting - fast decay
@@ -143,6 +144,7 @@ export class CapturePoint {
                     if (this.progress <= 0) {
                         this.partialControlTeam = currentTeam; // Switch partial control
                         this.progress = 0;
+                        gameManager.handlePointCapture(null);
                     }
                 }
             } else {
@@ -155,6 +157,7 @@ export class CapturePoint {
 
                     if (this.progress <= 0) {
                         this.partialControlTeam = null;
+                        gameManager.handlePointCapture(null);
                     }
                 }
             }
@@ -173,6 +176,7 @@ export class CapturePoint {
                 if (this.progress <= 0) {
                     //console.log(`[CapturePoint] ${this.controllingTeam.name} lost control`);
                     this.controllingTeam = null;
+                    gameManager.handlePointCapture(null);
                 }
             } else {
                 // Controlling team is present alone - no decay
@@ -216,5 +220,23 @@ export class CapturePoint {
         return Array.from(this.playersOnPoint).filter(p => 
             gameManager.getPlayerTeam(p.player) === team
         ).length;
+    }
+
+    private updateProgress(captureRate: number, team: Team) {
+        const prevProgress = this.progress;
+        this.progress = Math.min(100, Math.max(0, this.progress + captureRate * 100));
+
+        if (this.progress >= 100 && this.controllingTeam !== team) {
+            this.controllingTeam = team;
+            this.onCaptured?.(team);
+            gameManager.handlePointCapture(team);
+        } else if (this.progress <= 0) {
+            this.controllingTeam = null;
+            gameManager.handlePointCapture(null);
+        }
+
+        //if (this.onProgress) {
+            //this.onProgress(this.progress, team);
+        //}
     }
 } 
