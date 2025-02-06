@@ -132,7 +132,7 @@ export class GameStateController {
             case GameState.MatchEnd:
                 return "Match ended!";
             case GameState.MatchStats:
-                return "Showing match statistics...";
+                return "";
             default:
                 return "";
         }

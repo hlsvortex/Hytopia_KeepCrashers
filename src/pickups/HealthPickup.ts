@@ -19,23 +19,28 @@ export class HealthPickup {
     private spawnPosition: Vector3;
     private respawnTime: number;
     private respawnTimer: ReturnType<typeof setTimeout> | null = null;
+    private largeHealAmount: number = 100;
+    private smallHealAmount: number = 30;
     
+
     constructor(options: HealthPickupOptions) {
-        this.healAmount = options.size === 'large' ? 60 : 25;
+        this.healAmount = options.size === 'large' ? this.largeHealAmount : this.smallHealAmount;
         this.respawnTime = options.respawnTime ?? 15; // Default 30 seconds
         this.spawnPosition = options.position;
         
+
         this.createPickup();
     }
 
     private createPickup() {
-        const scale = this.healAmount === 50 ? 1 : 0.9;
+        const scale = this.healAmount === this.largeHealAmount ? 1 : 0.9;
 
         this.entity = new Entity({
             name: 'HealthPickup',
             modelUri: 'models/items/heal-potion.gltf',
             modelScale: scale,
             rigidBodyOptions: {
+
                 type: RigidBodyType.DYNAMIC,
                 gravityScale: 0,
             }

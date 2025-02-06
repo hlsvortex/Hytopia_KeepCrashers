@@ -1,3 +1,14 @@
+/* Hide default UI elements */
+#chat-window {
+    display: none !important;
+}
+
+div[style="z-index: 10000"] {
+    display: none !important;
+}
+
+
+
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&display=swap');
 
@@ -576,13 +587,15 @@
 }
 
 .red-timer {
-    color: #ff4444;
+    color: #f15b5b;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
 }
 
 .blue-timer {
-    color: #4444ff;
+    color: #5f92f1;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
 }
 
 .class-button {

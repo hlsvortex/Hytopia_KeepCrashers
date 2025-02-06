@@ -146,10 +146,13 @@ export abstract class AbilityController {
         });
         }
     }
-
+    // THis is the aim direction for the player it cast a raycast from the center of the camera to find the target point
+    // they it usess that point to aim from the players projectile spawn point - its super hacky rite now because
+    // i cant get the correct direct /position of the camera is seems. or im dumb.
     protected calculateAimDirection(entity: PlayerEntity, maxDistance: number) { 
         // Get camera orientation
         const camera = entity.player.camera;
+
         const cameraPos = camera.attachedToEntity?.position;//entity.position;
         const cameraForward = camera.facingDirection;
 
@@ -185,8 +188,6 @@ export abstract class AbilityController {
         const finalDirection = Vector3.fromVector3Like(cameraForward)
             .rotateY(rotateAround, -0.22);
         
-        // Add downward component based on camera orientation
-        //finalDirection.y -= 0.15; // Adjust this value to control downward tilt
         finalDirection.normalize(); // Normalize to maintain consistent direction
 
         // Original projectile origin without right offset
@@ -201,7 +202,6 @@ export abstract class AbilityController {
         origin.x += rightVector.x * originOffset;
         origin.z += rightVector.z * originOffset;
 
-        
         // Raycast from offset camera position
         const raycastResult = world?.simulation.raycast(
             raycastPos,
@@ -210,11 +210,12 @@ export abstract class AbilityController {
             { filterExcludeRigidBody: entity.rawRigidBody }
         );
 
+        // If we hit nothing return the max distance point
         const targetPoint = raycastResult?.hitPoint ||
             new Vector3(raycastPos.x, raycastPos.y, raycastPos.z)
                 .add(new Vector3(finalDirection.x, finalDirection.y, finalDirection.z).scale(maxDistance));
 
-        // Projectiles Direction
+        // Projectiles Direction from player towards the target point
         const direction = new Vector3(
             targetPoint.x - origin.x,
             targetPoint.y - origin.y,

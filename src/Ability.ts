@@ -43,6 +43,19 @@ export abstract class Ability {
         this.isCharging = true;
         this.chargeStartTime = Date.now();
         
+        // Play charge start sound if configured
+        if (this.options.chargeStartSFX) {
+            const playbackRate = Math.random() * 0.2 + 0.9;
+            const chargeSound = new Audio({
+                uri: this.options.chargeStartSFX.uri,
+                volume: this.options.chargeStartSFX.volume ?? 0.6,
+                position: this.abilityController.getAttachedEntity()?.position,
+                referenceDistance: this.options.chargeStartSFX.referenceDistance ?? 10,
+                playbackRate: playbackRate
+            });
+            chargeSound.play(world);
+        }
+        
         const entity = this.abilityController.getAttachedEntity();
         if (entity) {
             const controller = entity.controller as MyEntityController;
@@ -166,22 +179,34 @@ export abstract class Ability {
     protected playUseSound(source: Entity) {
         if (!this.options.useSFX) return;
 
+        const playbackRate = Math.random() * 0.2 + 0.8;
+
         const useSound = new Audio({
             uri: this.options.useSFX.uri,
-            volume: this.options.useSFX.volume ?? 1
+            volume: this.options.useSFX.volume ?? 1,
+            position: source.position,
+            referenceDistance: this.options.useSFX.referenceDistance ?? 10,
+            playbackRate: playbackRate
         });
+
+
         useSound.play(world);
+
     }
 
     protected playHitSound(position: Vector3Like) {
         if (!this.options.hitSFX) return;
 
+        const playbackRate = Math.random() * 0.2 + 0.8;
+
         const hitSound = new Audio({
             uri: this.options.hitSFX.uri,
             volume: this.options.hitSFX.volume ?? 1,
             position: position,
-            referenceDistance: this.options.hitSFX.referenceDistance ?? 10
+            referenceDistance: this.options.hitSFX.referenceDistance ?? 10,
+            playbackRate: playbackRate
         });
+
         hitSound.play(world);
     }
 

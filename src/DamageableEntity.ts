@@ -121,7 +121,8 @@ export class DamageableEntity extends PlayerEntity {
             const damageSound = new Audio({
                 uri: soundEffect.uri,
                 volume: soundEffect.volume,
-                position: this.position
+                position: this.position,
+                referenceDistance: 10
             });
             damageSound.play(this.world);
         }

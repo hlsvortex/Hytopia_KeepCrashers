@@ -23,12 +23,19 @@ export interface AbilityOptions {
     useSFX?: {
         uri: string;
         volume?: number;
+        referenceDistance?: number;
     };
     hitSFX?: {
         uri: string;
         volume?: number;
         referenceDistance?: number;
     };
+    chargeStartSFX?: {
+        uri: string;
+        volume?: number;
+        referenceDistance?: number;
+    };
+
     useImpulse?: {
         direction: 'forward' | 'backward' | 'up';
         force: number;

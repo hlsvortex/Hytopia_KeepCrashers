@@ -258,15 +258,17 @@ export class GameManager {
 
 
         const light = new Light({
-            attachedToEntity: playerEntity, // the entity to follow
+            //attachedToEntity: playerEntity, // the entity to follow
+            position: new Vector3(0, 4.1, 0),
             color: { r: 255, g: 255, b: 255 },
             intensity: 5,
-            offset: { x: 0, y: 1.1, z: -1 }, // an offset of the pointlight relative to the attached entity
+            distance: 10,
+            offset: { x: 0, y: 1.1, z: 0 }, // an offset of the pointlight relative to the attached entity
         });
 
-        playerEntity.light = light;
+        //playerEntity.light = light;
 
-        //light.spawn(world);
+        light.spawn(world);
         //light.
 
         this.InitCamera(playerEntity);
@@ -314,6 +316,8 @@ export class GameManager {
         const team = this.getPlayerTeam(entity.player);
         const teamColor = team?.color || '#ffffff';
 
+        // Disable nameplate UI for now
+        /*
         const nameplateUI = new SceneUI({
             templateId: 'player-nameplate',
             attachedToEntity: entity,
@@ -327,7 +331,9 @@ export class GameManager {
 
         nameplateUI.load(world);
         (entity as DamageableEntity).nameplateUI = nameplateUI;
+        */
     }
+
     
     public InitCamera(entity: PlayerEntity) {
 

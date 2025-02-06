@@ -104,23 +104,24 @@ export class WizardAbilityController extends AbilityController {
             resourceCost: 5,
             resourceType: Resource.Mana,
             maxRange: 12,
-            speed: 15,
+            speed: 20,
             damage: 3,
 
-            modelUri: 'models/particles/beam_segment.gltf',
-            modelScale: 0.1,
+            modelUri: 'models/projectiles/firedart.gltf',
+            modelScale: 0.3,
             projectileRadius: 0.05,
             knockback: 0.2,
             gravityScale: 0.1,
             hitFX: ParticleFX.FIREHIT,
             useSFX: {
-                uri: 'audio/sfx/fire/fire-spell-instant-cast.wav',
+                uri: 'audio/sfx/fire/Fire Spell 02.wav',
                 volume: 0.6
+                
             },
             hitSFX: {
-                uri: 'audio/sfx/fire/Fire Spell 18.wav',
+                uri: 'audio/sfx/fire/fire-ignite.mp3',
                 volume: 0.8,
-                referenceDistance: 20
+                referenceDistance:10
             },
 
             icon: 'ui/icons/fireball.png',
@@ -239,7 +240,7 @@ export class FighterAbilityController extends AbilityController {
             name: 'Charge-Slash',
             slot: 'secondary',
             cooldown: 0.8,
-            resourceCost: 40,
+            resourceCost: 35,
             resourceType: Resource.Mana,
             maxRange: 0.1,
             speed: 15,
@@ -268,7 +269,6 @@ export class FighterAbilityController extends AbilityController {
                     damage: {
                         min: 15,
                         max: 30
-
                     },
                     size: {
                         min: 0.6,
@@ -276,25 +276,28 @@ export class FighterAbilityController extends AbilityController {
                     },
                     impulseForce: {
                         min: -5,
-                        max: -12  // Stronger push at full charge
+                        max: -12
                     }
                 }
             },
+            
             useSFX: {
-                uri: 'audio/sfx/player/player-swing-woosh.mp3',
+                uri: 'audio/sfx/damage/Sword Woosh 19.wav',
                 volume: 0.6
             },
-
+            /*
             hitSFX: {
                 uri: 'audio/sfx/player/bow-hit.mp3',
                 volume: 1,
                 referenceDistance: 15
             },
+            */
             useImpulse: {
                 direction: 'forward',
                 force: -15,
                 useAimDirection: false
             }
+
         };
 
 
@@ -370,9 +373,6 @@ export class ArcherAbilityController extends AbilityController {
         this.useCustomJump = true;
     }
 
-    
-   
-
     protected setupAbilities() {
         
         const shootArrowOptions: PhysicsProjectileOptions = {
@@ -401,7 +401,11 @@ export class ArcherAbilityController extends AbilityController {
                 volume: 1,
                 referenceDistance: 15
             },
-
+            chargeStartSFX: {
+                uri: 'audio/sfx/player/Bow string drawing fast 1.wav',
+                volume: 0.5,
+                referenceDistance: 8
+            },
 
             charging: {
                 minChargeTime: 0.0,
@@ -550,24 +554,26 @@ export class ArcherAbilityController extends AbilityController {
         }
         
         // Double Jump code
-        if (input.sp && !myController.isJumping && !this.hasDoubledJumped) {
+        if (input.sp && !myController.isJumping && this.jumpCount < 3) {
 
-            const staminaCost = 5; // stamina per second
+
+            const staminaCost = 5 * this.jumpCount; // stamina per second
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
+
 
             if(this.jumpCount == 0) {
                 entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, this.jumpVelocity, entity.linearVelocity.z));
             }
             else {
                 entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, 1, entity.linearVelocity.z));
-                entity.applyImpulse(new Vector3(0, 16, 0));
+                entity.applyImpulse(new Vector3(0, 13, 0));
             }
 
             damageableEntity.useStamina(staminaCost);
             this.jumpCount++;
             if (this.jumpCount > 1) {
-                this.hasDoubledJumped = true;
+                //this.hasDoubledJumped = true;
             }
 
         
