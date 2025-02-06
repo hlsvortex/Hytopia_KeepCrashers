@@ -24,4 +24,4 @@ export class RaycastAbility extends Ability {
             ray.hitEntity.takeDamage(this.options.damage);
         }
     }
-} 
+}   

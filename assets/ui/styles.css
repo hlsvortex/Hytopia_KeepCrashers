@@ -18,13 +18,14 @@ div[style="z-index: 10000"] {
     bottom: 15px;
     left: 20px;
     background: rgba(20, 15, 0, 0.9); /* Dark amber background */
-    padding: 8px;
+    padding: 4px;
     border-radius: 6px;
     color: white;
     font-family: 'Fira Sans', sans-serif;
     z-index: 950;
-    width: 140px; /* Match other panels */
-    border: 1px solid rgba(255, 220, 150, 0.2);
+    width: 150px; /* Match other panels */
+    border: 2px solid rgba(116, 116, 116, 0.5);
+    filter: drop-shadow(0 0 0.2rem #000000);
 }
 
 .stats-panel div {
@@ -48,27 +49,27 @@ div[style="z-index: 10000"] {
     height: 12px;
     background: rgba(80, 70, 30, 0.4); /* Yellow-tinged background */
     margin: 0px 0px;
-    border-radius: 4px;
+    border-radius: 6px;
     position: relative;
 }
 
 .stat-fill {
     height: 100%;
-    transition: width 0.3s ease;
+    transition: width 0.1s ease;
 }
 
 .health-fill {
-    background: linear-gradient(to right, #ffd700 0%, #ffaa00 100%); /* Gold gradient */
+    background: linear-gradient(to right, #f15b5b, #f15b5b);
     box-shadow: 0 0 8px rgba(255, 170, 0, 0.3);
 }
 
 .stamina-fill {
-    background: linear-gradient(to right, #c8ff00 0%, #a0d000 100%); /* Lime gold */
+    background: linear-gradient(to right, #44ff44, #66ff66);
     box-shadow: 0 0 8px rgba(200, 255, 0, 0.2);
 }
 
 .mana-fill {
-    background-color: #4444ff;
+    background: linear-gradient(to right, #5f92f1, #5f92f1);
 }
 
 .stat-value {
@@ -362,18 +363,20 @@ div[style="z-index: 10000"] {
 /* Game State UI */
 .game-state-display {
     position: fixed;
-    top: 70px;
+    top: 90px;
     left: 50%;
     transform: translateX(-50%);
     color: rgba(226, 223, 53, 0.9); /* Slightly less bright white */
     font-size: 22px;
-    font-family: 'IM Fell English', serif;
+    font-family: 'Fira Sans', sans-serif;
     font-weight: 400; /* Lighter weight */
     text-align: center;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: rgba(104, 104, 104, 0.9);
     padding: 5px 5px;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 5px;
+
     min-width: 200px;
     white-space: nowrap;
     z-index: 1000;
@@ -421,22 +424,24 @@ div[style="z-index: 10000"] {
 /* Red team specific styles */
 #red-team h3 {
     background-color: rgba(255, 68, 68, 0.0);
-    color: #ff4444;
+    color: #f15b5b;
 }
 
 #red-team .player-stat {
-    background-color: rgba(255, 68, 68, 0.3);
+    background-color: #f15b5b;
 }
+
 
 /* Blue team specific styles */
 #blue-team h3 {
     background-color: rgba(68, 68, 255, 0.0);
-    color: #4444ff;
+    color: #5f92f1;
 }
 
 #blue-team .player-stat {
-    background-color: rgba(68, 68, 255, 0.3);
+    background-color: #5f92f1;
 }
+
 
 /* Match stats panel */
 #match-stats {
@@ -450,7 +455,13 @@ div[style="z-index: 10000"] {
     transform: translateY(-30%);
     z-index: 1000;
     background: rgba(0, 0, 0, 0.9);
+    color: rgba(41, 41, 41, 0.9);
+    font-family: 'Fira Sans', sans-serif;
+    filter: drop-shadow(0 0 0.2rem #000000);
+    font-weight: 600;
 }
+
+
 
 .stats-header {
     display: flex;
@@ -515,6 +526,8 @@ div[style="z-index: 10000"] {
     text-align: center;
     z-index: 1000;
     pointer-events: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    filter: drop-shadow(0 0 0.2rem #000000);
 }
 
 .capture-title {
@@ -558,6 +571,7 @@ div[style="z-index: 10000"] {
     align-items: center;
     gap: 20px;
     width: 100%;
+    
 }
 
 .control-info {

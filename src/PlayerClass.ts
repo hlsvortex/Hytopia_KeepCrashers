@@ -225,14 +225,14 @@ export class FighterAbilityController extends AbilityController {
             },
             useSFX: {
                 uri: 'audio/sfx/player/player-swing-woosh.mp3',
-                volume: 0.6
+                volume: 0.8,
+                referenceDistance: 15
             },
 
-
             hitSFX: {
-                uri: 'audio/sfx/player/bow-hit.mp3',
-                volume: 1,
-                referenceDistance: 15
+                uri: 'audio/sfx/player/player-swing-woosh.mp3',
+                volume: 0.5,
+                referenceDistance: 10
             },
         };
 
@@ -283,7 +283,8 @@ export class FighterAbilityController extends AbilityController {
             
             useSFX: {
                 uri: 'audio/sfx/damage/Sword Woosh 19.wav',
-                volume: 0.6
+                referenceDistance: 15,
+                volume: 0.9
             },
             /*
             hitSFX: {
@@ -394,16 +395,17 @@ export class ArcherAbilityController extends AbilityController {
             icon: '{{CDN_ASSETS_URL}}/ui/icons/arrow.png',
             useSFX: {
                 uri: 'audio/sfx/player/Fantasy_Game_Attack_Bow_A.wav',
-                volume: 0.6
+                referenceDistance: 15,
+                volume: 0.8
             },
             hitSFX: {
                 uri: 'audio/sfx/player/bow-hit.mp3',
-                volume: 1,
+                volume: 0.5,
                 referenceDistance: 15
             },
             chargeStartSFX: {
                 uri: 'audio/sfx/player/Bow string drawing fast 1.wav',
-                volume: 0.5,
+                volume: 0.8,
                 referenceDistance: 8
             },
 
@@ -454,7 +456,7 @@ export class ArcherAbilityController extends AbilityController {
             lifeTime: 1.5,
             useSFX: {
                 uri: 'audio/sfx/player/player-swing-woosh.mp3',
-                volume: 0.6
+                volume: 0.8
             },
             hitSFX: {
                 uri: 'audio/sfx/fire/Fire Spell 18.wav',
@@ -560,8 +562,6 @@ export class ArcherAbilityController extends AbilityController {
             const staminaCost = 5 * this.jumpCount; // stamina per second
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
-
-
             if(this.jumpCount == 0) {
                 entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, this.jumpVelocity, entity.linearVelocity.z));
             }
@@ -572,15 +572,10 @@ export class ArcherAbilityController extends AbilityController {
 
             damageableEntity.useStamina(staminaCost);
             this.jumpCount++;
-            if (this.jumpCount > 1) {
-                //this.hasDoubledJumped = true;
-            }
-
-        
+          
             input.sp = false;
         }
         else if (myController.isGrounded) {
-            this.hasDoubledJumped = false;
             this.jumpCount = 0;
         }
        

@@ -66,10 +66,7 @@ export default class MyEntityController extends BaseEntityController {
 
   public useCustomJump: boolean = false;
 
-  private readonly JUMP_STAMINA_COST = 3;  // Stamina cost per jump
   public isJumping: boolean = false;
-  private readonly JUMP_CUTOFF_VELOCITY = 4; // Velocity threshold for jump cutoff
-  private readonly JUMP_GRAVITY_MULTIPLIER = 2.5; // Faster fall when jump released
 
   /**
    * A function allowing custom logic to determine if the entity can walk.
@@ -380,7 +377,7 @@ export default class MyEntityController extends BaseEntityController {
       // Cut jump short if space released and still moving upward
       entity.setLinearVelocity(new Vector3(
         currentVelocity.x,
-        4,
+        6,
         currentVelocity.z
       ));
 

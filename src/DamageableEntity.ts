@@ -118,8 +118,11 @@ export class DamageableEntity extends PlayerEntity {
                 soundEffect = DamageableEntity.DAMAGE_SOUNDS.HEAVY;
             }
 
+            const playbackRate = Math.random() * 0.2 + 0.8;
+
             const damageSound = new Audio({
                 uri: soundEffect.uri,
+                playbackRate: playbackRate,
                 volume: soundEffect.volume,
                 position: this.position,
                 referenceDistance: 10
