@@ -45,7 +45,9 @@ export class GameManager {
     private localPlayer: DamageableEntity | undefined;
     private gameMusic: Audio | undefined;
     private gameMusicBattle: Audio | undefined;
-
+    private readonly SPAWN_DAMAGE_INTERVAL = 1000; // Damage every 500ms
+    private readonly SPAWN_DAMAGE_AMOUNT = 100;
+    private lastSpawnDamageTime: Map<string, number> = new Map();
 
     // Add team spawn areas
     private teamSpawnAreas: Map<string, { min: Vector3, max: Vector3 }> = new Map([
@@ -156,6 +158,7 @@ export class GameManager {
             this.updateStatsUI();
             this.gameStateController.update(this.players.size);
             this.worldEventRouter.emit('STAT_REGENERATION_TICK', undefined);
+            this.CheckIfPlayerIsInEnemySpawn(1);
         }, 1000);
     }
 
@@ -718,12 +721,60 @@ export class GameManager {
 
     }
 
-    public isPointInSpawnArea(point: Vector3, team: Team) {
+    public isPointInSpawnArea(point: Vector3, team: Team, expandX: number = 0, expandZ: number = 0) {
         const spawnArea = this.teamSpawnAreas.get(team.name);
         if (!spawnArea) return false;
-        return (point.x >= spawnArea.min.x && point.x <= spawnArea.max.x) &&
-            (point.z >= spawnArea.min.z && point.z <= spawnArea.max.z);
+        
+        // Expand the boundaries by the specified range
+        const expandedMin = new Vector3(
+            spawnArea.min.x - expandX,
+            spawnArea.min.y,
+            spawnArea.min.z - expandZ
+        );
+        const expandedMax = new Vector3(
+            spawnArea.max.x + expandX,
+            spawnArea.max.y,
+            spawnArea.max.z + expandZ
+        );
+        
+        return (point.x >= expandedMin.x && point.x <= expandedMax.x) &&
+            (point.z >= expandedMin.z && point.z <= expandedMax.z);
     }
 
+    // Add method to check if player is in enemy spawn
+    private isPlayerInEnemySpawn(player: Player, expandX: number = 0, expandZ: number = 0): boolean {
+        const playerTeam = this.getPlayerTeam(player);
+        if (!playerTeam) return false;
+        
+        // Get enemy team
+        const enemyTeam = this.teams.find(t => t.name !== playerTeam.name);
+        if (!enemyTeam) return false;
+        
+        return this.isPointInSpawnArea(
+            Vector3.fromVector3Like(this.players.get(player.id)?.position!), 
+            enemyTeam,
+            expandX,
+            expandZ
+        );
+    }
+
+    public CheckIfPlayerIsInEnemySpawn(deltaMs: number) {
+        const currentTime = Date.now();
+        
+        // Check each player for spawn area damage
+        this.players.forEach((entity, playerId) => {
+            if (!entity.player) return;
+            
+            const lastDamageTime = this.lastSpawnDamageTime.get(playerId) || 0;
+            if (currentTime - lastDamageTime >= this.SPAWN_DAMAGE_INTERVAL) {
+                if (this.isPlayerInEnemySpawn(entity.player, 3, 7)) { // Expand X by 3, Z by 5
+                    entity.takeDamage(this.SPAWN_DAMAGE_AMOUNT);
+                    this.lastSpawnDamageTime.set(playerId, currentTime);
+                }
+            }
+        });
+
+        // ... rest of tick logic
+    }
 
 }
