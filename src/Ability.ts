@@ -215,7 +215,7 @@ export abstract class Ability {
 
         let impulseDirection: Vector3;
         if (this.options.useImpulse.useAimDirection && aimDirection) {
-            impulseDirection = Vector3.fromVector3Like(aimDirection);
+            impulseDirection = Vector3.fromVector3Like(aimDirection).normalize();
         } else {
             impulseDirection = Vector3.fromVector3Like(source.directionFromRotation);
         }
@@ -231,9 +231,11 @@ export abstract class Ability {
                 impulseDirection = new Vector3(0, this.options.useImpulse.force, 0);
                 break;
         }
-
+        impulseDirection.y += 0.1;
+        source.setLinearVelocity(impulseDirection);
         source.applyImpulse(impulseDirection);
     }
+
 
     /*
     protected emitAbilityUsed(payload: T) {

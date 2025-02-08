@@ -3,7 +3,7 @@ import type { Ability } from './Ability';
 import { DamageableEntity } from './DamageableEntity';
 import { world } from './GlobalContext';
 import type MyEntityController from './MyEntityController';
-
+import * as math from './utils/math';
 export abstract class AbilityController {
     protected _abilities: Map<string, Ability> = new Map();
     protected attachedEntity?: PlayerEntity;
@@ -69,32 +69,43 @@ export abstract class AbilityController {
         this._abilities.set(key, ability);
     }
 
-    protected updateAbilityInput(entity: PlayerEntity, ability: Ability, buttonDown: boolean) {
-        if (!ability.canUseAbility(entity as DamageableEntity)) return;
+    protected updateAbilityInput(entity: PlayerEntity, ability: Ability, buttonDown: boolean): boolean {
+
+        if (!ability.canUseAbility(entity as DamageableEntity)) return false;
 
         if (ability.hasCharging()) {
 
+            let isCharging = false;
             if(buttonDown) {
                 ability.getChargeLevel();
+                isCharging = true;
             }
 
             if (buttonDown && !ability.getIsCharging()) {
                 if (ability) {
                     ability.startCharge();
                 }
+                isCharging = true;
             }
             else if (ability.getIsCharging() && !buttonDown) {
                 this.useAbility(ability, entity);
+                isCharging = true;
+
             }
+
+            return isCharging;
         }
         else if (buttonDown) {
 
             if (!ability.options.useType || ability.options.useType === 'instant') {
                 this.useAbility(ability, entity);
+                return true;
             }
             else if (ability.options.useType === 'hold_continuous') {
                 this.useAbilityTick(ability, entity);
+                return true;
             }
+
             else if (ability.options.useType === 'toggle_continuous') {
                 // Tick the ability
                 const interval = setInterval(() => {
@@ -105,13 +116,9 @@ export abstract class AbilityController {
                     clearInterval(interval);
                 }, 1000);
             }
-            
-
-
-
-
-
         }
+
+        return false;
     }
 
     protected useAbility(ability: Ability, entity: PlayerEntity) {
@@ -146,20 +153,27 @@ export abstract class AbilityController {
         });
         }
     }
-    // THis is the aim direction for the player it cast a raycast from the center of the camera to find the target point
+    // This is the aim direction for the player it cast a raycast from the center of the camera to find the target point
     // they it usess that point to aim from the players projectile spawn point - its super hacky rite now because
     // i cant get the correct direct /position of the camera is seems. or im dumb.
+
     protected calculateAimDirection(entity: PlayerEntity, maxDistance: number) { 
         // Get camera orientation
         const camera = entity.player.camera;
+        const cameraPos = camera.attachedToEntity?.position;
+        const cameraForward = Vector3.fromVector3Like(camera.facingDirection).normalize();
 
-        const cameraPos = camera.attachedToEntity?.position;//entity.position;
-        const cameraForward = camera.facingDirection;
+        // Get the vertical angle (pitch) of the camera
+        const pitch = camera.orientation.pitch;
 
-        const cameraOffset = camera.offset;
-        const zoom = camera.zoom;
 
-        //console.log(cameraOffsetX);
+        // Project camera forward onto horizontal plane for consistent rotation
+        const horizontalForward = new Vector3(
+            cameraForward.x,
+            0,  // Zero out Y component
+            cameraForward.z
+        );
+
         // Calculate right vector for camera offset
         const rightVector = new Vector3(
             -cameraForward.z,
@@ -167,11 +181,22 @@ export abstract class AbilityController {
             cameraForward.x
         ).normalize();
 
+        // Use world up vector to rotate left
+        const angleInRadians = -0.23 - pitch*pitch*0.15; 
+        const rotatedHorizontal = math.rotateForwardVector(horizontalForward, angleInRadians);
+        // Apply the same pitch to our rotated direction
+
+        const finalDirection = new Vector3(
+            rotatedHorizontal.x * Math.cos(pitch),
+            Math.sin(pitch),
+            rotatedHorizontal.z * Math.cos(pitch)
+        ).normalize();
+
         if (!cameraPos) return;
 
         // Apply right offset only to camera/raycast position
-        const rightOffset = camera.filmOffset * 0.035;
-        const heightOffset = cameraOffset.y ;
+        const rightOffset = camera.filmOffset * 0.038;
+        const heightOffset = camera.offset.y ;
         let raycastPos = new Vector3(
             cameraPos.x + rightVector.x * rightOffset,
             cameraPos.y + heightOffset,
@@ -179,22 +204,15 @@ export abstract class AbilityController {
         );
 
         // Add forward offset based on zoom
-        const forwardOffset = -zoom ;  // Adjust multiplier as needed
+        const forwardOffset = -camera.zoom/2;  // Adjust multiplier as needed
         raycastPos.add(Vector3.fromVector3Like(cameraForward).scale(forwardOffset));
 
         
-        // Calculate a downward tilt relative to camera orientation
-        const rotateAround = new Vector3(0, 1, 0);
-        const finalDirection = Vector3.fromVector3Like(cameraForward)
-            .rotateY(rotateAround, -0.22);
-        
-        finalDirection.normalize(); // Normalize to maintain consistent direction
-
         // Original projectile origin without right offset
         const originForwardOffset = 0.15;
         const origin = new Vector3(
             entity.position.x + finalDirection.x * originForwardOffset,
-            entity.position.y + 0.3 + finalDirection.y * originForwardOffset,
+            entity.position.y + 0.35 + finalDirection.y * originForwardOffset,
             entity.position.z + finalDirection.z * originForwardOffset
         );
        

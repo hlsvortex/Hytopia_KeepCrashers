@@ -66,3 +66,26 @@ export function faceDirection(wantedDirection: Vector3Like): QuaternionLike {
         w: cosY * cosP
     };
 }
+
+export function dot(a: Vector3Like, b: Vector3Like): number {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+
+export function rotateForwardVector(forward: Vector3Like, angle: number): Vector3 {
+    // Convert to Vector3 and normalize
+    const vec = Vector3.fromVector3Like(forward).normalize();
+    
+    // Calculate new x and z using rotation matrix for Y axis:
+    // [cos θ   0   sin θ]
+    // [  0     1     0  ]
+    // [-sin θ  0   cos θ]
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    
+    return new Vector3(
+        vec.x * cos + vec.z * sin,  // New x
+        vec.y,                      // Y stays the same
+        -vec.x * sin + vec.z * cos  // New z
+    ).normalize();
+}

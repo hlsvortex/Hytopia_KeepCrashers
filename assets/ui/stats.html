@@ -365,6 +365,7 @@
             else if (data.type === 'SHOW_CLASS_SELECT') {
                 const menu = document.querySelector('.class-select-menu');
                 if (menu) {
+                    
                     menu.style.display = 'flex';
                     menuVisible = true;
                     hytopia.sendData({
@@ -382,10 +383,11 @@
         let menuVisible = false;
 
         // Update menu toggle handler
+        
         document.addEventListener('keydown', (event) => {
             if (event.key.toLowerCase() === 'c') {
                 const menu = document.querySelector('.class-select-menu');
-                if (menu) {
+                if (menu && menu.style.display === 'flex') {
                     const willShow = menu.style.display === 'none';
                     menu.style.display = willShow ? 'flex' : 'none';
                     menuVisible = willShow;
@@ -397,8 +399,10 @@
                 }
             }
         });
+        
 
         // Restore class selection functionality
+
         document.querySelectorAll('.class-button').forEach(button => {
             button.addEventListener('click', () => {
                 const className = button.dataset.class;

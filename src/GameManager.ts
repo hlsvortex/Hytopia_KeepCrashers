@@ -44,13 +44,14 @@ export class GameManager {
     private keepLight: Light;
     private localPlayer: DamageableEntity | undefined;
     private gameMusic: Audio | undefined;
- 
+    private gameMusicBattle: Audio | undefined;
+
 
     // Add team spawn areas
     private teamSpawnAreas: Map<string, { min: Vector3, max: Vector3 }> = new Map([
-        ['Red', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
+        ['Red', { min: new Vector3(-30, 3, 53), max: new Vector3(-4, 3, 61) }],
         //['Blue', { min: new Vector3(-4, 3, 53), max: new Vector3(-30, 3, 61) }],
-        ['Blue', { min: new Vector3(4, 3, -53), max: new Vector3(31, 3, -62) }]
+        ['Blue', { min: new Vector3(4, 3, -62), max: new Vector3(31, 3, -53) }]
     ]);
 
     private doors: Entity[] = [];
@@ -82,12 +83,50 @@ export class GameManager {
         
     }
 
+    private playSongBattleMusic() {
+
+        if (this.gameMusic) {
+            this.gameMusic.pause();
+        }
+
+        if (!this.gameMusicBattle) {
+            this.gameMusicBattle = new Audio({
+                uri: 'audio/music/Good Day To Die.mp3',
+                loop: true, // Loop the music when it ends
+                volume: 0.1, // Relative volume 0 to 1
+            });
+        }
+
+        this.gameMusicBattle.play(world); // Play the music in our world
+    }
+
+    
+
+    private playSongMusic() {
+
+        if (this.gameMusicBattle) {
+            this.gameMusicBattle.pause();
+        }
+
+        if (!this.gameMusic) {
+            this.gameMusic = new Audio({
+                uri: 'audio/music/jungle-theme.mp3',
+                loop: true, // Loop the music when it ends
+                volume: 0.1, // Relative volume 0 to 1
+            });
+        }
+
+        this.gameMusic.play(world); // Play the music in our world
+    }
+
+
     private initGame() {
         // Initialize game mode
         const controlPoint = new CapturePoint(new Vector3(0, 2.15, 0), 8, 10, 5);
         controlPoint.spawn(world);
         this.gameModeController = new KingOfTheHill(this, this.worldEventRouter, controlPoint);
 
+        /*
         this.gameMusic = new Audio({
             uri: 'audio/music/jungle-theme.mp3',
             loop: true, // Loop the music when it ends
@@ -95,9 +134,12 @@ export class GameManager {
         });
 
         this.gameMusic.play(world); // Play the music in our world
+        */
+        this.playSongMusic();
 
         // respawn system
         new RespawnSystem(world.eventRouter);
+
 
         this.buildStartAreaDoors(world);
 
@@ -132,6 +174,12 @@ export class GameManager {
             if (newState === GameState.MatchStats) {
                 this.buildStartAreaDoors(world);
                 this.updateKeepLightColor(null);
+                this.playSongMusic();
+
+            }
+
+            if (newState === GameState.MatchPlay) {
+                this.playSongBattleMusic();
             }
         });
 
@@ -525,10 +573,15 @@ export class GameManager {
     }
 
     public openDoors(open: boolean = true) {
+    
         this.doors.forEach(door => {
-            door.setPosition(new Vector3(0, open ? 90 : 0, 0));
+            //door.setPosition(new Vector3(0, open ? 90 : 0, 0));
+            door.despawn();
         });
-    }
+
+        this.doors = [];
+    
+    }   
     
 
     // Add these methods to your existing GameManager class
@@ -589,16 +642,6 @@ export class GameManager {
         }
     }
 
-    public toggleClassSelection() {
-        // Send toggle message directly
-        this.players.forEach(player => {
-            player.player.ui.sendData({
-                type: 'TOGGLE_MENU',
-                menuId: 'class'
-            });
-        });
-    }
-
     public showStats() {
         this.players.forEach(player => {
             player.player.ui.sendData({
@@ -653,4 +696,34 @@ export class GameManager {
 
         this.keepLight.setColor({ r, g, b });
     }
+
+    // Add method to check if player is in their team's spawn area
+    public isPlayerInSpawnArea(player?: Player): boolean {
+        if (!player) return false;
+        
+        const entity = this.players.get(player.id);
+        if (!entity) return false;
+        
+        const team = this.getPlayerTeam(player);
+        if (!team) return false;
+        
+        const spawnArea = this.teamSpawnAreas.get(team.name);
+        
+        if (!spawnArea) return false;
+        
+        const pos = entity.position;
+        const isInSpawn = this.isPointInSpawnArea(new Vector3(pos.x, pos.y, pos.z), team);
+
+        return isInSpawn;
+
+    }
+
+    public isPointInSpawnArea(point: Vector3, team: Team) {
+        const spawnArea = this.teamSpawnAreas.get(team.name);
+        if (!spawnArea) return false;
+        return (point.x >= spawnArea.min.x && point.x <= spawnArea.max.x) &&
+            (point.z >= spawnArea.min.z && point.z <= spawnArea.max.z);
+    }
+
+
 }

@@ -1,5 +1,4 @@
 import { Entity, Light, PlayerEntity, SceneUI, Audio } from 'hytopia';
-import { Player, EventRouter } from 'hytopia';
 import type { PlayerDeathEventPayload } from './events';
 import { PlayerEvents } from './events';
 import { PlayerMatchStats } from './PlayerMatchStats';
@@ -39,7 +38,7 @@ export class DamageableEntity extends PlayerEntity {
         
         if (currentTime - this.lastHeightDamageTime >= this.HEIGHT_DAMAGE_INTERVAL) {
             if (entity.position.y <= 2.2) {
-                this.takeDamage(5);
+                this.takeDamage(20);
             }
             this.lastHeightDamageTime = currentTime;
         }

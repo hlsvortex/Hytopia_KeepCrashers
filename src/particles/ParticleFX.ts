@@ -32,7 +32,7 @@ export const ParticleFX = {
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 1.5,
+            size: 3.5,
             sizeRandomness: 0.2, // 30% size variation
             lifetime: 0.5,
             lifetimeRandomness: 0.3, // 30% lifetime variation

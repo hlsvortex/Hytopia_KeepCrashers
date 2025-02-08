@@ -27,23 +27,26 @@ export class WizardAbilityController extends AbilityController {
         const fireballOptions: PhysicsProjectileOptions = {
             name: 'Fireball',
             slot: 'primary',
-            cooldown: 1.5,
-            resourceCost: 15,
+            cooldown: 1.0,
+            resourceCost: 35,
             resourceType: Resource.Mana,
-            maxRange: 18,
+            maxRange: 19,
             speed: 21,
             damage: 30,
 
             modelUri: 'models/projectiles/fireball.gltf',
-            modelScale: 0.8,
+            modelScale: 0.9,
             projectileRadius: 0.3,
             knockback: 0.8,
             gravityScale: 0.0,
+           
             useImpulse: {
-                direction: 'forward',
-                force: 7,
-                useAimDirection: false
+                direction: 'backward',
+                force: 4,
+                useAimDirection: true
             },
+
+
             hitFX: ParticleFX.EXPLOSION,
             aoe: {
                 radius: 2,
@@ -52,8 +55,6 @@ export class WizardAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
-            icon: 'ui/icons/fireball.png',
-
             useSFX: {
                 uri: 'audio/sfx/fire/Fire Spell 01.wav',
                 volume: 0.6
@@ -61,7 +62,7 @@ export class WizardAbilityController extends AbilityController {
             hitSFX: {
                 uri: 'audio/sfx/fire/Fire Spell 18.wav',
                 volume: 0.8,
-                referenceDistance: 25
+                referenceDistance: 20
             }
         };
 
@@ -100,8 +101,8 @@ export class WizardAbilityController extends AbilityController {
         const firedartsOptions: PhysicsProjectileOptions = {
             name: 'Firedarts',
             slot: 'secondary',
-            cooldown: 0.15,
-            resourceCost: 4,
+            cooldown: 0.2,
+            resourceCost: 1,
             resourceType: Resource.Mana,
             maxRange: 12,
             speed: 20,
@@ -113,6 +114,11 @@ export class WizardAbilityController extends AbilityController {
             knockback: 0.3,
             gravityScale: 0.1,
             hitFX: ParticleFX.FIREHIT,
+            isSensor: true,
+            multiHit: {
+                maxHits: 3,
+                hitCooldown: 0.2
+            },
             useSFX: {
                 uri: 'audio/sfx/fire/Fire Spell 02.wav',
                 volume: 0.6,
@@ -155,12 +161,16 @@ export class WizardAbilityController extends AbilityController {
 
         const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
         const abilitySecondary = this._abilities.get('secondary') as SelfAbility;
+        
+        if(this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false)) {
+            input.mr = false;
+        }
+        else if(this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false)) {
+            input.ml = false;
+        }
+        
+        
 
-        this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
-        this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
-        
-        
-        
         //console.log(input.space);
         if (input.sp) {
 
@@ -213,7 +223,6 @@ export class FighterAbilityController extends AbilityController {
             //noHitOnBlockCollision: true,
             //noHitOnEntityCollision: true,
             isSensor: true,
-            icon: '{{CDN_ASSETS_URL}}/ui/icons/bomb.png',
             velocityReverse: {
                 time: 0.65,        // Reverse after 0.5 seconds
                 duration: 0.2,    // Take 0.2 seconds to reverse
@@ -246,8 +255,8 @@ export class FighterAbilityController extends AbilityController {
             speed: 15,
             damage: 15,
             modelUri: 'models/projectiles/slash1.gltf',
-            modelScale: 0.5,
-            projectileRadius: 0.5,
+            modelScale: 0.6,
+            projectileRadius: 0.6,
             knockback: 0.4,
             gravityScale: 0.0,
             lifeTime: 0.25,
@@ -294,10 +303,11 @@ export class FighterAbilityController extends AbilityController {
             },
             */
             useImpulse: {
-                direction: 'forward',
+                direction: 'backward',
                 force: -15,
-                useAimDirection: false
+                useAimDirection: true
             }
+
 
         };
 
@@ -332,12 +342,17 @@ export class FighterAbilityController extends AbilityController {
         const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
         const abilitySecondary = this._abilities.get('secondary') as PhysicsProjectileAbility;
 
-        this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
-        this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
-
         const myController = entity.controller as AbilityEntityController;
         const damageableEntity = entity as DamageableEntity;
 
+        if (this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false)) {
+            input.ml = false;
+        }
+        else if (this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false)) {
+            input.mr = false;
+        }
+
+        
         if (abilityPrimary.getIsCharging() && !myController.isGrounded && entity.linearVelocity.y < 0.05) {
 
             entity.applyImpulse(new Vector3(0, 0.25, 0));
@@ -439,13 +454,13 @@ export class ArcherAbilityController extends AbilityController {
         const bombOptions: PhysicsProjectileOptions = {
             name: 'Bomb',
             slot: 'secondary',
-            cooldown: 0.8,
+            cooldown: 0.9,
             resourceCost: 35,
             resourceType: Resource.Mana,
             maxRange: -1,
             speed: 15,
 
-            damage: 20,
+            damage: 15,
             modelUri: 'models/items/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
@@ -454,6 +469,11 @@ export class ArcherAbilityController extends AbilityController {
             hitFX: ParticleFX.EXPLOSION,
             noHitOnBlockCollision: true,
             lifeTime: 1.5,
+            useImpulse: {
+                direction: 'backward',
+                force: 5,
+                useAimDirection: true
+            },
             useSFX: {
                 uri: 'audio/sfx/player/player-swing-woosh.mp3',
                 volume: 0.8
@@ -469,7 +489,6 @@ export class ArcherAbilityController extends AbilityController {
                 knockback: 15.5,
                 falloff: true,
             },
-            icon: '{{CDN_ASSETS_URL}}/ui/icons/bomb.png',
         };
 
         this.addAbility('secondary', new PhysicsProjectileAbility(bombOptions, this.eventRouter, this));
@@ -541,13 +560,17 @@ export class ArcherAbilityController extends AbilityController {
 
         const abilityPrimary = this._abilities.get('primary') as PhysicsProjectileAbility;
         const abilitySecondary = this._abilities.get('secondary') as PhysicsProjectileAbility;
-
-        this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false);
-        this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false);
-        
+ 
         const myController = entity.controller as AbilityEntityController;
         const damageableEntity = entity  as DamageableEntity;
         
+        if (this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false)) {
+            input.mr = false;
+        }
+        else if (this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false)) {
+            input.ml = false;
+        }
+
     
         // GLide a bit when charging
         if (abilityPrimary.getIsCharging() && !myController.isGrounded && entity.linearVelocity.y < 0.05) {
@@ -555,11 +578,11 @@ export class ArcherAbilityController extends AbilityController {
             entity.applyImpulse(new Vector3(0, 0.25, 0));
         }
         
-        // Double Jump code
+        // Tripple Jump code
         if (input.sp && !myController.isJumping && this.jumpCount < 3) {
 
 
-            const staminaCost = 5 * this.jumpCount; // stamina per second
+            const staminaCost = 5 * this.jumpCount; // stamina per jump
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
             if(this.jumpCount == 0) {

@@ -292,22 +292,23 @@ div[style="z-index: 10000"] {
 
 .charging-bar {
     position: fixed;
-    left: 52%;
-    top: 45%;
+    left: 53%;
+    top: 46%;    
     width: 5px;
     height: 50px;
     background-color: #000000;
-    border: 1px solid #000000;
+    border: 2px solid #000000;
     border-radius: 2px;
     display: none;
+
 }
 
 .charging-bar-fill {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: #0011ff;
-    border-radius: 1px;
+    background-color: #5797eb;
+    border-radius: 2px;
     transition: height 0.05s linear;
 }
 

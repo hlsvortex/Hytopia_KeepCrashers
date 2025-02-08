@@ -142,12 +142,25 @@ export default class AbilityEntityController extends MyEntityController {
     public tickWithPlayerInput(entity: PlayerEntity, input: PlayerInput, cameraOrientation: PlayerCameraOrientation, deltaTimeMs: number) {
         if (!entity.isSpawned || !entity.world) return;
 
+       
+
         if (this.pauseInput) return;
         // Call parent class for default movement
         super.tickWithPlayerInput(entity, input, cameraOrientation, deltaTimeMs);
 
         this.currentAbilityController.tick(entity, input, deltaTimeMs);
-    
+        
+        if (input.c ) {
+            input.c = false;
+            if (!gameManager.isPlayerInSpawnArea(entity.player)) {
+                return;
+            }
+
+            this.ownerEntity?.player.ui.sendData({
+                type: 'SHOW_CLASS_SELECT'
+            });
+        }
+
         // Regenerate stats
         if (entity instanceof DamageableEntity) {
             this.regenerateStats(entity, deltaTimeMs);

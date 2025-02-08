@@ -19,9 +19,6 @@ export class PhysicsProjectileAbility extends Ability {
         super(options, eventRouter, abilityController);
     }
 
-    private hasReversed = false;
-    private startVelocity = new Vector3(0, 0, 0);    
-    private isColliding = false;
     private hitCount = 0;
     private staticVelocity = new Vector3(0, 0, 0);
     private useDirection: Vector3Like = new Vector3(0, 0, 0);
@@ -32,16 +29,17 @@ export class PhysicsProjectileAbility extends Ability {
 
         const chargeLevel = this.endCharge(); // Get final charge level and reset charging state
         this.hitCount = 0;
-        this.hasReversed = false;
         this.useDirection = Vector3.fromVector3Like(direction).normalize();
         this.hitABlock = false;
 
         // Apply charge effects
         let { speed, damage, gravityScale } = this.getChargedValues(chargeLevel);
         let size = 0;
+        let effects = null;
+
 
         if (this.options.charging?.chargeEffects) {
-            const effects = this.options.charging.chargeEffects;
+            effects = this.options.charging.chargeEffects;
             
             if (effects.speed) {
                 speed = this.getChargedValue(chargeLevel, effects.speed.min, effects.speed.max);
@@ -57,10 +55,13 @@ export class PhysicsProjectileAbility extends Ability {
             }
         }
 
+        
+
         let impulseForce = this.options.useImpulse?.force ?? 0;
         
         // Apply charge effects to impulse force if configured
         if (this.options.charging?.chargeEffects?.impulseForce) {
+
             impulseForce = this.getChargedValue(
                 chargeLevel,
                 this.options.charging.chargeEffects.impulseForce.min,
@@ -78,7 +79,6 @@ export class PhysicsProjectileAbility extends Ability {
         const directionVector = new Vector3(direction.x, direction.y, direction.z).normalize();
         const velocityVector = directionVector.scale(speed);
 
-        this.startVelocity = velocityVector;
         this.staticVelocity = velocityVector;
         const projectile = new Entity({
             name: `${this.options.name} Projectile`,
@@ -161,21 +161,25 @@ export class PhysicsProjectileAbility extends Ability {
             }
         };
 
+        // Calculate scaled radius independently
+        const baseRadius = this.options.projectileRadius;
+        const scaleFactor = size > 0 ? (1 + size/this.options.modelScale) : 1;
+        const finalRadius = baseRadius * scaleFactor;
 
         projectile.createAndAddChildCollider({
             shape: ColliderShape.BALL,
-            radius: this.options.projectileRadius,
+            radius: finalRadius,
             isSensor: this.options.isSensor ?? false,
             friction: 0.6,
             bounciness: 1,
             
+
             collisionGroups: {
                 belongsTo: [CollisionGroup.ENTITY],
                 collidesWith: [CollisionGroup.PLAYER, CollisionGroup.BLOCK, CollisionGroup.ENTITY],
             },
             
             onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
-                this.isColliding = started;
                 if (!started) return;
                 if (otherEntity == source) return;
                 
@@ -202,8 +206,8 @@ export class PhysicsProjectileAbility extends Ability {
 
                     this.hitCount++;
 
-                    console.log(`Hit count: ${this.hitCount}`);
-                    console.log(`Max hits: ${this.options.multiHit?.maxHits}`);
+                    //console.log(`Hit count: ${this.hitCount}`);
+                    //console.log(`Max hits: ${this.options.multiHit?.maxHits}`);
 
                     if (this.options.multiHit) {
                         
@@ -222,7 +226,7 @@ export class PhysicsProjectileAbility extends Ability {
                         this.projectileEnd(projectile, source);
                     }
                 }
-
+                    
                 world.eventRouter.emit('ProjectileHit', {
                     type: source.name,
                     source,
@@ -282,7 +286,7 @@ export class PhysicsProjectileAbility extends Ability {
     private handleAOEDamage(position: Vector3Like, source: DamageableEntity) {
         if (!this.options.aoe) return;
 
-
+        
         // Create a spherical collider for AOE detection
         const aoeCollider = new Collider({
             shape: ColliderShape.BALL,
