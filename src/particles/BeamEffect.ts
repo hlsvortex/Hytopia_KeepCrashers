@@ -1,7 +1,7 @@
 import { ColliderShape, CollisionGroup, Entity, Quaternion, RigidBodyType, Vector3, World, type Vector3Like ,  type RgbColor, BlockType, PlayerEntity} from 'hytopia';
-import { faceDirection, getRotationFromDirection } from './utils/math';
-import { BeamAbility } from './abilities/BeamAbility';
-import { DamageableEntity } from './DamageableEntity';
+import { faceDirection, getRotationFromDirection } from '../utils/math';
+import { BeamAbility } from '../abilities/BeamAbility';
+import { DamageableEntity } from '../DamageableEntity';
 
 export class BeamEffect {
 

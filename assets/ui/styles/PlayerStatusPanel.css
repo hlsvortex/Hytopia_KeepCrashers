@@ -1,0 +1,184 @@
+/* Player Status Panel */
+.stats-panel {
+    position: fixed;
+    bottom: 15px;
+    left: 20px;
+    background: rgba(14, 14, 14, 0.9);
+    /* Dark amber background */
+    border-radius: 6px;
+    color: white;
+    font-family: 'Fira Sans', sans-serif;
+    z-index: 950;
+    width: 160px;
+    /* Match other panels */
+    border: 2px solid rgba(116, 116, 116, 0.5);
+    filter: drop-shadow(0 0 0.2rem #000000);
+    padding: 3px;
+    box-sizing: border-box;
+}
+
+/* Health/Stamina/Mana Bars */
+.stat-bar {
+    width: calc(100% - 0px);
+    height: 20px;
+    background: rgba(80, 70, 30, 0.4);
+    /* Yellow-tinged background */
+    border-radius: 2px;
+    position: relative;
+    padding: 4px;    
+    box-sizing: border-box;
+}
+
+.stat-fill {
+    height: 100%;
+    transition: width 0.2s ease;
+    border-radius: 2px;
+}
+
+.stat-bar-mana {
+    width: 100%;
+    height: 16px;
+    background: rgba(80, 70, 30, 0.4);
+    border-radius: 2px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+.health-fill { background: linear-gradient(to right, #ff4444, #ff6666); }
+.stamina-fill { background: linear-gradient(to right, #ccd641, #e1f05c); }
+.mana-fill { background: linear-gradient(to right, #4470ff, #668aff); }
+
+/* Mana Container */
+#mana-fill-container {
+    position: fixed;
+    bottom: 93px;
+    /* Position above abilities */
+    right: 27px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1px;
+    border-radius: 5px;
+    color: white;
+    z-index: 950;
+    width: 160px;
+    border: 2px solid rgba(116, 116, 116, 0.5);
+    filter: drop-shadow(0 0 0.2rem #103f6b);
+    box-sizing: border-box;
+}
+
+.stat-value-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-family: 'Fira Sans', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Ability Containers */
+.ability-container {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.ability-icon {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+}
+
+/* Cooldown Overlay */
+.cooldown-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    transition: height 0.3s ease;
+    display: none;
+}
+
+.cooldown-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.8em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Ability Icon Styles */
+.ability-icon-fireball {
+    background-image: url('../icons/fireball.png');
+    filter: drop-shadow(0 0 0.3rem #ff8800);
+    background-color: rgba(255, 68, 0, 0.1);
+}
+
+.ability-icon-firedarts {
+    background-image: url('../icons/firebeam.png');
+    filter: drop-shadow(0 0 0.3rem #ff8800);
+    background-color: rgba(255, 136, 0, 0.1);
+}
+
+.ability-icon-firebeam {
+    background-image: url('../icons/fireball.png');
+    filter: drop-shadow(0 0 0.4rem #ff6600);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.ability-icon-firebeam {
+    background-image: url('../icons/arrow.png');
+    filter: drop-shadow(0 0 0.4rem #ff4800);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.ability-icon-arrow {
+    background-image: url('../icons/arrow.png');
+    filter: drop-shadow(0 0 0.4rem #00ff4c);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.ability-icon-bomb {
+    background-image: url('../icons/bomb.png');
+    filter: drop-shadow(0 0 0.4rem #00ff4c);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.ability-icon-axe-throw {
+    background-image: url('../icons/axethrow.png');
+    filter: drop-shadow(0 0 0.4rem #1900ff);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.ability-icon-charge-slash {
+    background-image: url('../icons/charge-slash.png');
+    filter: drop-shadow(0 0 0.4rem #0004ff);
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+/* Position containers */
+#ability1 {
+    position: fixed;
+    bottom: 20px;
+    right: 115px;
+    /* Space for second ability */
+    z-index: 900;
+}
+
+#ability2 {
+    position: fixed;
+    bottom: 20px;
+    right: 33px;
+    z-index: 900;
+}

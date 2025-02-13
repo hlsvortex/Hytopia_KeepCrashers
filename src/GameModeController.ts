@@ -1,8 +1,10 @@
-import { EventRouter } from 'hytopia';
+import { EventRouter, Vector3 } from 'hytopia';
 import { Team } from './Team';
 import { GameManager } from './GameManager';
 import { CapturePoint } from './CapturePoint';
 import { GameState } from './GameState';
+import { world } from './GlobalContext';
+import { KOTHLevelController } from './KOTHLevelController';
 
 export abstract class GameModeController {
     protected _isInOvertime: boolean = false;
@@ -34,11 +36,20 @@ export class KingOfTheHill extends GameModeController {
     private initialLockDuration: number = 10; // Seconds before point unlocks
     private matchDuration: number = 120;//180; // 3 minutes in seconds
     private overtimeThreshold: number = 30; // Seconds remaining for overtime
+    public levelController: KOTHLevelController;
 
-    constructor(gameManager: GameManager, eventRouter: EventRouter, controlPoint: CapturePoint) {
+
+    constructor(gameManager: GameManager, eventRouter: EventRouter) {
         super(gameManager, eventRouter);
-        this.controlPoint = controlPoint;
         
+        this.controlPoint = new CapturePoint(new Vector3(0, 2.15, 0), 8, 10, 5);
+        this.controlPoint.spawn(world);
+        
+        this.levelController = new KOTHLevelController();
+        this.levelController.setWorld(world);
+        this.levelController.setupObjects();
+
+
         // Initialize team timers
         const redTeam = gameManager.getTeam('Red')!;
         const blueTeam = gameManager.getTeam('Blue')!;

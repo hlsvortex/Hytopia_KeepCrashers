@@ -84,6 +84,10 @@ export class CapturePoint {
         }
     }
 
+    private pointCaptureEvent(team: Team | null) {
+        world.eventRouter.emit('POINT_CAPTURED', team);
+    }
+
     update(deltaTime: number) {
         const teamsPresent = new Set<Team>();
         this.playersOnPoint.forEach(player => {
@@ -133,7 +137,9 @@ export class CapturePoint {
                         this.controllingTeam = currentTeam;
                         this.partialControlTeam = null;
                         this.onCaptured(currentTeam);
-                        gameManager.handlePointCapture(currentTeam);
+                        this.pointCaptureEvent(currentTeam);
+
+                        //gameManager.handlePointCapture(currentTeam);
                     }
                 } else {
                     // Opposing team contesting - fast decay
@@ -144,7 +150,8 @@ export class CapturePoint {
                     if (this.progress <= 0) {
                         this.partialControlTeam = currentTeam; // Switch partial control
                         this.progress = 0;
-                        gameManager.handlePointCapture(null);
+                        //gameManager.handlePointCapture(null);
+                        this.pointCaptureEvent(null);
                     }
                 }
             } else {
@@ -157,7 +164,8 @@ export class CapturePoint {
 
                     if (this.progress <= 0) {
                         this.partialControlTeam = null;
-                        gameManager.handlePointCapture(null);
+                        //gameManager.handlePointCapture(null);
+                        this.pointCaptureEvent(null);
                     }
                 }
             }
@@ -176,7 +184,8 @@ export class CapturePoint {
                 if (this.progress <= 0) {
                     //console.log(`[CapturePoint] ${this.controllingTeam.name} lost control`);
                     this.controllingTeam = null;
-                    gameManager.handlePointCapture(null);
+                    //gameManager.handlePointCapture(null);
+                    this.pointCaptureEvent(null);
                 }
             } else {
                 // Controlling team is present alone - no decay
@@ -229,10 +238,12 @@ export class CapturePoint {
         if (this.progress >= 100 && this.controllingTeam !== team) {
             this.controllingTeam = team;
             this.onCaptured?.(team);
-            gameManager.handlePointCapture(team);
+            //gameManager.handlePointCapture(team);
+            this.pointCaptureEvent(team);
         } else if (this.progress <= 0) {
             this.controllingTeam = null;
-            gameManager.handlePointCapture(null);
+            //gameManager.handlePointCapture(null);
+            this.pointCaptureEvent(null);
         }
 
         //if (this.onProgress) {

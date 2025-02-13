@@ -223,12 +223,7 @@ export default class MyEntityController extends BaseEntityController {
     const currentVelocity = entity.linearVelocity;
     const targetVelocities = { x: 0, y: 0, z: 0 };
 
-    // Get ability controller to check charging state
-    const abilityController = entity.controller as AbilityEntityController;
-    //const isCharging = abilityController?.currentAbilityController?.isAnyAbilityCharging() ?? false;
     
-    // Use charging state to determine if walking
-   
     // Temporary, animations
     if (this.isGrounded && (w || a || s || d)) {
         if (!this.isWalking) {
@@ -286,38 +281,7 @@ export default class MyEntityController extends BaseEntityController {
     }
 
     targetVelocities.y = this.handleJump(entity, input, this, Vector3.fromVector3Like(targetVelocities)).y;
-    /*
-    // Jump handling
-    if (sp && this.canJump(this)) {
-        if (this.isGrounded && currentVelocity.y > -0.001 && currentVelocity.y <= 3) {
-            const damageableEntity = entity as DamageableEntity;
-            //if (damageableEntity.stamina < this.JUMP_STAMINA_COST) return;
-
-            //damageableEntity.useStamina(this.JUMP_STAMINA_COST);
-            targetVelocities.y = this.jumpVelocity;
-            this.isJumping = true;
-            console.log('Jump ' + this.isJumping);
-            //input.sp = false;
-        }
-    } 
     
-    if (!input.sp && this.isJumping && currentVelocity.y > 4) {
-        // Cut jump short if space released and still moving upward
-        console.log('Cut jump short');
-        entity.setLinearVelocity(new Vector3(
-            currentVelocity.x,
-            4,
-            currentVelocity.z 
-        ));
-        
-        //entity.applyImpulse(new Vector3(0, this.JUMP_GRAVITY_MULTIPLIER, 0));
-        this.isJumping = false;
-    }
-
-    if (this.isGrounded) {
-        //this.isJumping = false;
-    }
-    */
 
     // Apply impulse relative to target velocities, taking platform velocity into account
     const platformVelocity = this._platform ? this._platform.linearVelocity : { x: 0, y: 0, z: 0 };
@@ -366,7 +330,6 @@ export default class MyEntityController extends BaseEntityController {
 
     if (input.sp && this.canJump(this)) {
       if (this.isGrounded && currentVelocity.y > -0.001 && currentVelocity.y <= 3) {
-        const damageableEntity = entity as DamageableEntity;
         newVelocities.y = this.jumpVelocity;
         this.isJumping = true;
       }
@@ -381,7 +344,6 @@ export default class MyEntityController extends BaseEntityController {
         currentVelocity.z
       ));
 
-      //entity.applyImpulse(new Vector3(0, this.JUMP_GRAVITY_MULTIPLIER, 0));
       this.isJumping = false;
     }
   

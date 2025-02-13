@@ -153,6 +153,20 @@ export abstract class AbilityController {
         });
         }
     }
+
+
+
+    protected updateAbilitiesInput(entity: PlayerEntity, abilityPrimary: Ability, abilitySecondary: Ability, input: PlayerInput) {
+
+        if (this.updateAbilityInput(entity, abilityPrimary, input.ml ?? false)) {
+            input.mr = false;
+        }
+        else if (this.updateAbilityInput(entity, abilitySecondary, input.mr ?? false)) {
+            input.ml = false;
+        }
+
+    }
+
     // This is the aim direction for the player it cast a raycast from the center of the camera to find the target point
     // they it usess that point to aim from the players projectile spawn point - its super hacky rite now because
     // i cant get the correct direct /position of the camera is seems. or im dumb.
@@ -202,7 +216,7 @@ export abstract class AbilityController {
             cameraPos.y + heightOffset,
             cameraPos.z + rightVector.z * rightOffset
         );
-
+        
         // Add forward offset based on zoom
         const forwardOffset = -camera.zoom/2;  // Adjust multiplier as needed
         raycastPos.add(Vector3.fromVector3Like(cameraForward).scale(forwardOffset));

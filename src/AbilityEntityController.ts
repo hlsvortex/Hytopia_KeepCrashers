@@ -1,23 +1,12 @@
 import {
-    Audio,
-    BaseEntityController,
-    ColliderShape,
-    CoefficientCombineRule,
-    CollisionGroup,
     Entity,
     PlayerEntity,
-    BlockType,
-    EventRouter,
-    RigidBodyType,
-    Quaternion,
 } from 'hytopia';
 
-import { Vector3 } from 'hytopia';
 
 import type {
     PlayerInput,
     PlayerCameraOrientation,
-    Vector3Like,
 } from 'hytopia';
 
 import MyEntityController from './MyEntityController';
@@ -26,10 +15,10 @@ import { DamageableEntity } from './DamageableEntity';
 import { PlayerEvents } from './events';
 import type { PlayerDeathEventPayload, PlayerRespawnEventPayload } from './events';
 import { gameManager, world } from './GlobalContext';
-import { ArcherAbilityController, WizardAbilityController, FighterAbilityController } from './PlayerClass';
 import { AbilityController } from './AbilityController';
-
-
+import { ArcherAbilityController } from './player_classes/ArcherAbilityController';
+import { WizardAbilityController } from './player_classes/WizardAbilityController';
+import { FighterAbilityController } from './player_classes/FighterAbilityController';
 
 
 export default class AbilityEntityController extends MyEntityController {
@@ -37,8 +26,6 @@ export default class AbilityEntityController extends MyEntityController {
     
     protected ownerEntity: PlayerEntity | undefined;
     
-    
-
     constructor(options: MyEntityControllerOptions = {}) {
         super(options);
         this.currentAbilityController = new WizardAbilityController(world.eventRouter); //new DefaultAbilityController(); // Fallback controller
@@ -51,15 +38,10 @@ export default class AbilityEntityController extends MyEntityController {
         // Initialize the current controller with the entity
         this.currentAbilityController.attach(this.ownerEntity);
 
-       
-
         world?.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
             console.log('Player death event received' + payload.player);
             if (payload.player == this.ownerEntity?.player) {
                 this.pauseInput = true;
-                
-                //this.ownerEntity.setAdditionalMass(100000);
-                
             }
         });
 
@@ -69,8 +51,6 @@ export default class AbilityEntityController extends MyEntityController {
                 this.pauseInput = false;
                 const damageable = this.ownerEntity as DamageableEntity;
                 damageable.respawn();
-                //this.ownerEntity.setAdditionalMass(0.1);
-                //gameManager.setTeamSpawnArea
             }
         });
 
@@ -83,9 +63,7 @@ export default class AbilityEntityController extends MyEntityController {
             }
 
         }, 200);
-
-       
-    }
+   }
 
     public detach() {
         // Clean up current controller

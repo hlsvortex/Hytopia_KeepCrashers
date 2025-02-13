@@ -1,0 +1,215 @@
+/* Add hint text */
+.class-select-menu::after {
+    content: 'Press C to Toggle';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.8em;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    
+}
+
+.class-select-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    z-index: 10000;
+    background: linear-gradient(to bottom, rgba(20, 20, 20, 0.92), rgba(5, 5, 5, 0.92));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+
+.class-button {
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(0, 0, 0, 0.9));
+    border: 4px solid rgba(255, 255, 255, 0.15);
+    width: 220px;
+    padding: 25px 20px;
+    min-height: 280px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center;
+    position: relative;
+    /* Ensure relative positioning for absolute children */
+}
+
+.class-button::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    /* Increased height for better text visibility */
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.95) 30%,
+            rgba(0, 0, 0, 0.8) 70%,
+            transparent);
+    border-radius: 6px;
+    z-index: 1;
+}
+
+.class-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Wizard hover effects */
+.class-button.wizard:hover {
+    border-color: rgba(168, 106, 248, 0.5);
+    box-shadow: 0 0 25px rgba(168, 106, 248, 0.2);
+}
+
+/* Fighter hover effects */
+.class-button.fighter:hover {
+    border-color: rgba(255, 94, 94, 0.5);
+    box-shadow: 0 0 25px rgba(255, 94, 94, 0.2);
+}
+
+/* Archer hover effects */
+.class-button.archer:hover {
+    border-color: rgba(107, 255, 184, 0.5);
+    box-shadow: 0 0 25px rgba(107, 255, 184, 0.2);
+}
+
+.class-icon {
+    width: 100px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.class-info {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.class-info h3 {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    z-index: 5;
+}
+
+.class-info p {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #eee;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    margin: 0;
+    padding: 5px;
+    text-align: left;
+    position: absolute;
+    /* Position absolutely */
+    bottom: 10%;
+    /* Start from middle */
+    transform: translateY(10%);
+    /* Move up by half height */
+
+
+    width: calc(100% - 50px);
+    z-index: 5;
+    /* Account for padding */
+}
+
+/* Style the control labels */
+.class-info p strong {
+    color: #fff;
+    font-weight: 500;
+    display: inline-block;
+    width: 45px;
+    margin-right: 8px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+   
+}
+
+/* Add new style for ability names */
+.class-info p span {
+    float: right;
+    text-align: right;
+    width: calc(100% - 55px);
+    /* Account for strong width + margin */
+}
+
+/* Add spacing between ability descriptions */
+.class-info p br {
+    content: "";
+    display: block;
+    margin-top: 4px;
+}
+
+.wizard {
+    background-image: url('../icons/firemage.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top;
+    border-color: rgba(136, 58, 234, 0.3);
+}
+
+.fighter {
+    background-image: url('../icons/barbarian.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top;
+    border-color: rgba(234, 58, 58, 0.3);
+}
+
+.archer {
+    background-image: url('../icons/archer.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top;
+    border-color: rgba(58, 234, 136, 0.3);
+}
+
+/* Add these color overrides */
+.class-button.wizard .class-info h3 {
+    color: #a86af8 !important;
+    text-shadow: 0 0 12px rgba(168, 106, 248, 0.8),
+        0 0 20px rgba(168, 106, 248, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.class-button.fighter .class-info h3 {
+    color: #ff5e5e !important;
+    text-shadow: 0 0 12px rgba(255, 94, 94, 0.8),
+        0 0 20px rgba(255, 94, 94, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.class-button.archer .class-info h3 {
+    color: #6bffb8 !important;
+    text-shadow: 0 0 12px rgba(107, 255, 184, 0.8),
+        0 0 20px rgba(107, 255, 184, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.class-info p {
+    color: #eee !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+
+
+.class-buttons {
+    display: flex;
+    gap: 30px;
+}

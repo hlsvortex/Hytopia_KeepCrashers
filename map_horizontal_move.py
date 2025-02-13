@@ -8,7 +8,7 @@ with open('assets/keep.json', 'r') as file:
 new_blocks = {}
 for position, block_id in data['blocks'].items():
     x, y, z = map(int, position.split(','))
-    new_x = x + 17  # Subtract 17 from the x-coordinate
+    new_x = x + 1  # Subtract 17 from the x-coordinate
     new_position = f"{new_x},{y},{z}"
     new_blocks[new_position] = block_id
 

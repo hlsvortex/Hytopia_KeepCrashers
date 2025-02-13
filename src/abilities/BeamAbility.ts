@@ -6,7 +6,7 @@ import type { AbilityController } from '../AbilityController';
 import type { AbilityOptions } from './AbilityOptions';
 import { ParticleFX } from '../particles/ParticleFX';
 import { ParticleEmitter } from '../particles/ParticleEmitter';
-import { BeamEffect } from '../BeamEffect';
+import { BeamEffect } from '../particles/BeamEffect';
 import { scaleDirection } from '../utils/math';
 
 

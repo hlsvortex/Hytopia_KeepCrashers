@@ -445,14 +445,16 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'f' || e.key === 'F') {
                 // Only toggle the stats panel, not the capture point
-                document.getElementById('match-stats').style.display = 'block';
+                //document.getElementById('match-stats').style.display = 'block';
+                MenuSystem.openMenu(MenuType.MATCH_STATS);
             }
         });
         
         document.addEventListener('keyup', (e) => {
             if (e.key === 'f' || e.key === 'F') {
                 // Only toggle the stats panel, not the capture point
-                document.getElementById('match-stats').style.display = 'none';
+                //document.getElementById('match-stats').style.display = 'none';
+                MenuSystem.openMenu(MenuType.HUD);
             }
         });
 

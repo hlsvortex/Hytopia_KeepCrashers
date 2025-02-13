@@ -47,9 +47,7 @@ export class GameStateController {
 
                 this.matchStartTimer--;
                 this.eventRouter.emit('MATCH_COUNTDOWN_UPDATE', this.matchStartTimer);
-                
-                //this.eventRouter.emit('GAME_STATE_UPDATE', this.getStateUpdate());
-
+             
                 if (this.matchStartTimer <= 0) {
                     this.setState(GameState.MatchPlay);
                 }
@@ -60,8 +58,6 @@ export class GameStateController {
                 break;
 
             case GameState.MatchEnd:
-                //this.setState(GameState.MatchStats);
-                //setTimeout(() => this.resetMatch(), 10000);
                 break;
         }
     }
@@ -69,7 +65,7 @@ export class GameStateController {
     public setState(newState: GameState) {
         this.currentState = newState;
         this.eventRouter.emit('GAME_STATE_CHANGED', newState);
-        gameManager.handleGameStateChange(newState);
+        //gameManager.handleGameStateChange(newState);
 
         // Handle state transitions
         switch(newState) {
@@ -87,10 +83,6 @@ export class GameStateController {
                     this.setState(GameState.WaitingForEnoughPlayers);
                 }, 10000);
                 break;
-        }
-
-        if (newState === GameState.MatchPlay) {
-            gameManager.openDoors();
         }
     }
 
