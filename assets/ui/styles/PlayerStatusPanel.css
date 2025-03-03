@@ -81,7 +81,7 @@
     width: 64px;
     height: 64px;
     background: rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 2px;
 }
 
@@ -169,16 +169,154 @@
 
 /* Position containers */
 #ability1 {
-    position: fixed;
-    bottom: 20px;
-    right: 115px;
     /* Space for second ability */
     z-index: 900;
 }
 
 #ability2 {
+    z-index: 900;
+}
+
+/* Health Bar */
+.health-hud {
+    position: fixed;
+    bottom: 13px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 13px; /* Add explicit height */
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	outline: 2px solid rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Ensure it's visible */
+}
+
+.health-bar {
+    height: 100%;
+    width: 100%; /* Default full width */
+    background: linear-gradient(to right, #d43939c4, #d43939c4);
+    transition: width 0.2s ease;
+}
+
+.health-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Right-side HUD Container */
+.right-hud-container {
     position: fixed;
     bottom: 20px;
-    right: 33px;
-    z-index: 900;
+    right: 20px;
+    display: flex;
+    flex-direction: row; /* Horizontal layout */
+    gap: 15px;
+    align-items: flex-end;
+    z-index: 1000; /* Ensure it's visible */
+}
+
+/* Vertical Bars Container */
+.vertical-bars {
+    display: flex;
+    flex-direction: row; /* Horizontal layout for bars */
+    gap: 15px;
+    align-items: flex-end;
+}
+
+/* Stamina and Mana Bars */
+.stamina-bar, .mana-bar {
+    width: 20px;
+    height: 150px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.stamina-fill, .mana-fill {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%; /* Default full height */
+    transition: height 0.2s ease, background-color 0.2s ease;
+}
+
+.stamina-fill {
+    background: linear-gradient(to top, #bbb949, #bbc34a);
+}
+
+.mana-fill {
+    background: linear-gradient(to top, #2196F3, #03A9F4);
+}
+
+.bar-text {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+/* Abilities Container */
+.abilities-container {
+    display: flex;
+    flex-direction: row; /* Horizontal layout for abilities */
+    gap: 25px;
+    align-items: flex-end;
+	padding-right: 10px;
+}
+
+/* Ability Containers */
+.ability {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px;
+    height: 90px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.ability-icon {
+    width: 60px;
+    height:60px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.ability-label {
+    color: white;
+    font-size: 12px;
+    margin-top: 8px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.ability-cooldown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    z-index: 100; /* Ensure it appears above everything */
 }

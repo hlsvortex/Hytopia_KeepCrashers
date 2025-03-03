@@ -7,48 +7,51 @@ export default class PlayerStatusPanel extends BasePanel {
     }
 
     init() {
-        
-
         this.container.innerHTML = `
-          <!-- Ability Container -->
-          <div id="ability1" class="ability-container" data-ability-name="Axe Throw">
-            <div class="ability-icon"></div>
-            <div class="cooldown-overlay">
-              <div class="cooldown-fill"></div>
-              <div class="cooldown-text"></div>
-            </div>
-          </div>
+            <div class="hud-container">
+                <!-- Health Bar -->
+                <div class="health-hud">
+                    <div id="health-bar" class="health-bar" style="width: 100%"></div>
+                    <div id="health-text" class="health-text">100 / 100</div>
+                </div>
 
-          <div id="ability2" class="ability-container" data-ability-name="Charge Slash">
-            <div class="ability-icon"></div>
-            <div class="cooldown-overlay">
-              <div class="cooldown-fill"></div>
-              <div class="cooldown-text"></div>
-            </div>
-          </div>
+                <!-- Right-side HUD -->
+                <div class="right-hud-container">
+                    <!-- Abilities -->
+                    <div class="abilities-container">
+                       
 
-          <!-- Add mana to bottom right -->
-          <div id="mana-fill-container">
-              <div class="stat-bar-mana">
-                <div id="mana-fill" class="stat-fill mana-fill"></div>
-                <span class="stat-value-overlay" id="mana-value">100</span>
-              </div>
-          </div>
+                        <!-- Primary Ability -->
+                        <div id="ability1" class="ability">
+                            <div class="ability-icon"></div>
+                            <div class="ability-cooldown"></div>
+                            <div class="ability-label">LMB</div>
+                        </div>
+						 <!-- Secondary Ability -->
+                        <div id="ability2" class="ability">
+                            <div class="ability-icon"></div>
+                            <div class="ability-cooldown"></div>
+                            <div class="ability-label">RMB</div>
+                        </div>
+                    </div>
 
-          <div class="stats-panel">
-            <div>
-              <div class="stat-bar">
-                <div id="health-fill" class="stat-fill health-fill" style="width: 100%"></div>
-                <span class="stat-value-overlay" id="health-value">100</span>
-              </div>
+                    <!-- Vertical Bars Container -->
+                    <div class="vertical-bars">
+						<!-- Mana Bar -->
+                        <div class="mana-bar">
+                            <div id="mana-fill" class="mana-fill" style="height: 100%"></div>
+                            <div class="bar-text">Mana</div>
+                        </div>
+                        <!-- Stamina Bar -->
+                        <div class="stamina-bar">
+                            <div id="stamina-fill" class="stamina-fill" style="height: 100%"></div>
+                            <div class="bar-text">Stamina</div>
+                        </div>
+
+                        
+                    </div>
+                </div>
             </div>
-            <div>
-              <div class="stat-bar">
-                <div id="stamina-fill" class="stat-fill stamina-fill" style="width: 100%"></div>
-                <span class="stat-value-overlay" id="stamina-value">100</span>
-              </div>
-            </div>
-          </div>
         `;
 
         this.addEventListeners();
@@ -87,37 +90,31 @@ export default class PlayerStatusPanel extends BasePanel {
         if (!data) return;
 
         const healthPercent = (data.health / data.maxHealth) * 100;
-        document.getElementById('health-fill').style.width = `${healthPercent}%`;
-        document.getElementById('health-value').textContent = Math.round(data.health);
-        document.getElementById('stamina-fill').style.width = `${data.stamina}%`;
-        document.getElementById('stamina-value').textContent = Math.round(data.stamina);
-        document.getElementById('mana-fill').style.width = `${data.mana}%`;
-        document.getElementById('mana-value').textContent = Math.round(data.mana);
+        document.getElementById('health-bar').style.width = `${healthPercent}%`;
+        document.getElementById('health-text').textContent = `${Math.round(data.health)} / ${Math.round(data.maxHealth)}`;
+        document.getElementById('stamina-fill').style.height = `${data.stamina}%`;
+        document.getElementById('mana-fill').style.height = `${data.mana}%`;
     }
 
     startCooldown(abilitySlotNumber, duration, iconUrl) {
         const abilitySlot = document.getElementById(`ability${abilitySlotNumber}`);
         if (!abilitySlot) return;
 
+        const cooldownElement = abilitySlot.querySelector('.ability-cooldown');
         let remaining = duration;
-        const cooldownOverlay = abilitySlot.querySelector('.cooldown-overlay');
-        const cooldownFill = abilitySlot.querySelector('.cooldown-fill');
-        const cooldownText = abilitySlot.querySelector('.cooldown-text');
 
-        cooldownOverlay.style.display = 'block';
-        cooldownText.textContent = `${remaining.toFixed(1)}s`;
-        cooldownFill.style.height = '100%';
-
-        const timer = setInterval(() => {
+        const updateCooldown = () => {
             remaining = Math.max(0, remaining - 0.1);
-            cooldownText.textContent = `${remaining.toFixed(1)}s`;
-            cooldownFill.style.height = `${(remaining / duration) * 100}%`;
-
+            cooldownElement.textContent = remaining > 0 ? `${remaining.toFixed(1)}s` : '';
+            
             if (remaining <= 0) {
                 clearInterval(timer);
-                cooldownOverlay.style.display = 'none';
-                cooldownText.textContent = 'Ready';
+                cooldownElement.style.display = 'none';
             }
-        }, 100);
+        };
+
+        cooldownElement.style.display = 'flex';
+        const timer = setInterval(updateCooldown, 100);
+        updateCooldown();
     }
 } 
