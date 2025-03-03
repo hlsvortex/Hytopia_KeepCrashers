@@ -226,9 +226,11 @@ export class PhysicsProjectileAbility extends Ability {
                 else {
                     this.hitABlock = true;
                     
-                    if (!this.options.multiHit) {
+					if (!this.options.multiHit || this.options.destroyOnBlockCollision) {
                         this.projectileEnd(projectile, source);
                     }
+
+
                 }
                     
                 world.eventRouter.emit('ProjectileHit', {

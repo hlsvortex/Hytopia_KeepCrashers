@@ -103,13 +103,13 @@ export class WizardAbilityController extends AbilityController {
         const firedartsOptions: PhysicsProjectileOptions = {
             name: 'Firedarts',
             slot: 'secondary',
-            cooldown: 0.15,
+            cooldown: 0.1,
             resourceCost: 1,
             resourceType: Resource.Mana,
             maxRange: 20,
             speed: 45,
-            damage: 5,
-			
+            damage: 4,
+			destroyOnBlockCollision: true,
             modelUri: 'models/projectiles/firedart.gltf',
             modelScale: 0.4,
             projectileRadius: 0.2,

@@ -81,6 +81,7 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     torque?: number;
     lifeTime?: number;
     gravityScale?: number;
+	destroyOnBlockCollision?: boolean;
     noHitOnEntityCollision?: boolean;
     noHitOnBlockCollision?: boolean;
 	faceVelocity?: boolean;
