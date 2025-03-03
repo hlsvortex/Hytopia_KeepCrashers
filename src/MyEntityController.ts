@@ -100,6 +100,10 @@ export default class MyEntityController extends BaseEntityController {
   /** @internal */
   private _platform: Entity | undefined;
 
+  public accelerationTime: number = 0.7; // Time in seconds to reach max speed
+
+  private _interpolationAccumulator: number = 0; // Add this property
+
   /**
    * @param options - Options for the controller.
    */
@@ -156,21 +160,22 @@ export default class MyEntityController extends BaseEntityController {
     // Ground sensor
     entity.createAndAddChildCollider({
       shape: ColliderShape.CYLINDER,
-      radius: 0.23,
+      radius: 0.20,
       halfHeight: 0.125,
       collisionGroups: {
         belongsTo: [ CollisionGroup.ENTITY_SENSOR ],
         collidesWith: [ CollisionGroup.BLOCK, CollisionGroup.ENTITY ],
       },
       isSensor: true,
-      relativePosition: { x: 0, y: -0.75, z: 0 },
+      relativePosition: { x: 0, y: -0.85, z: 0 },
       tag: 'groundSensor',
       onCollision: (_other: BlockType | Entity, started: boolean) => {
         // Ground contact
         this._groundContactCount += started ? 1 : -1;
   
         if (!this._groundContactCount) {
-          entity.startModelOneshotAnimations([ 'jump_loop' ]);
+			entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !['jump_loop', 'idle_upper'].includes(v)));
+			entity.startModelLoopedAnimations([ 'jump_loop', 'idle_upper' ]);
         } else {
           entity.stopModelAnimations([ 'jump_loop' ]);
         }
@@ -191,7 +196,7 @@ export default class MyEntityController extends BaseEntityController {
     entity.createAndAddChildCollider({
       shape: ColliderShape.CAPSULE,
       halfHeight: 0.30,
-      radius: 0.37,
+      radius: 0.47,
       collisionGroups: {
         belongsTo: [ CollisionGroup.ENTITY_SENSOR ],
         collidesWith: [ CollisionGroup.BLOCK ],
@@ -222,7 +227,7 @@ export default class MyEntityController extends BaseEntityController {
     const { yaw } = cameraOrientation;
     const currentVelocity = entity.linearVelocity;
     const targetVelocities = { x: 0, y: 0, z: 0 };
-
+	const isMoving = w || a || s || d;
     
     // Temporary, animations
     if (this.isGrounded && (w || a || s || d)) {
@@ -239,7 +244,7 @@ export default class MyEntityController extends BaseEntityController {
         }
 
         this._stepAudio?.play(entity.world, !this._stepAudio?.isPlaying);
-    } else {
+    } else if (this.isGrounded) {
         this._stepAudio?.pause();
         const idleAnimations = [ 'idle_upper', 'idle_lower' ];
         entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !idleAnimations.includes(v)));
@@ -280,15 +285,37 @@ export default class MyEntityController extends BaseEntityController {
       }
     }
 
-    targetVelocities.y = this.handleJump(entity, input, this, Vector3.fromVector3Like(targetVelocities)).y;
-    
+    // Create Vector3 instances for lerping
+    const currentVel = new Vector3(currentVelocity.x, currentVelocity.y, currentVelocity.z);
+    const targetVel = new Vector3(targetVelocities.x, currentVelocity.y, targetVelocities.z); // Keep y-axis unchanged
 
-    // Apply impulse relative to target velocities, taking platform velocity into account
+	if (!isMoving) {
+		
+		if (targetVel.squaredMagnitude > 0.0001) {
+			this._interpolationAccumulator = 0.2;
+		}
+		else {
+			this._interpolationAccumulator = 0;
+		}
+		
+	}
+	  
+    // Accumulate interpolation factor over multiple frames
+    this._interpolationAccumulator += deltaTimeMs / 1000;
+    const interpolationFactor = Math.min(this._interpolationAccumulator / this.accelerationTime, 1);
+
+    // Lerp only x/z directions using Vector3.lerp
+    const lerpedVelocities = currentVel.lerp(targetVel, interpolationFactor);
+
+    // Apply jump handling with lerped velocities
+    lerpedVelocities.y = this.handleJump(entity, input, this, Vector3.fromVector3Like(targetVelocities)).y;
+
+    // Apply impulse relative to lerped velocities, taking platform velocity into account
     const platformVelocity = this._platform ? this._platform.linearVelocity : { x: 0, y: 0, z: 0 };
     const deltaVelocities = {
-      x: targetVelocities.x - currentVelocity.x + platformVelocity.x,
-      y: targetVelocities.y + platformVelocity.y,
-      z: targetVelocities.z - currentVelocity.z + platformVelocity.z,
+      x: lerpedVelocities.x - currentVelocity.x + platformVelocity.x,
+      y: lerpedVelocities.y + platformVelocity.y,
+      z: lerpedVelocities.z - currentVelocity.z + platformVelocity.z,
     };
 
     const hasExternalVelocity = 

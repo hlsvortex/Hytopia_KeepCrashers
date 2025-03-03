@@ -17,7 +17,7 @@ export class CapturePoint {
         public radius: number = 5,
         public captureSpeed: number = 0.8, // % per second per player
         public decaySpeed: number = 0.5, // % per second when contested
-        public MAX_CAPTURE_RATE: number = 5.0 // Maximum 15% per second
+        public MAX_CAPTURE_RATE: number = 15.0 // Maximum 15% per second
     ) {
         
 

@@ -6,10 +6,71 @@
     <link rel="stylesheet" href="{{CDN_ASSETS_URL}}/ui/styles.css">
     <link rel="stylesheet" href="{{CDN_ASSETS_URL}}/ui/styles/ClassSelectMenu.css">
     <link rel="stylesheet" href="{{CDN_ASSETS_URL}}/ui/styles/PlayerStatusPanel.css">
+    <link rel="stylesheet" href="{{CDN_ASSETS_URL}}/ui/styles/Nameplate.css">
     <title>Minimal Test</title>
 </head>
 <body>
     <script type="module" src="{{CDN_ASSETS_URL}}/ui/scripts/MenuSystem.js"></script>
+	<!-- Add nameplate template -->
+	<template id="player-nameplate">
+		<div class="nameplate">
+			<div class="name">{{name}}</div>
+			<div class="health-bar">
+				<div class="health-fill"></div>
+			</div>
+		</div>
+	</template>
 
 </body>
+<script>
+		hytopia.onData((data) => {
+			if (data.type === 'player-id') {
+				localStorage.setItem('playerId', data.playerId)
+				const playerName = localStorage.getItem('playerName')
+			}
+		})
+
+
+	 // Register nameplate template
+		hytopia.registerSceneUITemplate('player-nameplate', (id, onState) => {
+			const template = document.getElementById('player-nameplate');
+			const clone = template.content.cloneNode(true);
+			const nameplate = clone.querySelector('.nameplate');
+			const nameElement = clone.querySelector('.name');
+			const healthBar = clone.querySelector('.health-fill');
+
+			onState(state => {
+				const playerId = localStorage.getItem('playerId');
+				nameElement.textContent = state.name;
+				nameElement.style.color = state.teamColor;
+				
+				// Calculate health percentage based on current and max health
+				const healthPercentage = (state.health / state.maxHealth) * 100;
+				healthBar.style.width = `${Math.max(0, Math.min(100, healthPercentage))}%`;
+				
+				// Update health bar state
+				healthBar.classList.remove('low', 'critical');
+				if (healthPercentage <= 25) {
+					healthBar.classList.add('critical');
+				} else if (healthPercentage <= 50) {
+					healthBar.classList.add('low');
+				}
+
+				if (playerId === state.playerId) {
+					nameplate.style.display = 'none';
+				} else {
+					nameplate.style.display = 'block';
+				}
+			});
+
+			return clone;
+		});
+
+    // Ensure the UI is properly initialized
+    hytopia.initializeUI({
+        templateId: 'player-nameplate',
+        position: { x: 0, y: 0, z: 0 } // Default position
+    });
+
+</script>
 </html> 

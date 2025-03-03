@@ -81,7 +81,7 @@ export class HealthPickup {
             this.entity.spawn(world, this.spawnPosition);
             this.entity.setPosition(this.spawnPosition);
             // Add floating animation
-            this.startFloatingAnimation();
+            //this.startFloatingAnimation();
         }
     }
 

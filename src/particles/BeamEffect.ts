@@ -58,7 +58,7 @@ export class BeamEffect {
                     //console.log("collision", otherEntity.name);
 
                     if(otherEntity instanceof DamageableEntity) {
-                      //  console.log("entity", otherEntity.name);
+                        //console.log("entity", otherEntity.name);
                         //otherEntity.takeDamage(this.beamAbility.options.damagePerTick);
                     }
                    
@@ -86,8 +86,8 @@ export class BeamEffect {
         const normalizedDir = Vector3.fromVector3Like(direction).normalize();
         const segmentDistance = 0.4;    
 
-        console.log("newEnd:", newEnd.toString());
-        console.log("newStart:", newStart.toString());
+        //console.log("newEnd:", newEnd.toString());
+        //console.log("newStart:", newStart.toString());
         //console.log("Normalized direction:", normalizedDir.toString());
 
 

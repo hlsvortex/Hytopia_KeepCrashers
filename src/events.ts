@@ -18,20 +18,5 @@ export interface PlayerRespawnEventPayload {
     respawnTime: number;
 } 
 
-export const HitEvents = {
-    HitEntity: 'HIT.ENTITY'
-};
-export interface HitEntityEventPayload {
-    entity: Entity | BlockType;
-    hitPosition: Vector3Like;
-    hitFX: HitFX;
-}
 
 
-
-enum HitFX {
-    Blood = 'blood',
-    Smoke = 'smoke',
-    Fire = 'fire',
-    Explosion = 'explosion'
-}

@@ -1,4 +1,4 @@
-import { Player, EventRouter, Vector3, PlayerUI, PlayerCameraMode, Audio } from 'hytopia';
+import { Player, EventRouter, Vector3, PlayerUI, PlayerCameraMode, Audio, SceneUI } from 'hytopia';
 import { Team } from './Team';
 import { PlayerEvents, type PlayerDeathEventPayload } from './events';
 import { PlayerEntity } from 'hytopia';
@@ -191,7 +191,7 @@ export class GameManager {
             modelUri: playerModel,
         
             modelLoopedAnimations: ['idle'],
-            modelScale: 0.5,
+            modelScale: 0.56,
             controller: entityController, // Use the entity controller
         }, 100, 100, 100);
 
@@ -201,6 +201,11 @@ export class GameManager {
         
         // Set initial class
         entityController.setClass('wizard');
+		// Initialize player UI data
+		player.ui.sendData({
+			type: 'player-id',
+			playerId: player.id,
+		});
 
     
         this.InitCamera(playerEntity);
@@ -252,7 +257,7 @@ export class GameManager {
         const teamColor = team?.color || '#ffffff';
 
         // Disable nameplate UI for now
-        /*
+        
         const nameplateUI = new SceneUI({
             templateId: 'player-nameplate',
             attachedToEntity: entity,
@@ -260,20 +265,21 @@ export class GameManager {
             state: {
                 name: entity.player.username.substring(0, 15),
                 health: 100,
-                teamColor: teamColor
+                teamColor: teamColor,
+                playerId: entity.player.id
             }
         });
 
         nameplateUI.load(world);
         (entity as DamageableEntity).nameplateUI = nameplateUI;
-        */
+        
     }
 
     
     public InitCamera(entity: PlayerEntity) {
 
         entity.player.camera.setMode(PlayerCameraMode.FIRST_PERSON);
-        entity.player.camera.setFilmOffset(8);
+        entity.player.camera.setFilmOffset(10);
 
         entity.player.camera.setForwardOffset(-2.5)
         entity.player.camera.setOffset({ x: 0, y: 0.8, z: 0 });

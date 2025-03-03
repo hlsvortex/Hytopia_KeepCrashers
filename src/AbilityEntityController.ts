@@ -151,7 +151,7 @@ export default class AbilityEntityController extends MyEntityController {
         const amount = regenerationRate * (deltaTimeMs / 1000);
         
         if (entity.linearVelocity.y < 0.05 && entity.linearVelocity.y > -0.05) {
-            entity.regenerateStamina(amount);
+            entity.regenerateStamina(amount+0.02);
         }
 
         entity.regenerateMana(amount);

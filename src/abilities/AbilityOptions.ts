@@ -83,6 +83,7 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     gravityScale?: number;
     noHitOnEntityCollision?: boolean;
     noHitOnBlockCollision?: boolean;
+	faceVelocity?: boolean;
     hitFX?: EmitterOptions;
     collisionGroups?: {
         belongsTo: number[];

@@ -67,7 +67,8 @@ export class DamageableEntity extends PlayerEntity {
             this.nameplateUI.setState({
                 health: this.health,
                 maxHealth: this.maxHealth,
-                hidden: this.hideNameplate
+                hidden: this.hideNameplate,
+                playerId: this.player?.id
             });
         }
     }
@@ -136,15 +137,15 @@ export class DamageableEntity extends PlayerEntity {
 
         console.log('Flashing red for ' + this.player.username);
         // Set tint to red
-        //this.setTintColor({ r: 200, g: 0, b: 0 });
+        this.setTintColor({ r: 220, g: 0, b: 0 });
         this.light?.setColor({ r: 250, g: 0, b: 0 });
         //this.respawn();
 
         // Reset after delay
         setTimeout(() => {
             console.log('Resetting tint to white');
-            //    this.setTintColor({ r: 255, g: 255, b: 255 }); // Reset to white
-            this.light?.setColor({ r: 255, g: 255, b: 255 });
+                this.setTintColor({ r: 255, g: 255, b: 255 }); // Reset to white
+            //this.light?.setColor({ r: 255, g: 255, b: 255 });
         }, 200);
     }
 

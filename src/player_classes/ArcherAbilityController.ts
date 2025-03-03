@@ -19,7 +19,7 @@ export class ArcherAbilityController extends AbilityController {
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
         this.maxHealth = 180;   // Medium health
-        this.runSpeed = 8.5;   // Good mobility
+        this.runSpeed = 7;   // Good mobility
         this.jumpVelocity = 12;  // Medium jump height
         this.useCustomJump = true;
     }
@@ -34,28 +34,28 @@ export class ArcherAbilityController extends AbilityController {
             resourceType: Resource.Mana,
             maxRange: 100,
             speed: 30,
-
+			faceVelocity: true,
             damage: 25,
             modelUri: 'models/projectiles/arrow.gltf',
             modelScale: 0.6,
-            projectileRadius: 0.2,
+            projectileRadius: 0.3,
             knockback: 0.5,
             gravityScale: 0.5,
             hitFX: ParticleFX.CLOUD_PUFF,
             useSFX: {
                 uri: 'audio/sfx/player/Fantasy_Game_Attack_Bow_A.wav',
-                referenceDistance: 15,
+                referenceDistance: 8,
                 volume: 0.8
             },
             hitSFX: {
                 uri: 'audio/sfx/player/bow-hit.mp3',
                 volume: 0.5,
-                referenceDistance: 15
+                referenceDistance: 8
             },
             chargeStartSFX: {
                 uri: 'audio/sfx/player/Bow string drawing fast 1.wav',
                 volume: 0.8,
-                referenceDistance: 8
+                referenceDistance: 5
             },
 
             charging: {
@@ -66,10 +66,10 @@ export class ArcherAbilityController extends AbilityController {
                 chargeEffects: {
                     speed: {
                         min: 18,
-                        max: 30
+                        max: 60
                     },
                     damage: {
-                        min: 20,
+                        min: 25,
                         max: 60
                     },
                     gravity: {
@@ -92,20 +92,20 @@ export class ArcherAbilityController extends AbilityController {
             resourceCost: 35,
             resourceType: Resource.Mana,
             maxRange: -1,
-            speed: 15,
-
+            speed: 18,
+			faceVelocity: false,
             damage: 15,
             modelUri: 'models/items/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
             knockback: 0.8,
             gravityScale: 0.6,
-            hitFX: ParticleFX.EXPLOSION,
+			hitFX: ParticleFX.EXPLOSION_SMALL,
             noHitOnBlockCollision: true,
             lifeTime: 1.5,
             useImpulse: {
                 direction: 'backward',
-                force: 5,
+                force: 3,
                 useAimDirection: true
             },
             useSFX: {
@@ -118,9 +118,9 @@ export class ArcherAbilityController extends AbilityController {
                 referenceDistance: 20
             },
             aoe: {
-                radius: 3.5,
+                radius: 2.0,
                 damage: 20,
-                knockback: 15.5,
+                knockback: 10.5,
                 falloff: true,
             },
         };
@@ -182,10 +182,10 @@ export class ArcherAbilityController extends AbilityController {
         }
 
         // Tripple Jump code
-        if (input.sp && !myController.isJumping && this.jumpCount < 3) {
+        if (input.sp && !myController.isJumping && this.jumpCount < 2) {
 
 
-            const staminaCost = 5 * this.jumpCount; // stamina per jump
+            const staminaCost = 20 * this.jumpCount+1; // stamina per jump
             if (damageableEntity.stamina < staminaCost) { return; }
             // Apply flying velocity
             if(this.jumpCount == 0) {
@@ -193,7 +193,8 @@ export class ArcherAbilityController extends AbilityController {
             }
             else {
                 entity.setLinearVelocity(new Vector3(entity.linearVelocity.x, 1, entity.linearVelocity.z));
-                entity.applyImpulse(new Vector3(0, 13, 0));
+
+				entity.applyImpulse(new Vector3(entity.linearVelocity.x, 27, entity.linearVelocity.z));
             }
 
             damageableEntity.useStamina(staminaCost);

@@ -1,0 +1,48 @@
+.nameplate {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+    padding: 1px 1px;
+	backdrop-filter: blur(2px);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.0);
+    font-family: 'Arial', sans-serif;
+}
+
+.nameplate .name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 4px;
+    white-space: nowrap;
+	text-align: center;
+}
+
+.nameplate .health-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.6);
+	border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.nameplate .health-fill {
+    height: 100%;
+    background: linear-gradient(to right, #af4c4c, #c34a4a);
+    border-radius: 3px;
+    transition: width 0.2s ease;
+}
+
+/* Health states */
+.nameplate .health-fill.low {
+    background: linear-gradient(to right, #FF5722, #FF9800);
+}
+
+.nameplate .health-fill.critical {
+    background: linear-gradient(to right, #F44336, #FF5252);
+}
+
+/* Team color indicator */

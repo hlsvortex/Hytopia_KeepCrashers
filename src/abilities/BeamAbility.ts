@@ -24,7 +24,7 @@ export class BeamAbility extends Ability {
     public isActive = false;
     private lastTickTime = 0;
     private lastHitPoint: Vector3 | undefined;
-    private readonly SPREAD_ANGLE = 0.9;  // Maximum spread angle in radians (about 5.7 degrees)
+    private readonly SPREAD_ANGLE = 1;  // Maximum spread angle in radians (about 5.7 degrees)
 
     constructor(
         public options: BeamAbilityOptions,
@@ -33,14 +33,19 @@ export class BeamAbility extends Ability {
     ) {
         super(options, eventRouter, abilityController);
         this.beamEffect = new BeamEffect(world, this);
+
+
     }
 
     use(origin: Vector3Like, direction: Vector3Like, source: Entity) {
        // if (!source.world) return;
 
+	    //source.setCcdEnabled(true);
+	   
+
         const range = this.options.range;
 
-        console.log("use BeamAbility " + range);
+        //console.log("use BeamAbility " + range);
         // Add random spread to direction
         const spreadDirection = Vector3.fromVector3Like(direction);
         
@@ -52,13 +57,14 @@ export class BeamAbility extends Ability {
         spreadDirection.normalize();
 
         // Use spreadDirection instead of original direction for the raycast
-        const raycastResult = world?.simulation.raycast(
+        const raycastResult = world.simulation.raycast(
             origin,
             spreadDirection,
             this.options.range,
             { filterExcludeRigidBody: source.rawRigidBody }
         );
 
+		
         let hitPoint = raycastResult?.hitPoint;
         if (!hitPoint) {
             const hitOffset = scaleDirection(spreadDirection, range);
@@ -69,8 +75,15 @@ export class BeamAbility extends Ability {
             console.log("hitPoint:", hitPoint);
         }
 
+		if (raycastResult?.hitBlock) { // see if the result hit a block
+			const breakPosition = raycastResult.hitBlock.globalCoordinate;
+			console.log("breakPosition:", breakPosition);
+			
+		}
+
+
         const hitOffset = scaleDirection(spreadDirection, range);
-        hitPoint = Vector3.fromVector3Like(origin).add(hitOffset);
+        //hitPoint = Vector3.fromVector3Like(origin).add(hitOffset);
 
         if(hitPoint) {
             this.lastHitPoint = Vector3.fromVector3Like(hitPoint);
@@ -79,6 +92,11 @@ export class BeamAbility extends Ability {
         
 
         this.beamEffect.update(Vector3.fromVector3Like(origin), Vector3.fromVector3Like(hitPoint), Vector3.fromVector3Like(spreadDirection));
+		
+		
+		if (raycastResult?.hitEntity instanceof DamageableEntity) {
+			raycastResult.hitEntity.takeDamage(this.options.damagePerTick, source as DamageableEntity);
+		}
 
         // Check if enough time has passed since last tick
         const currentTime = Date.now();

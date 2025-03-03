@@ -15,7 +15,7 @@ export class FighterAbilityController extends AbilityController {
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
         this.maxHealth = 200;  // Tankier
-        this.runSpeed = 7;     // Slower but stronger
+        this.runSpeed = 6;     // Slower but stronger
         this.jumpVelocity = 14;  // Standard jump
     }
 
@@ -28,12 +28,12 @@ export class FighterAbilityController extends AbilityController {
             resourceCost: 0,
             resourceType: Resource.Mana,
             maxRange: -1,
-            speed: 20,
-
+            speed: 25,
+			faceVelocity: false,
             damage: 15,
             modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
-            projectileRadius: 0.3,
+            projectileRadius: 0.4,
             knockback: 0.6,
             gravityScale: 0.0,
             hitFX: ParticleFX.CLOUD_PUFF,
@@ -43,24 +43,24 @@ export class FighterAbilityController extends AbilityController {
             //noHitOnEntityCollision: true,
             isSensor: true,
             velocityReverse: {
-                time: 0.65,        // Reverse after 0.5 seconds
-                duration: 0.2,    // Take 0.2 seconds to reverse
-                speedMultiplier: 1.2  // Return slightly faster
+                time: 0.6,        // Reverse after 0.5 seconds
+                duration: 0.18,    // Take 0.2 seconds to reverse
+                speedMultiplier: 1.1  // Return slightly faster
             },
             multiHit: {
                 maxHits: 5,           // Can hit up to 3 targets
-                hitCooldown: 0.2      // 0.2s cooldown between hits on same target
+                hitCooldown: 0.15      // 0.2s cooldown between hits on same target
             },
             useSFX: {
                 uri: 'audio/sfx/player/player-swing-woosh.mp3',
-                volume: 0.8,
-                referenceDistance: 15
+                volume: 0.9,
+                referenceDistance: 8
             },
 
             hitSFX: {
                 uri: 'audio/sfx/player/player-swing-woosh.mp3',
                 volume: 0.5,
-                referenceDistance: 10
+                referenceDistance: 8
             },
         };
 
@@ -96,7 +96,7 @@ export class FighterAbilityController extends AbilityController {
                     },
                     damage: {
                         min: 20,
-                        max: 60
+                        max: 50
                     },
                     size: {
                         min: 0.6,
@@ -111,7 +111,7 @@ export class FighterAbilityController extends AbilityController {
 
             useSFX: {
                 uri: 'audio/sfx/damage/Sword Woosh 19.wav',
-                referenceDistance: 15,
+                referenceDistance: 10,
                 volume: 0.9
             },
             /*
@@ -177,9 +177,9 @@ export class FighterAbilityController extends AbilityController {
 
             damageableEntity.useStamina(6 * deltaTimeMs/1000);
 
-            if (entity.linearVelocity.y > 4.1) { return; }
+            if (entity.linearVelocity.y > 1.1) { return; }
             // Apply flying velocity
-            entity.applyImpulse(new Vector3(0, 0.45, 0));
+            entity.applyImpulse(new Vector3(0, 0.8, 0));
 
 
         }

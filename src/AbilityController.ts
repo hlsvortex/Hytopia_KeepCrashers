@@ -196,7 +196,7 @@ export abstract class AbilityController {
         ).normalize();
 
         // Use world up vector to rotate left
-        const angleInRadians = -0.23 - pitch*pitch*0.15; 
+        const angleInRadians = -0.285 - pitch*pitch*0.15; 
         const rotatedHorizontal = math.rotateForwardVector(horizontalForward, angleInRadians);
         // Apply the same pitch to our rotated direction
 
@@ -209,7 +209,7 @@ export abstract class AbilityController {
         if (!cameraPos) return;
 
         // Apply right offset only to camera/raycast position
-        const rightOffset = camera.filmOffset * 0.038;
+        const rightOffset = camera.filmOffset * 0.038;//38
         const heightOffset = camera.offset.y ;
         let raycastPos = new Vector3(
             cameraPos.x + rightVector.x * rightOffset,

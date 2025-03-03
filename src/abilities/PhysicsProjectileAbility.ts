@@ -24,6 +24,9 @@ export class PhysicsProjectileAbility extends Ability {
     private useDirection: Vector3Like = new Vector3(0, 0, 0);
     private hitABlock = false;
 
+	private sourcePosition: Vector3 = new Vector3(0, 0, 0);
+	private returnDirection: Vector3Like = new Vector3(0, 0, 0);
+
     use(origin: Vector3Like, direction: Vector3Like, source: Entity) {
         if (!source.world) return;
 
@@ -116,13 +119,13 @@ export class PhysicsProjectileAbility extends Ability {
             
             if(this.options.velocityReverse  ) {
 
-                if(age > this.options.velocityReverse.time ) {
-                
-                    this.staticVelocity =  new Vector3(
-                        this.useDirection.x * -1 * this.options.speed,
-                        this.useDirection.y * -1 * this.options.speed,
-                        this.useDirection.z * -1 * this.options.speed
-                    );
+                if (age > this.options.velocityReverse.time) {
+
+					this.staticVelocity = new Vector3(
+						this.useDirection.x * -1 * this.options.speed,
+						this.useDirection.y * -1 * this.options.speed,
+						this.useDirection.z * -1 * this.options.speed
+					);
                 }
 
                 else {
@@ -136,9 +139,12 @@ export class PhysicsProjectileAbility extends Ability {
                     else {
                         this.staticVelocity = new Vector3(0,0,0);
                     }
+
+					this.returnDirection = this.staticVelocity;
+					
                 }
 
-                entity.setLinearVelocity(this.staticVelocity);
+				entity.setLinearVelocity(this.staticVelocity);
             }
 
            const currentVelocity = entity.linearVelocity;
@@ -147,12 +153,10 @@ export class PhysicsProjectileAbility extends Ability {
             // Check if the projectile is moving (non-zero velocity)
             if (currentVelocity.x !== 0 || currentVelocity.y !== 0 || currentVelocity.z !== 0) {
 
-                if(!this.options.velocityReverse) {
+                if(this.options.faceVelocity) {
                     // Set the projectile's rotation
                     projectile.setRotation(faceDirection(currentVelocity));
                 }
-                
-
             }
             
             // Despawn if exceeded lifetime
@@ -170,7 +174,7 @@ export class PhysicsProjectileAbility extends Ability {
             shape: ColliderShape.BALL,
             radius: finalRadius,
             isSensor: this.options.isSensor ?? false,
-            friction: 0.6,
+            friction: 0.1,
             bounciness: 1,
             
 
@@ -240,7 +244,7 @@ export class PhysicsProjectileAbility extends Ability {
        
         projectile.spawn(source.world, origin);
 
-        projectile.setRotation(faceDirection(this.useDirection));
+		projectile.setRotation(faceDirection(this.useDirection));
        
         if (this.options.torque) {
             

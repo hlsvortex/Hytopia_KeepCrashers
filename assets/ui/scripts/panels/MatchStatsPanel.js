@@ -67,6 +67,7 @@ export default class MatchStatsPanel extends BasePanel {
 
                     // Clear existing content
                     teamElement.innerHTML = `
+                        <h3>${teamName}</h3>
                         <div class="stats-header">
                             <span>Player</span>
                             <span>Deaths</span>
@@ -79,9 +80,9 @@ export default class MatchStatsPanel extends BasePanel {
                         const div = document.createElement('div');
                         div.className = 'player-stat';
                         div.innerHTML = `
-                            <span style="flex: 1; text-align: left;">${player.username}</span>
-                            <span style="text-align: right; width: 50px; margin-right: 15px;">${player.deaths || 0}</span>
-                            <span style="text-align: right; width: 50px;">${player.kills || 0}</span>
+                            <span>${player.username}</span>
+                            <span>${player.deaths || 0}</span>
+                            <span>${player.kills || 0}</span>
                         `;
                         teamElement.appendChild(div);
                     });

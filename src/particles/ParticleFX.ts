@@ -3,43 +3,64 @@ import { type EmitterOptions } from "./ParticleEmitter";
 
 export const ParticleFX = {
     BLOODHIT: {
-        count: 8,
+        count: 6,
         speed: 1.5,
         spawnOptions: {
-            radius: 0.2,
+            radius: 0.5,
             shellOnly: false,
             useSpawnDirectionForVelocity: false,
             velocityRandomness: 0.8 // 30% randomness
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 1.3,
+            size: 1.1,
             sizeRandomness: 0.3, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blooddrop.gltf',
-            gravityScale: 0.6
+            gravityScale: 0.4
         }
     } satisfies EmitterOptions,
 
     EXPLOSION: {
-        count: 20,
-        speed: 3,
+        count: 15,
+        speed: 1.5,
         spawnOptions: {
-            radius: 0.05,
+            radius: 1,
             shellOnly: false,
             useSpawnDirectionForVelocity: true,
             velocityRandomness: 0.7 // 30% randomness
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 3.0,
+            size: 6.0,
             sizeRandomness: 0.2, // 30% size variation
-            lifetime: 0.5,
+            lifetime: 0.4,
             lifetimeRandomness: 0.3, // 30% lifetime variation
             modelUri: 'models/particles/ember.gltf',
-            gravityScale: 0.2
+            gravityScale: 0.1
         }
     } satisfies EmitterOptions,
+
+	EXPLOSION_SMALL: {
+		count: 10,
+		speed: 1.5,
+		spawnOptions: {
+			radius: 0.5,
+			shellOnly: true,
+			useSpawnDirectionForVelocity: true,
+			velocityRandomness: 0.7 // 30% randomness
+		},
+		particleOptions: {
+			color: { r: 255, g: 0, b: 0 },
+			size: 5.0,
+			sizeRandomness: 0.2, // 30% size variation
+			lifetime: 0.4,
+			lifetimeRandomness: 0.5, // 30% lifetime variation
+			modelUri: 'models/particles/ember.gltf',
+			gravityScale: 0.1
+		}
+	} satisfies EmitterOptions,
+
 
     FIREHIT: {
         count: 4,
@@ -73,7 +94,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     CLOUD_PUFF: {
-        count: 15,
+        count: 10,
         speed: 0.5,
         spawnOptions: {
             radius: 0.05,
