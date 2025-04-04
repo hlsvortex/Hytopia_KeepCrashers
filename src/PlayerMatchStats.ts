@@ -8,4 +8,10 @@ export class PlayerMatchStats {
     public addKill() { this.kills++ }
     public addDeath() { this.deaths++ }
     public addSuicide() { this.suicides++ }
+    
+    public resetStats() {
+        this.kills = 0;
+        this.deaths = 0;
+        this.suicides = 0;
+    }
 } 

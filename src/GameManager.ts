@@ -12,6 +12,7 @@ import { GameStateController, GameStateEvent } from './GameStateController';
 import { GameModeController } from './GameModeController';
 import { KingOfTheHill } from './GameModeController';
 import { GameSFX } from './sfx';
+import { MenuType } from '../assets/ui/scripts/MenuType';
 
 export class GameManager {
     private readonly teams: Team[] = [
@@ -385,13 +386,34 @@ export class GameManager {
     public resetMatch() {
         // Reset player positions and stats
         this.players.forEach(player => {
+            // Reset health and position
             player.respawn();
             const spawnPos = this.getTeamSpawnPosition(this.getPlayerTeam(player.player)?.name || 'Red');
             player.setPosition(spawnPos);
+            
+            // Reset kills and deaths to 0
+            player.matchStats.resetStats();
+            
+            // Close scoreboard screen if open
+            player.player.ui.sendData({
+                type: 'gameOverSequence',
+                state: GameState.WaitingForPlayersReady,
+                hideScoreboard: true
+            });
         });
         
         // Clear any game mode specific state
         this.gameModeController.reset();
+        
+		
+        // Send broadcast message that stats are reset
+        world.chatManager.sendBroadcastMessage(
+            "Game has been reset! All player stats have been cleared.",
+            "00FFFF"
+        );
+        
+        // Update the UI with reset stats
+        this.updateStatsUI();
     }
 
     public getTeam(teamName: string): Team | undefined {

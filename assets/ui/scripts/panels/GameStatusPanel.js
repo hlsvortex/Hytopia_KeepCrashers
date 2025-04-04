@@ -65,11 +65,11 @@ export default class GameStatusPanel extends BasePanel {
             readyButton.style.display =
               data.state === 'WaitingForPlayersReady' && !data.isReady ? 'block' : 'none';
 
-
+			window.menuSystem.closeMenu(MenuType.MATCH_STATS);
             // Handle victory and stats screens
             switch (data.state) {
               
-              case 'MatchPlay':
+			  case 'MatchPlay':
               case 'MatchEnd':
                 //window.menuSystem.openMenu(MenuType.RoundWinner);
                 //victoryScreen.style.display = 'flex';

@@ -89,7 +89,10 @@ export class GameStateController {
             case GameState.MatchStats:
                 // Show stats for 10 seconds then reset
                 setTimeout(() => {
+                    // This will hide the scoreboard and reset stats
                     this.resetMatch();
+                    
+                    // Transition to waiting state after reset is complete
                     this.setState(GameState.WaitingForEnoughPlayers);
                 }, 10000);
                 break;
@@ -109,8 +112,10 @@ export class GameStateController {
         } else {
             this.readyPlayers.delete(playerId);
         }
-
-		world.emit(GameStateEvent.PLAYER_READY_UPDATE, { playerId, isReady });
+		
+		//world.emit(GameStateEvent.PLAYER_READY_UPDATE, { playerId, isReady });
+		
+		//world(GameStateEvent.PLAYER_READY_UPDATE, { playerId, isReady });
     }
 
     public getStateUpdate(playerId?: string): GameStateUpdate {
@@ -145,8 +150,10 @@ export class GameStateController {
         this.matchStartTimer = 5;
         this.readyPlayers.clear();
         gameManager.resetMatch();
+        //this.currentState = GameState.WaitingForEnoughPlayers;
         this.setState(GameState.WaitingForEnoughPlayers);
-        console.log("Resetting match");
+		console.log("Resetting match");
+
     }
 
     public isPlayerReady(playerId: string): boolean {

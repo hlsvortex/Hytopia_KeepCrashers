@@ -85,7 +85,7 @@ export class KingOfTheHill extends GameModeController {
                     this.gameManager.handleGameWin(controllingTeam);
                 } else if (!this._isInOvertime) {
                     this._isInOvertime = true;
-                    this.eventRouter.emit('OVERTIME_STARTED', controllingTeam);
+                    //this.eventRouter.emit('OVERTIME_STARTED', controllingTeam);
                 }
             }
         }

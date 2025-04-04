@@ -23,7 +23,7 @@ export const ParticleFX = {
 
     EXPLOSION: {
         count: 15,
-        speed: 1.5,
+        speed: 1.2,
         spawnOptions: {
             radius: 1,
             shellOnly: false,
