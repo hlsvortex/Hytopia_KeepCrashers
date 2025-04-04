@@ -3,6 +3,7 @@ import type { PlayerDeathEventPayload } from './events';
 import { PlayerEvents } from './events';
 import { PlayerMatchStats } from './PlayerMatchStats';
 import { gameManager } from './GlobalContext';
+import { world } from './GlobalContext';
 
 export class DamageableEntity extends PlayerEntity {
 
@@ -109,6 +110,27 @@ export class DamageableEntity extends PlayerEntity {
                     victim: this,
                     killer: source !== this ? source : undefined
                 });
+                
+                // Send kill message to chat
+                if (source && source !== this) {
+                    const sourceTeam = gameManager.getPlayerTeam(source.player);
+                    const victimTeam = gameManager.getPlayerTeam(this.player);
+                    const killerColor = sourceTeam?.color?.replace('#', '') || 'FFFFFF';
+                    const victimColor = victimTeam?.color?.replace('#', '') || 'FFFFFF';
+                    
+                    // Format: [Team] Killer eliminated [Team] Victim!
+                    this.world.chatManager.sendBroadcastMessage(
+                        `[${sourceTeam?.name}] ${source.player.username} eliminated [${victimTeam?.name}] ${this.player.username}!`,
+                        killerColor
+                    );
+                } else {
+                    // Self-elimination or environment kill
+                    const victimTeam = gameManager.getPlayerTeam(this.player);
+                    this.world.chatManager.sendBroadcastMessage(
+                        `[${victimTeam?.name}] ${this.player.username} eliminated themselves!`,
+                        'FF0000'
+                    );
+                }
             }
 
             console.log('Player death event received' + this.player);

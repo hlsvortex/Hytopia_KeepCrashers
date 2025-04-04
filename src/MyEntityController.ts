@@ -301,8 +301,16 @@ export default class MyEntityController extends BaseEntityController {
 	}
 	  
     // Accumulate interpolation factor over multiple frames
-    this._interpolationAccumulator += deltaTimeMs / 1000;
-    const interpolationFactor = Math.min(this._interpolationAccumulator / this.accelerationTime, 1);
+   
+
+	if(w || a || s || d) {
+		this._interpolationAccumulator += deltaTimeMs / 1000;
+	}
+	else {
+		this._interpolationAccumulator += 8*deltaTimeMs / 1000;
+	}
+
+	const interpolationFactor = Math.min(this._interpolationAccumulator / this.accelerationTime, 1);
 
     // Lerp only x/z directions using Vector3.lerp
     const lerpedVelocities = currentVel.lerp(targetVel, interpolationFactor);

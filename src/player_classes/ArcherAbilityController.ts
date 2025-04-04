@@ -15,16 +15,17 @@ import type AbilityEntityController from '../AbilityEntityController';
 export class ArcherAbilityController extends AbilityController {
     private bowEntity?: Entity;
     private jumpCount: number = 0;
-    protected jumpVelocity: number = 12;
 
     constructor(eventRouter: EventRouter) {
         super(eventRouter);
         this.maxHealth = 180;   // Medium health
         this.runSpeed = 7;   // Good mobility
+        this.jumpVelocity = 12;  // Medium jump height
         this.useCustomJump = true;
     }
 
     protected setupAbilities() {
+
         const shootArrowOptions: PhysicsProjectileOptions = {
             name: 'Arrow',
             slot: 'primary',
@@ -37,14 +38,8 @@ export class ArcherAbilityController extends AbilityController {
             damage: 25,
             modelUri: 'models/projectiles/arrow.gltf',
             modelScale: 0.6,
-            projectileRadius: 0.25,
-            // Custom box collider shape for arrows - much longer in the z direction (forward)
-            boxColliderExtents: {
-                x: 0.1,   // thin width
-                y: 0.1,   // thin height
-                z: 0.5    // long in forward direction
-            },
-            knockback: 2.0,
+            projectileRadius: 0.3,
+            knockback: 0.5,
             gravityScale: 0.5,
             hitFX: ParticleFX.CLOUD_PUFF,
             useSFX: {
@@ -71,7 +66,7 @@ export class ArcherAbilityController extends AbilityController {
                 chargeEffects: {
                     speed: {
                         min: 18,
-                        max: 70
+                        max: 75
                     },
                     damage: {
                         min: 25,
@@ -103,12 +98,6 @@ export class ArcherAbilityController extends AbilityController {
             modelUri: 'models/items/bomb.gltf',
             modelScale: 0.6,
             projectileRadius: 0.3,
-            // Custom box collider shape - wider than tall
-            boxColliderExtents: {
-                x: 0.4,  // wider on the sides
-                y: 0.4, // shorter height
-                z: 0.4   // wider front/back
-            },
             knockback: 0.8,
             gravityScale: 0.6,
 			hitFX: ParticleFX.EXPLOSION_SMALL,
@@ -131,7 +120,7 @@ export class ArcherAbilityController extends AbilityController {
             aoe: {
                 radius: 2.0,
                 damage: 20,
-                knockback: 30.0,
+                knockback: 10.5,
                 falloff: true,
             },
         };

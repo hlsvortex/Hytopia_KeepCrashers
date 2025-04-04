@@ -33,19 +33,15 @@ export class FighterAbilityController extends AbilityController {
             damage: 15,
             modelUri: 'models/items/battle-axe.gltf',
             modelScale: 0.6,
-            projectileRadius: 0.4,
+            projectileRadius: 0.3,
             knockback: 0.6,
             gravityScale: 0.0,
             hitFX: ParticleFX.CLOUD_PUFF,
             lifeTime: 1.2,
-            torque: 1,
+            torque: 2,
             //noHitOnBlockCollision: true,
             //noHitOnEntityCollision: true,
-			boxColliderExtents: {
-				x: 0.1,   // thin width
-				y: 0.4,   // thin height
-				z: 0.1    // long in forward direction
-			},
+		
             isSensor: true,
             velocityReverse: {
                 time: 0.6,        // Reverse after 0.5 seconds
@@ -97,7 +93,7 @@ export class FighterAbilityController extends AbilityController {
                 chargeEffects: {
                     speed: {
                         min: 20,
-                        max: 35
+                        max: 30
                     },
                     damage: {
                         min: 20,
@@ -109,7 +105,7 @@ export class FighterAbilityController extends AbilityController {
                     },
                     impulseForce: {
                         min: -5,
-                        max: -10
+                        max: -11
                     }
                 }
             },

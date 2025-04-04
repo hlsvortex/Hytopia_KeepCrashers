@@ -50,8 +50,9 @@ export class WizardAbilityController extends AbilityController {
             hitFX: ParticleFX.EXPLOSION,
             aoe: {
                 radius: 2.3,
+
                 damage: 20,
-                knockback: 35.0,
+                knockback: 15.5,
                 falloff: true,
             },
             useSFX: {

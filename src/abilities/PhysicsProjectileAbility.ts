@@ -3,7 +3,7 @@ import { Ability } from '../Ability';
 import { type PhysicsProjectileOptions } from './AbilityOptions';
 import { DamageableEntity } from '../DamageableEntity';
 import { faceDirection, getRotationFromDirection } from '../utils/math';
-import { world, particlePool } from '../GlobalContext';
+import { world } from '../GlobalContext';
 import { ParticleEmitter } from '../particles/ParticleEmitter';
 import { ParticleFX } from '../particles/ParticleFX';
 import { Collider } from 'hytopia';
@@ -92,7 +92,7 @@ export class PhysicsProjectileAbility extends Ability {
                 type: RigidBodyType.DYNAMIC,
                 linearVelocity: velocityVector,
                 gravityScale: gravityScale,
-                ccdEnabled: true,
+                
             },
 
         });
@@ -170,29 +170,13 @@ export class PhysicsProjectileAbility extends Ability {
         const scaleFactor = size > 0 ? (1 + size/this.options.modelScale) : 1;
         const finalRadius = baseRadius * scaleFactor;
 
-        // Determine collider extents - use custom values if provided, otherwise use the radius
-        const halfExtents = {
-            x: this.options.boxColliderExtents?.x !== undefined 
-                ? this.options.boxColliderExtents.x * scaleFactor 
-                : finalRadius,
-            y: this.options.boxColliderExtents?.y !== undefined 
-                ? this.options.boxColliderExtents.y * scaleFactor 
-                : finalRadius,
-            z: this.options.boxColliderExtents?.z !== undefined 
-                ? this.options.boxColliderExtents.z * scaleFactor 
-                : finalRadius
-        };
-
-        // Log collider dimensions for debugging
-        console.log(`Creating projectile collider with extents: x=${halfExtents.x}, y=${halfExtents.y}, z=${halfExtents.z}`);
-
         projectile.createAndAddChildCollider({
             shape: ColliderShape.BLOCK,
-            halfExtents: halfExtents,
+            halfExtents: { x: finalRadius, y: finalRadius, z: finalRadius },
             isSensor: this.options.isSensor ?? false,
             friction: 0.1,
             bounciness: 1,
-			
+            
 
             collisionGroups: {
                 belongsTo: [CollisionGroup.ENTITY],
@@ -236,14 +220,9 @@ export class PhysicsProjectileAbility extends Ability {
                 else if (otherEntity instanceof DamageableEntity && !otherEntity.isDead()) {
 
                     otherEntity.takeDamage(damage, source as DamageableEntity);
-                    
-					console.log(`Knockback: ${this.options.knockback}`);
-					console.log(`Velocity Vector: ${velocityVector}`);
-
-					otherEntity.applyImpulse(velocityVector.scale(this.options.knockback));
-
+                    otherEntity.applyImpulse(velocityVector.scale(this.options.knockback));
                     if (otherEntity instanceof DamageableEntity) {
-                        particlePool.getParticleEmitter(ParticleFX.BLOODHIT, otherEntity.position as Vector3);
+                        this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), otherEntity.position as Vector3);
                     }   
 
 
@@ -302,7 +281,7 @@ export class PhysicsProjectileAbility extends Ability {
 
 
         if (this.options.useFX) {
-            particlePool.getParticleEmitter(this.options.useFX, origin);
+            this.spawnEffect(new ParticleEmitter(this.options.useFX), origin);
         }
 
         this.playUseSound(source);
@@ -322,7 +301,7 @@ export class PhysicsProjectileAbility extends Ability {
 
         // Visual effects
         if (this.options.hitFX) {
-            particlePool.getParticleEmitter(this.options.hitFX, projectile.position as Vector3);
+            this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
         }
 
         this.playHitSound(projectile.position);
@@ -342,35 +321,35 @@ export class PhysicsProjectileAbility extends Ability {
             radius: this.options.aoe.radius,
             isSensor: true,
             relativePosition: position,
-            onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
+            onCollision: (other: Entity | BlockType, started: boolean) => {
                 if (!started) return;
 
                 // Skip if not a damageable entity or already dead
-                if (!(otherEntity instanceof DamageableEntity) || otherEntity.isDead()) return;
+                if (!(other instanceof DamageableEntity) || other.isDead()) return;
 
                 let damage = this.options.aoe!.damage;
                 let knockback = this.options.aoe!.knockback ?? 0;
 
                 if (this.options.aoe!.falloff) {
                     // Calculate distance-based falloff
-                    const distance = Vector3.fromVector3Like(position).distance(Vector3.fromVector3Like(otherEntity.position));
+                    const distance = Vector3.fromVector3Like(position).distance(Vector3.fromVector3Like(other.position));
                     const falloffFactor = 1 - (distance / this.options.aoe!.radius);
                     damage *= Math.max(0, falloffFactor); // Ensure non-negative
                     knockback *= falloffFactor;
                 }
 
                 // Apply damage and knockback
-                otherEntity.takeDamage(damage, source);
+                other.takeDamage(damage, source);
                 
-                if (otherEntity instanceof DamageableEntity) {
-                    particlePool.getParticleEmitter(ParticleFX.BLOODHIT, otherEntity.position as Vector3);
+                if (other instanceof DamageableEntity) {
+                    this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), other.position as Vector3);
                 }   
 
                 if (knockback > 0) {
-                    const direction = Vector3.fromVector3Like(otherEntity.position)
+                    const direction = Vector3.fromVector3Like(other.position)
                         .subtract(Vector3.fromVector3Like(position))
                         .normalize();
-                    otherEntity.applyImpulse(direction.scale(knockback));
+                    other.applyImpulse(direction.scale(knockback));
                 }
             }
         });
@@ -383,6 +362,15 @@ export class PhysicsProjectileAbility extends Ability {
             aoeCollider.removeFromSimulation();
         }, 100); // 100ms should be enough to detect all collisions
     }
+
+    public spawnEffect(effect: ParticleEmitter, position: Vector3Like) {
+        
+        effect.spawn(world, position);
+        effect.burst();
+
+        //(() => effect.destroy(), effect.particleOptions.lifetime * 1000);
+    }
+
 
     private getChargedValues(chargeLevel: number) {
         let speed = this.options.speed;
