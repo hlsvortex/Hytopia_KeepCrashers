@@ -1,4 +1,4 @@
-import { Entity, EventRouter, PlayerEntity, Vector3, type PlayerInput } from 'hytopia';
+import { Entity, EntityEvent, EventRouter, PlayerEntity, Vector3, type PlayerInput } from 'hytopia';
 import type { Ability } from './Ability';
 import { DamageableEntity } from './DamageableEntity';
 import { world } from './GlobalContext';
@@ -41,9 +41,9 @@ export abstract class AbilityController {
             this.spawnClassItems();
         } else {
             // Listen for spawn event
-            entity.onSpawn = () => {
-                this.spawnClassItems();
-            };
+            entity.on(EntityEvent.SPAWN, () => {
+					this.spawnClassItems();
+			});
         }
     }
 
@@ -196,13 +196,14 @@ export abstract class AbilityController {
         ).normalize();
 
         // Use world up vector to rotate left
-        const angleInRadians = -0.285 - pitch*pitch*0.15; 
+        const angleInRadians = -0.285 - pitch*pitch*0.18; 
         const rotatedHorizontal = math.rotateForwardVector(horizontalForward, angleInRadians);
         // Apply the same pitch to our rotated direction
+		const pitchMod = 0;//pitch *0.1;
 
         const finalDirection = new Vector3(
             rotatedHorizontal.x * Math.cos(pitch),
-            Math.sin(pitch),
+			Math.sin(pitch + pitchMod),
             rotatedHorizontal.z * Math.cos(pitch)
         ).normalize();
 
@@ -226,7 +227,7 @@ export abstract class AbilityController {
         const originForwardOffset = 0.15;
         const origin = new Vector3(
             entity.position.x + finalDirection.x * originForwardOffset,
-            entity.position.y + 0.35 + finalDirection.y * originForwardOffset,
+            entity.position.y + 0.36 + finalDirection.y * originForwardOffset,
             entity.position.z + finalDirection.z * originForwardOffset
         );
        

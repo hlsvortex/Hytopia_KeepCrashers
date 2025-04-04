@@ -41,6 +41,11 @@ export class FighterAbilityController extends AbilityController {
             torque: 1,
             //noHitOnBlockCollision: true,
             //noHitOnEntityCollision: true,
+			boxColliderExtents: {
+				x: 0.1,   // thin width
+				y: 0.4,   // thin height
+				z: 0.1    // long in forward direction
+			},
             isSensor: true,
             velocityReverse: {
                 time: 0.6,        // Reverse after 0.5 seconds
@@ -104,7 +109,7 @@ export class FighterAbilityController extends AbilityController {
                     },
                     impulseForce: {
                         min: -5,
-                        max: -12
+                        max: -10
                     }
                 }
             },

@@ -30,8 +30,8 @@ export class WizardAbilityController extends AbilityController {
             cooldown: 1.0,
             resourceCost: 25,
             resourceType: Resource.Mana,
-            maxRange: 22,
-            speed: 35,
+            maxRange: 25,
+            speed: 45,
             damage: 30,
 
             modelUri: 'models/projectiles/fireball.gltf',
@@ -50,9 +50,8 @@ export class WizardAbilityController extends AbilityController {
             hitFX: ParticleFX.EXPLOSION,
             aoe: {
                 radius: 2.3,
-
                 damage: 20,
-                knockback: 15.5,
+                knockback: 35.0,
                 falloff: true,
             },
             useSFX: {
@@ -107,7 +106,7 @@ export class WizardAbilityController extends AbilityController {
             resourceCost: 1,
             resourceType: Resource.Mana,
             maxRange: 20,
-            speed: 45,
+            speed: 50,
             damage: 4,
 			destroyOnBlockCollision: true,
             modelUri: 'models/projectiles/firedart.gltf',
@@ -230,8 +229,10 @@ export class WizardAbilityController extends AbilityController {
                     const lerpFactor = 0.1; // Adjust this value for smoother or snappier movement
                     const newVelocity = velocity.lerp(limitedVelocity, lerpFactor);
 
-                    entity.setLinearVelocity(newVelocity);
-                    entity.setGravityScale(0.01); // Reduce gravity while flying
+                    //entity.setLinearVelocity(newVelocity);
+					entity.setLinearVelocity(newVelocity);
+					
+					entity.setGravityScale(0.01); // Reduce gravity while flying
                 }
             }
         } else if (myController.isGrounded) {

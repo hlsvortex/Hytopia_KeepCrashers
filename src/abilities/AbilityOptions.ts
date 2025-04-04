@@ -86,6 +86,12 @@ export interface PhysicsProjectileOptions extends AbilityOptions {
     noHitOnBlockCollision?: boolean;
 	faceVelocity?: boolean;
     hitFX?: EmitterOptions;
+    // Custom box collider extents (if not provided, will use projectileRadius for all dimensions)
+    boxColliderExtents?: {
+        x?: number;
+        y?: number; 
+        z?: number;
+    };
     collisionGroups?: {
         belongsTo: number[];
         collidesWith: number[];

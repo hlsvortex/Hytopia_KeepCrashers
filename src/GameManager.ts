@@ -1,14 +1,14 @@
-import { Player, EventRouter, Vector3, PlayerUI, PlayerCameraMode, Audio, SceneUI } from 'hytopia';
+import { Player, EventRouter, Vector3, PlayerUI, PlayerCameraMode, Audio, SceneUI, PlayerUIEvent, ChatEvent } from 'hytopia';
 import { Team } from './Team';
 import { PlayerEvents, type PlayerDeathEventPayload } from './events';
 import { PlayerEntity } from 'hytopia';
 import AbilityEntityController from './AbilityEntityController';
 
 import { DamageableEntity } from './DamageableEntity';
-import { world } from './GlobalContext';
+import { world, sendChatMessage, sendPlayerChatMessage } from './GlobalContext';
 import { RespawnSystem } from './RespawnSystem';
 import { GameState } from './GameState';
-import { GameStateController } from './GameStateController';
+import { GameStateController, GameStateEvent } from './GameStateController';
 import { GameModeController } from './GameModeController';
 import { KingOfTheHill } from './GameModeController';
 import { GameSFX } from './sfx';
@@ -39,7 +39,7 @@ export class GameManager {
 
 
     constructor(private readonly worldEventRouter: EventRouter) {
-        this.gameStateController = new GameStateController(worldEventRouter);
+        this.gameStateController = new GameStateController();
         this.initGame();
         this.startGameLoop();
         this.setupEventListeners();
@@ -50,9 +50,11 @@ export class GameManager {
 
         // Initialize game mode
         this.gameModeController = new KingOfTheHill(this, this.worldEventRouter);
+		
+	
 
         // respawn system
-        new RespawnSystem(world.eventRouter);
+        new RespawnSystem(world);
 
         this.playSongMusic();
     }
@@ -70,34 +72,48 @@ export class GameManager {
 
     private setupEventListeners() {
     
-        this.worldEventRouter.on('GAME_STATE_CHANGED', (newState: GameState) => {
+        world.on(GameStateEvent.GAME_STATE_CHANGED, (newState: GameState) => {
             console.log(`GAME_STATE_CHANGED ${newState}!`);
             
             this.updatePlayerUI();
             this.handleGameStateChange(newState);
         });
 
-        this.worldEventRouter.on('POINT_CAPTURED', (team: Team | null) => {
+        world.on(GameStateEvent.POINT_CAPTURED, (team: Team | null) => {
             this.handlePointCapture(team);
         });
 
-        this.worldEventRouter.on('MATCH_COUNTDOWN_UPDATE', (timeLeft: number) => {
+		world.on(GameStateEvent.MATCH_COUNTDOWN_UPDATE, (timeLeft: number) => {
             this.updatePlayerUI();
         });
 
-        this.worldEventRouter.on('MATCH_TIME_UPDATE', (timeLeft: number) => {
+        world.on(GameStateEvent.MATCH_TIME_UPDATE, (timeLeft: number) => {
             this.updatePlayerUI();
         });
 
-        world?.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
+        world?.on(PlayerEvents.Death, (payload: PlayerDeathEventPayload) => {
             payload.victim.matchStats.addDeath();
 
             if (payload.killer) {
                 if (payload.killer === payload.victim) {
                     payload.victim.matchStats.addSuicide();
+                    // Broadcast suicide message
+                    sendChatMessage(`${payload.victim.player.username} died by their own hand!`, "FF0000");
                 } else {
                     payload.killer.matchStats.addKill();
+                    // Get team colors without # symbol
+                    const killerTeam = this.getPlayerTeam(payload.killer.player);
+                    const victimTeam = this.getPlayerTeam(payload.victim.player);
+                    
+                    // Broadcast kill message
+                    sendChatMessage(
+                        `${payload.killer.player.username} eliminated ${payload.victim.player.username}!`,
+                        killerTeam?.color?.startsWith('#') ? killerTeam.color.substring(1) : killerTeam?.color
+                    );
                 }
+            } else {
+                // Environmental death
+                sendChatMessage(`${payload.victim.player.username} died mysteriously!`, "FF9900");
             }
 
             setTimeout(() => {
@@ -106,6 +122,24 @@ export class GameManager {
 
             this.updateStatsUI();
         });
+        
+        // Listen for chat messages if chatManager is available
+        if (world.chatManager) {
+            // Use any type for now to bypass type checking until we can properly define the event types
+            world.chatManager.on(ChatEvent.BROADCAST_MESSAGE as any, (payload: any) => {
+                // Log chat messages to console for monitoring
+                if (payload.player) {
+                    console.log(`[CHAT] ${payload.player.username}: ${payload.message}`);
+                    
+                    // Auto-respond to "hello" with a greeting - use correct color format
+                    if (payload.message.toLowerCase().includes('hello') || payload.message.toLowerCase().includes('hi')) {
+                        setTimeout(() => {
+                            sendPlayerChatMessage(payload.player, `Hello, ${payload.player.username}! How are you doing?`, "00FFFF");
+                        }, 500);
+                    }
+                }
+            });
+        }
     }
 
 
@@ -176,29 +210,32 @@ export class GameManager {
 
         console.log('InitPlayerEntity ' + player.username);
         const team = this.assignPlayerToTeam(player);
-        this.worldEventRouter.emit('PLAYER_ASSIGNED', { player, team });
-        
-        
+
         // Create entity controller first
         const entityController = new AbilityEntityController();
 
         const playerModel = team.name === 'Red' ? 'models/players/red_player.gltf' : 'models/players/blue_player.gltf';
+
 
         // Create player entity with controller
         const playerEntity = new DamageableEntity({
             player,
             name: 'Player',
             modelUri: playerModel,
-        
             modelLoopedAnimations: ['idle'],
             modelScale: 0.56,
             controller: entityController, // Use the entity controller
+			hideNameplate: true
         }, 100, 100, 100);
+
 
         // Get spawn position based on team
         const spawnPosition = this.getTeamSpawnPosition(team.name);
-        playerEntity.spawn(world, spawnPosition);
+		playerEntity.spawn(world, spawnPosition);
         
+		console.log('playerEntity', playerEntity.position);
+
+
         // Set initial class
         entityController.setClass('wizard');
 		// Initialize player UI data
@@ -215,15 +252,28 @@ export class GameManager {
         // Add to player map
         this.addPlayer(player, playerEntity);
 
-        this.worldEventRouter.emit('PLAYER.CREATED', playerEntity);
+        // Welcome message
+        sendPlayerChatMessage(player, `Welcome to the game, ${player.username}!`);
+        
+        // Team message with proper color format
+        const formattedTeamColor = team.color?.startsWith('#') ? team.color.substring(1) : team.color;
+        sendPlayerChatMessage(player, `You've been assigned to the ${team.name} team.`, formattedTeamColor);
+        
+        // Help message with proper color format
+        sendPlayerChatMessage(player, "Press C while in the spawn area to change your class.", "FFCC00");
+
+        // Register chat commands if world.chatManager is initialized
+        this.registerChatCommands();
+
+        //this.worldEventRouter.emit('PLAYER.CREATED', playerEntity);
 
         // Updated UI handler
-        playerEntity.player.ui.onData = (playerUI: PlayerUI, data: Record<string, any>) => {
+        playerEntity.player.ui.on(PlayerUIEvent.DATA, (payload: { playerUI: PlayerUI, data: Record<string, any> }) => {
             //console.log('Got data from player UI:', data);
 
-            if (data.type === 'PLAYER_READY') {
+            if (payload.data.type === 'PLAYER_READY') {
                 this.setPlayerReady(player.id, true);
-                playerUI.sendData({
+                payload.playerUI.sendData({
                     type: 'gameStateUpdate',
                     state: this.gameStateController.getState(),
                     message: this.gameStateController.getStateMessage(),
@@ -232,19 +282,57 @@ export class GameManager {
             }
   
             // Add proper CLASS_CHANGE handler
-            if (data.type === 'CLASS_CHANGE') {
-                this.handleClassChange(player, data.className);
+            if (payload.data.type === 'CLASS_CHANGE') {
+                this.handleClassChange(player, payload.data.className);
             }
 
-            if (data.type === 'TOGGLE_POINTER_LOCK') {
-                playerUI.lockPointer(!data.enabled);
+            if (payload.data.type === 'TOGGLE_POINTER_LOCK') {
+                payload.playerUI.lockPointer(!payload.data.enabled);
             }
 
-            if (data.type === 'MENU_SYSTEM_READY') {
+            if (payload.data.type === 'MENU_SYSTEM_READY') {
                 console.log('InitUI: Initializing client-side menu system');
                //this.menuSystem.initializeOnClient(data.containerId);
             }
-        };
+        });
+    }
+
+    private registerChatCommands() {
+        if (!world || !world.chatManager) {
+            console.warn("Cannot register chat commands: world.chatManager is not available");
+            return;
+        }
+
+        // Help command
+        world.chatManager.registerCommand('/help', (player, args, message) => {
+            sendPlayerChatMessage(player, "Available commands:", "FFFFFF");
+            sendPlayerChatMessage(player, "/help - Shows this help message", "CCCCCC");
+            sendPlayerChatMessage(player, "/stats - Shows your current match stats", "CCCCCC");
+            sendPlayerChatMessage(player, "/team - Shows your team information", "CCCCCC");
+        });
+
+        // Stats command
+        world.chatManager.registerCommand('/stats', (player, args, message) => {
+            const entity = this.getPlayerEntity(player.id);
+            if (entity) {
+                const stats = entity.matchStats;
+                sendPlayerChatMessage(player, `Your stats: Kills: ${stats.kills}, Deaths: ${stats.deaths}`, "00FFFF");
+            }
+        });
+
+        // Team command
+        world.chatManager.registerCommand('/team', (player, args, message) => {
+            const team = this.getPlayerTeam(player);
+            if (team) {
+                // Ensure color is formatted correctly without #
+                const formattedColor = team.color?.startsWith('#') ? team.color.substring(1) : team.color;
+                sendPlayerChatMessage(player, `You are on the ${team.name} team with ${team.players.length} players.`, formattedColor);
+                const teammates = team.players.filter(p => p.id !== player.id).map(p => p.username).join(", ");
+                if (teammates) {
+                    sendPlayerChatMessage(player, `Your teammates: ${teammates}`, "FFFFFF");
+                }
+            }
+        });
     }
 
     public InitUI(entity: PlayerEntity) {
@@ -267,7 +355,9 @@ export class GameManager {
                 health: 100,
                 teamColor: teamColor,
                 playerId: entity.player.id
-            }
+            
+			},
+			viewDistance: 7
         });
 
         nameplateUI.load(world);
@@ -284,7 +374,7 @@ export class GameManager {
         entity.player.camera.setForwardOffset(-2.5)
         entity.player.camera.setOffset({ x: 0, y: 0.8, z: 0 });
         entity.player.camera.setZoom(1.3);
-        entity.player.camera.setFov(75 );
+        entity.player.camera.setFov(80 );
     }
 
     public assignPlayerToTeam(player: Player): Team {
@@ -415,6 +505,9 @@ export class GameManager {
         const entity = this.players.get(player.id);
         if (entity?.controller instanceof AbilityEntityController) {
             entity.controller.setClass(className);
+            
+            // Send chat message about class change - use proper color format without #
+            sendPlayerChatMessage(player, `You've changed to the ${className} class!`, '00FF00');
         }
     }
 
@@ -441,22 +534,33 @@ export class GameManager {
         switch (newState) {
             case GameState.MatchStartCountdown:
                 this.playGameSound(GameSFX.COUNTDOWN);
+                sendChatMessage("Match countdown started!", "FFFF00");
                 break;
             case GameState.MatchStats:
                 this.playSongMusic();
+                sendChatMessage("Viewing match stats...");
                 break;
             case GameState.MatchPlay:
                 this.playSongBattleMusic();
                 this.playGameSound(GameSFX.MATCH_START);
+                sendChatMessage("Match has begun!", "00FF00");
                 break;
             case GameState.MatchEnd:
                 this.playGameSound(GameSFX.MATCH_END);
+                sendChatMessage("Match has ended!", "FF9900");
                 break;
         }
     }
 
     public handlePointCapture(team: Team | null) {
         this.playGameSound(GameSFX.POINT_CAPTURE);
+        if (team) {
+            // Make sure the color is properly formatted without the # symbol
+            const formattedColor = team.color?.startsWith('#') ? team.color.substring(1) : team.color;
+            sendChatMessage(`${team.name} team has captured the point!`, formattedColor);
+        } else {
+            sendChatMessage("The capture point has been neutralized!");
+        }
     }
 
     

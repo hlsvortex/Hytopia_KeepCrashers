@@ -5,7 +5,7 @@ import { Light } from 'hytopia';
 import { Team } from './Team';
 import { GameState } from './GameState';
 import { world } from './GlobalContext';
-
+import { GameStateEvent } from './GameStateController';
 export class KOTHLevelController extends LevelObjectsController {
     private keepLight: Light;
     private doors: Entity[] = [];
@@ -16,11 +16,11 @@ export class KOTHLevelController extends LevelObjectsController {
         this.keepLight = new Light({
             position: new Vector3(0, 4.1, 0),
             color: { r: 255, g: 255, b: 255 },
-            intensity: 15,
-            distance: 12,
+            intensity: 16,
+            distance: 17,
         });
 
-        world.eventRouter.on('GAME_STATE_CHANGED', (newState: GameState) => {
+        world.on(GameStateEvent.GAME_STATE_CHANGED, (newState: GameState) => {
 
             if (newState === GameState.MatchStats) {
                 this.setupDoors(world);
@@ -33,7 +33,7 @@ export class KOTHLevelController extends LevelObjectsController {
             
         });
 
-        world.eventRouter.on('POINT_CAPTURED', (team: Team | null) => {
+        world.on(GameStateEvent.POINT_CAPTURED, (team: Team | null) => {
             this.updateKeepLightColor(team);
         });
     }

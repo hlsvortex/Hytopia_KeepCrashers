@@ -1,16 +1,19 @@
 import { PlayerEvents, type PlayerDeathEventPayload, type PlayerRespawnEventPayload } from './events';
 
-import { EventRouter, Player } from 'hytopia';
+import { EventRouter, Player, World } from 'hytopia';
+import { world } from './GlobalContext';
+
+
 
 export class RespawnSystem {
     private respawnTimers: Map<string, Timer> = new Map();
 
-    constructor(private eventRouter: EventRouter) {
+    constructor(private world: World) {
         this.setupListeners();
     }
 
     private setupListeners() {
-        this.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
+		world.on(PlayerEvents.Death, (payload: PlayerDeathEventPayload) => {
             this.handlePlayerDeath(payload);
         });
     }
@@ -33,7 +36,7 @@ export class RespawnSystem {
     }
 
     private respawnPlayer(player: Player ) {
-        this.eventRouter.emit<PlayerRespawnEventPayload>(PlayerEvents.Respawn, {
+        world.emit(PlayerEvents.Respawn, { 
             player,
             respawnTime: Date.now()
         });

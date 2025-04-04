@@ -1,11 +1,3 @@
-/* Hide default UI elements */
-#chat-window {
-    display: none !important;
-}
-
-div[style="z-index: 10000"] {
-    display: none !important;
-}
 
 
 

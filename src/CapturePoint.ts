@@ -1,7 +1,8 @@
-import { Entity, Vector3, World, Collider, ColliderShape, EventRouter, RigidBodyType, BlockType } from 'hytopia';
+import { Entity, Vector3, World, Collider, ColliderShape, EventRouter, RigidBodyType, BlockType, CollisionGroup } from 'hytopia';
 import { Team } from './Team';
 import { DamageableEntity } from './DamageableEntity';
 import { gameManager, world } from './GlobalContext';
+import { GameStateEvent } from './GameStateController';
 
 export class CapturePoint {
     public progress: number = 0;
@@ -9,7 +10,7 @@ export class CapturePoint {
     public partialControlTeam: Team | null = null;
     private playersOnPoint: Set<DamageableEntity> = new Set();
     private collider: Collider;
-    private entityModel: Entity;
+    //private entityModel: Entity;
     public onCaptured: (team: Team) => void = () => {};
 
     constructor(
@@ -23,12 +24,15 @@ export class CapturePoint {
 
         //world.simulation.enableDebugRendering(true);
         //world.simulation.enableDebugRendering(true);
-        this.entityModel = new Entity({
+        /*
+		this.entityModel = new Entity({
             name: 'Capture Point',
             modelUri: 'models/structures/capture-point.gltf',
             modelScale: 7,
+			
             rigidBodyOptions: {
                 type: RigidBodyType.FIXED,
+				
                 colliders: [ // Array of collider options, results in a created collider when spawned
                     {
                         shape: ColliderShape.ROUND_CYLINDER,
@@ -37,19 +41,31 @@ export class CapturePoint {
                         radius: 3,
                         mass: 1, // if not provided, automatically calculated based on shape volume.
                         bounciness: -0, // very bouncy!
-                        relativePosition: { x: 0, y: -0.05, z: 0 } // acts like an offset relative to the parent. 
+                        relativePosition: { x: 0, y: -0.05, z: 0 }, // acts like an offset relative to the parent. 
+						isSensor: true,
+						collisionGroups: {
+							belongsTo: [CollisionGroup.GROUP_6],
+							collidesWith: [CollisionGroup.GROUP_12],
+						},
                     },
+					
                 ]
             }
 
         });
+		
+		
+		this.entityModel.setCollisionGroupsForSensorColliders({
+			belongsTo: [CollisionGroup.ENTITY_SENSOR],
+			collidesWith: [CollisionGroup.GROUP_12],
+		});
 
         this.entityModel.spawn(world, this.position);
-
+*/
         // Create capture zone collider
         this.collider = new Collider({
             shape: ColliderShape.BLOCK,
-            halfExtents: { x: 8, y: 3, z: 6 },
+            halfExtents: { x: 8, y: 3, z: 8 },
             isSensor: true,
             // When not a child of rigid body,
             // relative position is relative to the world, 
@@ -85,7 +101,7 @@ export class CapturePoint {
     }
 
     private pointCaptureEvent(team: Team | null) {
-        world.eventRouter.emit('POINT_CAPTURED', team);
+        world.emit(GameStateEvent.POINT_CAPTURED, team);
     }
 
     update(deltaTime: number) {

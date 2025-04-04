@@ -1,8 +1,18 @@
-import { EventRouter } from 'hytopia';
+import { EventRouter, Player, PlayerEvent, World } from 'hytopia';
 import { GameState } from './GameState';
 import type { GameStateUpdate } from './GameState';
 import { gameManager } from './GlobalContext';
+import { world } from './GlobalContext';
 
+export enum GameStateEvent {
+	GAME_STATE_CHANGED = 'GAME_STATE_CHANGED',
+	MATCH_COUNTDOWN_UPDATE = 'MATCH_COUNTDOWN_UPDATE',
+	PLAYER_READY_UPDATE = 'PLAYER_READY_UPDATE',
+	MATCH_END = 'MATCH_END',
+	MATCH_STATS = 'MATCH_STATS',
+	POINT_CAPTURED = 'POINT_CAPTURED',
+	MATCH_TIME_UPDATE = 'MATCH_TIME_UPDATE',
+}
 
 export class GameStateController {
     private currentState: GameState = GameState.WaitingForEnoughPlayers;
@@ -12,11 +22,10 @@ export class GameStateController {
     private minPlayers: number = 2;
     private currentPlayers: number = 0;
 
-
-    constructor(private eventRouter: EventRouter) 
+	
+    constructor() 
     {
-
-      
+		//GameStateController.eventRouter.emit(GameStateEvent.WAITING_FOR_ENOUGH_PLAYERS, { player: { id: 'test' }, world: world });
     }
 
     public update(currentPlayerCount: number) {
@@ -46,11 +55,12 @@ export class GameStateController {
                 console.log(`Match start countdown ${this.matchStartTimer}`);
 
                 this.matchStartTimer--;
-                this.eventRouter.emit('MATCH_COUNTDOWN_UPDATE', this.matchStartTimer);
+				world.emit(GameStateEvent.MATCH_COUNTDOWN_UPDATE, this.matchStartTimer);
              
                 if (this.matchStartTimer <= 0) {
                     this.setState(GameState.MatchPlay);
                 }
+
                 break;
 
             case GameState.MatchPlay:
@@ -64,7 +74,7 @@ export class GameStateController {
 
     public setState(newState: GameState) {
         this.currentState = newState;
-        this.eventRouter.emit('GAME_STATE_CHANGED', newState);
+		world.emit(GameStateEvent.GAME_STATE_CHANGED, newState);
         //gameManager.handleGameStateChange(newState);
 
         // Handle state transitions
@@ -99,7 +109,8 @@ export class GameStateController {
         } else {
             this.readyPlayers.delete(playerId);
         }
-        this.eventRouter.emit('PLAYER_READY_UPDATE', { playerId, isReady });
+
+		world.emit(GameStateEvent.PLAYER_READY_UPDATE, { playerId, isReady });
     }
 
     public getStateUpdate(playerId?: string): GameStateUpdate {

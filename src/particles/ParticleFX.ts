@@ -1,8 +1,9 @@
 import { type RgbColor } from "hytopia";
-import { type EmitterOptions } from "./ParticleEmitter";
+import type { EmitterOptions } from "./ParticleEmitter";
 
 export const ParticleFX = {
     BLOODHIT: {
+        name: 'BLOODHIT',
         count: 6,
         speed: 1.5,
         spawnOptions: {
@@ -22,6 +23,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     EXPLOSION: {
+        name: 'EXPLOSION',
         count: 15,
         speed: 1.5,
         spawnOptions: {
@@ -42,6 +44,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
 	EXPLOSION_SMALL: {
+        name: 'EXPLOSION_SMALL',
 		count: 10,
 		speed: 1.5,
 		spawnOptions: {
@@ -63,6 +66,7 @@ export const ParticleFX = {
 
 
     FIREHIT: {
+        name: 'FIREHIT',
         count: 4,
         speed: 1,
         spawnOptions: {
@@ -82,6 +86,7 @@ export const ParticleFX = {
         }
     } satisfies EmitterOptions,    
     DUST: {
+        name: 'DUST',
         count: 10,
         speed: 3,
         particleOptions: {
@@ -94,6 +99,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     CLOUD_PUFF: {
+        name: 'CLOUD_PUFF',
         count: 10,
         speed: 0.5,
         spawnOptions: {
@@ -115,6 +121,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     FOUNTAIN: {
+        name: 'FOUNTAIN',
         count: 20,
         speed: 5,
         spawnOptions: {

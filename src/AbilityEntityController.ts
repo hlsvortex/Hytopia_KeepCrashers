@@ -19,7 +19,23 @@ import { AbilityController } from './AbilityController';
 import { ArcherAbilityController } from './player_classes/ArcherAbilityController';
 import { WizardAbilityController } from './player_classes/WizardAbilityController';
 import { FighterAbilityController } from './player_classes/FighterAbilityController';
+import type { GameStateEvent } from './GameStateController';
+import type { Team } from './Team';
+import type { GameState } from './GameState';
 
+
+declare module 'hytopia' {
+	// Augment the base EventPayloads interface directly
+	interface EventPayloads {
+		// Add your custom events using ENUM MEMBERS as keys
+		[GameStateEvent.GAME_STATE_CHANGED]: GameState;
+		[GameStateEvent.POINT_CAPTURED]: Team | null;
+		[GameStateEvent.MATCH_COUNTDOWN_UPDATE]: number;
+		[GameStateEvent.MATCH_TIME_UPDATE]: number;
+		[PlayerEvents.Death]: PlayerDeathEventPayload;
+		[PlayerEvents.Respawn]: PlayerRespawnEventPayload;
+	}
+}
 
 export default class AbilityEntityController extends MyEntityController {
     private currentAbilityController: AbilityController;
@@ -28,24 +44,25 @@ export default class AbilityEntityController extends MyEntityController {
     
     constructor(options: MyEntityControllerOptions = {}) {
         super(options);
-        this.currentAbilityController = new WizardAbilityController(world.eventRouter); //new DefaultAbilityController(); // Fallback controller
+        this.currentAbilityController = new WizardAbilityController(world); //new DefaultAbilityController(); // Fallback controller
     }
 
 
     public attach(entity: Entity) {
+
         super.attach(entity);
         this.ownerEntity = entity as PlayerEntity;
         // Initialize the current controller with the entity
         this.currentAbilityController.attach(this.ownerEntity);
 
-        world?.eventRouter.on<PlayerDeathEventPayload>(PlayerEvents.Death, (payload) => {
+        world?.on(PlayerEvents.Death, (payload: PlayerDeathEventPayload) => {
             console.log('Player death event received' + payload.player);
             if (payload.player == this.ownerEntity?.player) {
                 this.pauseInput = true;
             }
         });
 
-        world?.eventRouter.on<PlayerRespawnEventPayload>(PlayerEvents.Respawn, (payload) => {
+        world?.on(PlayerEvents.Respawn, (payload: PlayerRespawnEventPayload) => {
             console.log('RESPAWNING' + payload.player);
             if (payload.player == this.ownerEntity?.player) {
                 this.pauseInput = false;
@@ -82,13 +99,13 @@ export default class AbilityEntityController extends MyEntityController {
         // Create new controller based on class name
         switch(className.toLowerCase()) {
             case 'wizard':
-                this.currentAbilityController = new WizardAbilityController(world.eventRouter);
+                this.currentAbilityController = new WizardAbilityController(world);
                 break;
             case 'fighter':
-                this.currentAbilityController = new FighterAbilityController(world.eventRouter);
+                this.currentAbilityController = new FighterAbilityController(world);
                 break;
             case 'archer':
-                this.currentAbilityController = new ArcherAbilityController(world.eventRouter);
+                this.currentAbilityController = new ArcherAbilityController(world);
                 break;
             default: return;
         }

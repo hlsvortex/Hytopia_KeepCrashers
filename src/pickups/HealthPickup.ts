@@ -1,4 +1,4 @@
-import { Entity, ColliderShape, RigidBodyType, Vector3, type RgbColor, CollisionGroup, BlockType, Audio } from 'hytopia';
+import { Entity, ColliderShape, RigidBodyType, Vector3, type RgbColor, CollisionGroup, BlockType, Audio, EntityEvent } from 'hytopia';
 import { DamageableEntity } from '../DamageableEntity';
 import { world } from '../GlobalContext';
 
@@ -137,8 +137,8 @@ export class HealthPickup {
         let time = 0;
 
         //setInterval(() => {
-        this.entity.onTick = (entity: Entity, deltaMs: number) => {
-            time += deltaMs / 1000;
+        this.entity.on(EntityEvent.TICK, (payload: { entity: Entity, tickDeltaMs: number }) => {
+            time += payload.tickDeltaMs / 1000;
             const newY = startY + Math.sin(time * 2) * 0.2;
 
             this.entity?.setPosition(new Vector3(
@@ -148,7 +148,7 @@ export class HealthPickup {
             ));
 
             this.entity?.setRotation({ x: 0, y: time * 2, z: 0, w: 1 });
-        };
+        });
     }
 
     public despawn() {

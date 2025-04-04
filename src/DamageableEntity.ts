@@ -1,4 +1,4 @@
-import { Entity, Light, PlayerEntity, SceneUI, Audio } from 'hytopia';
+import { Entity, Light, PlayerEntity, SceneUI, Audio, EntityEvent } from 'hytopia';
 import type { PlayerDeathEventPayload } from './events';
 import { PlayerEvents } from './events';
 import { PlayerMatchStats } from './PlayerMatchStats';
@@ -33,16 +33,18 @@ export class DamageableEntity extends PlayerEntity {
         }
     };
 
-    onTick = (entity: Entity, tickDeltaMs: number) => {
-        const currentTime = Date.now();
-        
-        if (currentTime - this.lastHeightDamageTime >= this.HEIGHT_DAMAGE_INTERVAL) {
-            if (entity.position.y <= 2.2) {
-                this.takeDamage(20);
-            }
-            this.lastHeightDamageTime = currentTime;
-        }
-    }
+	onTick = (payload: { entity: Entity; tickDeltaMs: number }) => {
+		
+		if (payload.entity.position.y > 2.2) {
+			return;
+		}
+		// Use payload.tickDeltaMs
+		const currentTime = Date.now();
+		if (currentTime - this.lastHeightDamageTime >= this.HEIGHT_DAMAGE_INTERVAL) {
+				this.takeDamage(25);
+			this.lastHeightDamageTime = currentTime;
+		}
+	}
 
     constructor(options: any, initialHealth: number = 100, initialStamina: number = 100, initialMana: number = 100) {
         super(options);
@@ -50,6 +52,13 @@ export class DamageableEntity extends PlayerEntity {
         this.health = initialHealth;
         this.stamina = initialStamina;
         this.mana = initialMana;
+
+		this.nametagSceneUI.setViewDistance(0);
+
+		this.on(EntityEvent.TICK, this.onTick);
+		
+
+		console.log('DamageableEntity constructor', options.player.id);
     }
 
     updateUI() {
@@ -94,7 +103,7 @@ export class DamageableEntity extends PlayerEntity {
 
         if (this.health <= 0) {
             if (this.world) {
-                this.world.eventRouter.emit<PlayerDeathEventPayload>(PlayerEvents.Death, {
+				this.world.emit( PlayerEvents.Death, { 
                     player: this.player,
                     deathTime: Date.now(),
                     victim: this,

@@ -1,9 +1,9 @@
 import type { BlockType, Entity, Player, Vector3Like } from "hytopia";
 import type { DamageableEntity } from "./DamageableEntity";
 
-export const PlayerEvents = {
-    Death: 'PLAYER.DEATH',
-    Respawn: 'PLAYER.RESPAWN'
+export enum PlayerEvents {
+    Death = 'PLAYER.DEATH',
+    Respawn = 'PLAYER.RESPAWN'
 };
 
 export interface PlayerDeathEventPayload {

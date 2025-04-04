@@ -87,7 +87,6 @@ export default class GameStatusPanel extends BasePanel {
                 display.style.display = 'none';
                 break;
               default:
-                window.menuSystem.openMenu(MenuType.HUD);
                 display.style.display = 'block';
             }
 

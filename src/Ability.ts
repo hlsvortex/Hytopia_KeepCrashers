@@ -21,6 +21,7 @@ export abstract class Ability {
     protected isCharging: boolean = false;
     protected lastUseTime: number = 0;
 
+    
     constructor(
         public options: AbilityOptions,
         protected eventRouter: EventRouter,

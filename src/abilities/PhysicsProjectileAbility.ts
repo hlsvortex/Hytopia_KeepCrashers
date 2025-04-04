@@ -1,9 +1,9 @@
-import { Entity, EventRouter, Vector3, type Vector3Like, RigidBodyType, ColliderShape, CollisionGroup, BlockType, type QuaternionLike, PlayerEntity } from 'hytopia';
+import { Entity, EventRouter, Vector3, type Vector3Like, RigidBodyType, ColliderShape, CollisionGroup, BlockType, type QuaternionLike, PlayerEntity, EntityEvent } from 'hytopia';
 import { Ability } from '../Ability';
 import { type PhysicsProjectileOptions } from './AbilityOptions';
 import { DamageableEntity } from '../DamageableEntity';
 import { faceDirection, getRotationFromDirection } from '../utils/math';
-import { world } from '../GlobalContext';
+import { world, particlePool } from '../GlobalContext';
 import { ParticleEmitter } from '../particles/ParticleEmitter';
 import { ParticleFX } from '../particles/ParticleFX';
 import { Collider } from 'hytopia';
@@ -92,7 +92,7 @@ export class PhysicsProjectileAbility extends Ability {
                 type: RigidBodyType.DYNAMIC,
                 linearVelocity: velocityVector,
                 gravityScale: gravityScale,
-                
+                ccdEnabled: true,
             },
 
         });
@@ -108,14 +108,14 @@ export class PhysicsProjectileAbility extends Ability {
         }
 
         
-        projectile.onTick = (entity: Entity, tickDeltaMs: number) => {
+        projectile.on(EntityEvent.TICK, (payload: { entity: Entity, tickDeltaMs: number }) => {
             // Custom tick handler if provided
             if (this.options.onProjectileTick) {
-                this.options.onProjectileTick(entity, tickDeltaMs);
+                this.options.onProjectileTick(payload.entity, payload.tickDeltaMs);
             }
 
             // Update age in seconds
-            age += tickDeltaMs / 1000;
+            age += payload.tickDeltaMs / 1000;
             
             if(this.options.velocityReverse  ) {
 
@@ -144,10 +144,10 @@ export class PhysicsProjectileAbility extends Ability {
 					
                 }
 
-				entity.setLinearVelocity(this.staticVelocity);
+				payload.entity.setLinearVelocity(this.staticVelocity);
             }
 
-           const currentVelocity = entity.linearVelocity;
+           const currentVelocity = payload.entity.linearVelocity;
 
 
             // Check if the projectile is moving (non-zero velocity)
@@ -163,20 +163,36 @@ export class PhysicsProjectileAbility extends Ability {
             if (age >= maxLifetime) {
                 this.projectileEnd(projectile, source);
             }
-        };
+        });	
 
         // Calculate scaled radius independently
         const baseRadius = this.options.projectileRadius;
         const scaleFactor = size > 0 ? (1 + size/this.options.modelScale) : 1;
         const finalRadius = baseRadius * scaleFactor;
 
+        // Determine collider extents - use custom values if provided, otherwise use the radius
+        const halfExtents = {
+            x: this.options.boxColliderExtents?.x !== undefined 
+                ? this.options.boxColliderExtents.x * scaleFactor 
+                : finalRadius,
+            y: this.options.boxColliderExtents?.y !== undefined 
+                ? this.options.boxColliderExtents.y * scaleFactor 
+                : finalRadius,
+            z: this.options.boxColliderExtents?.z !== undefined 
+                ? this.options.boxColliderExtents.z * scaleFactor 
+                : finalRadius
+        };
+
+        // Log collider dimensions for debugging
+        console.log(`Creating projectile collider with extents: x=${halfExtents.x}, y=${halfExtents.y}, z=${halfExtents.z}`);
+
         projectile.createAndAddChildCollider({
-            shape: ColliderShape.BALL,
-            radius: finalRadius,
+            shape: ColliderShape.BLOCK,
+            halfExtents: halfExtents,
             isSensor: this.options.isSensor ?? false,
             friction: 0.1,
             bounciness: 1,
-            
+			
 
             collisionGroups: {
                 belongsTo: [CollisionGroup.ENTITY],
@@ -186,7 +202,22 @@ export class PhysicsProjectileAbility extends Ability {
             onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
                 if (!started) return;
                 if (otherEntity == source) return;
-                
+				
+				// console.log(`Projectile collided with: ${otherEntity.name}`);
+
+                if (otherEntity instanceof BlockType) {
+                    const collisionPos = projectile.position; // Get projectile world position at collision
+                    
+                    // Calculate integer block coordinates using Math.floor
+                    const blockX = Math.floor(collisionPos?.x ?? 0);
+                    const blockY = Math.floor(collisionPos?.y ?? 0);
+                    const blockZ = Math.floor(collisionPos?.z ?? 0);
+
+                    // Log both world and block coordinates
+                    console.log(`Projectile collided with BlockType`);
+                    console.log(`  World Coords: X=${collisionPos?.x?.toFixed(2) ?? 'N/A'}, Y=${collisionPos?.y?.toFixed(2) ?? 'N/A'}, Z=${collisionPos?.z?.toFixed(2) ?? 'N/A'}`);
+                    console.log(`  Block Coords: iX=${blockX}, iY=${blockY}, iZ=${blockZ}`);
+                }
 
                 if (this.options.noHitOnBlockCollision && otherEntity instanceof BlockType) {
                     return;
@@ -196,15 +227,23 @@ export class PhysicsProjectileAbility extends Ability {
                     return;
                 }
 
+
+		
+
                 if (this.options.onCollision) {
                     this.options.onCollision(source, otherEntity);
                 }
                 else if (otherEntity instanceof DamageableEntity && !otherEntity.isDead()) {
 
                     otherEntity.takeDamage(damage, source as DamageableEntity);
-                    otherEntity.applyImpulse(velocityVector.scale(this.options.knockback));
+                    
+					console.log(`Knockback: ${this.options.knockback}`);
+					console.log(`Velocity Vector: ${velocityVector}`);
+
+					otherEntity.applyImpulse(velocityVector.scale(this.options.knockback));
+
                     if (otherEntity instanceof DamageableEntity) {
-                        this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), otherEntity.position as Vector3);
+                        particlePool.getParticleEmitter(ParticleFX.BLOODHIT, otherEntity.position as Vector3);
                     }   
 
 
@@ -226,6 +265,7 @@ export class PhysicsProjectileAbility extends Ability {
                 else {
                     this.hitABlock = true;
                     
+					
 					if (!this.options.multiHit || this.options.destroyOnBlockCollision) {
                         this.projectileEnd(projectile, source);
                     }
@@ -233,13 +273,14 @@ export class PhysicsProjectileAbility extends Ability {
 
                 }
                     
-                world.eventRouter.emit('ProjectileHit', {
+				/*
+                world.emit('ProjectileHit', {
                     type: source.name,
                     source,
                     target: otherEntity instanceof Entity ? otherEntity : undefined,
                     damage: this.options.damage
                 });
-                
+                */
                 //projectile.despawn();
             }
         });
@@ -261,7 +302,7 @@ export class PhysicsProjectileAbility extends Ability {
 
 
         if (this.options.useFX) {
-            this.spawnEffect(new ParticleEmitter(this.options.useFX), origin);
+            particlePool.getParticleEmitter(this.options.useFX, origin);
         }
 
         this.playUseSound(source);
@@ -281,12 +322,14 @@ export class PhysicsProjectileAbility extends Ability {
 
         // Visual effects
         if (this.options.hitFX) {
-            this.spawnEffect(new ParticleEmitter(this.options.hitFX), projectile.position as Vector3);
+            particlePool.getParticleEmitter(this.options.hitFX, projectile.position as Vector3);
         }
 
         this.playHitSound(projectile.position);
         
-        projectile.despawn();
+		if (projectile !== undefined && projectile.isSpawned) {
+			projectile.despawn();
+		}
     }
 
     private handleAOEDamage(position: Vector3Like, source: DamageableEntity) {
@@ -299,35 +342,35 @@ export class PhysicsProjectileAbility extends Ability {
             radius: this.options.aoe.radius,
             isSensor: true,
             relativePosition: position,
-            onCollision: (other: Entity | BlockType, started: boolean) => {
+            onCollision: (otherEntity: Entity | BlockType, started: boolean) => {
                 if (!started) return;
 
                 // Skip if not a damageable entity or already dead
-                if (!(other instanceof DamageableEntity) || other.isDead()) return;
+                if (!(otherEntity instanceof DamageableEntity) || otherEntity.isDead()) return;
 
                 let damage = this.options.aoe!.damage;
                 let knockback = this.options.aoe!.knockback ?? 0;
 
                 if (this.options.aoe!.falloff) {
                     // Calculate distance-based falloff
-                    const distance = Vector3.fromVector3Like(position).distance(Vector3.fromVector3Like(other.position));
+                    const distance = Vector3.fromVector3Like(position).distance(Vector3.fromVector3Like(otherEntity.position));
                     const falloffFactor = 1 - (distance / this.options.aoe!.radius);
                     damage *= Math.max(0, falloffFactor); // Ensure non-negative
                     knockback *= falloffFactor;
                 }
 
                 // Apply damage and knockback
-                other.takeDamage(damage, source);
+                otherEntity.takeDamage(damage, source);
                 
-                if (other instanceof DamageableEntity) {
-                    this.spawnEffect(new ParticleEmitter(ParticleFX.BLOODHIT), other.position as Vector3);
+                if (otherEntity instanceof DamageableEntity) {
+                    particlePool.getParticleEmitter(ParticleFX.BLOODHIT, otherEntity.position as Vector3);
                 }   
 
                 if (knockback > 0) {
-                    const direction = Vector3.fromVector3Like(other.position)
+                    const direction = Vector3.fromVector3Like(otherEntity.position)
                         .subtract(Vector3.fromVector3Like(position))
                         .normalize();
-                    other.applyImpulse(direction.scale(knockback));
+                    otherEntity.applyImpulse(direction.scale(knockback));
                 }
             }
         });
@@ -340,15 +383,6 @@ export class PhysicsProjectileAbility extends Ability {
             aoeCollider.removeFromSimulation();
         }, 100); // 100ms should be enough to detect all collisions
     }
-
-    public spawnEffect(effect: ParticleEmitter, position: Vector3Like) {
-        
-        effect.spawn(world, position);
-        effect.burst();
-
-        //(() => effect.destroy(), effect.particleOptions.lifetime * 1000);
-    }
-
 
     private getChargedValues(chargeLevel: number) {
         let speed = this.options.speed;
